@@ -1,0 +1,47 @@
+{
+  "discovery": {
+    "mdns": {
+      "mode": "minimal"
+    }
+  },
+  "logging": {
+    "redactSensitive": "tools"
+  },
+  "session": {
+    "dmScope": "per-channel-peer"
+  },
+  "agents": {
+    "defaults": {
+      "sandbox": {
+        "mode": "all",
+        "scope": "session",
+        "workspaceAccess": "rw",
+        "workspaceRoot": "~/.openclaw/sandboxes",
+        "docker": {
+          "image": "openclaw-sandbox:bookworm-slim",
+          "workdir": "/workspace",
+          "readOnlyRoot": true,
+          "tmpfs": ["/tmp", "/var/tmp", "/run"],
+          "network": "none",
+          "user": "1000:1000",
+          "capDrop": ["ALL"],
+          "pidsLimit": 256,
+          "memory": "1g",
+          "memorySwap": "2g",
+          "cpus": 1,
+          "ulimits": {
+            "nofile": { "soft": 1024, "hard": 2048 },
+            "nproc": 256
+          },
+          "env": {
+            "LANG": "C.UTF-8"
+          }
+        },
+        "prune": {
+          "idleHours": 24,
+          "maxAgeDays": 7
+        }
+      }
+    }
+  }
+}
