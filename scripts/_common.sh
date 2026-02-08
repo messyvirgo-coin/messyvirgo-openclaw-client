@@ -16,9 +16,44 @@ require_cmd() {
   command -v "$1" >/dev/null 2>&1 || die "Missing dependency: $1"
 }
 
+compose_base() {
+  docker compose -f "$ROOT_DIR/docker-compose.yml" -f "$ROOT_DIR/docker-compose.secure.yml" "$@"
+}
+
+compose_linux_hostnet() {
+  docker compose \
+    -f "$ROOT_DIR/docker-compose.yml" \
+    -f "$ROOT_DIR/docker-compose.secure.yml" \
+    -f "$ROOT_DIR/docker-compose.linux-hostnet.yml" \
+    "$@"
+}
+
+compose_project_name() {
+  # Default Compose project name is the directory name.
+  basename "$ROOT_DIR"
+}
+
+is_gateway_hostnet_running() {
+  # True if gateway container exists and runs with network_mode=host.
+  local proj cid
+  proj="$(compose_project_name)"
+  cid="$(docker ps -a \
+    --filter "label=com.docker.compose.project=${proj}" \
+    --filter "label=com.docker.compose.service=openclaw-gateway" \
+    -q | head -n 1 || true)"
+  if [[ -z "${cid:-}" ]]; then
+    return 1
+  fi
+  [[ "$(docker inspect -f '{{.HostConfig.NetworkMode}}' "$cid" 2>/dev/null || true)" == "host" ]]
+}
+
 compose() {
-  # shellcheck disable=SC2068
-  docker compose -f "$ROOT_DIR/docker-compose.yml" -f "$ROOT_DIR/docker-compose.secure.yml" ${@}
+  # Auto-select the right compose stack.
+  if ! is_macos && [[ -f "$ROOT_DIR/docker-compose.linux-hostnet.yml" ]] && is_gateway_hostnet_running; then
+    compose_linux_hostnet "$@"
+  else
+    compose_base "$@"
+  fi
 }
 
 load_env() {

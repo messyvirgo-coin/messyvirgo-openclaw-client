@@ -1,0 +1,8 @@
+.env
+.env.*
+
+# Local clones/build artifacts (created by scripts/setup.sh)
+.openclaw-src/
+
+# OS/editor noise
+.DS_Store

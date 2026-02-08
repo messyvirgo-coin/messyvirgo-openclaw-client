@@ -29,9 +29,19 @@ This repo is a **wrapper** that runs OpenClaw **fully in Docker** with a **local
 # Run OpenClaw CLI commands
 ./scripts/cli.sh status
 ./scripts/cli.sh dashboard --no-open
+
+# Interactive CLI shell (run multiple commands)
+./scripts/cli-shell.sh
 ```
 
 More checklists: `[docs/VERIFY.md](docs/VERIFY.md)`
+
+Linux note: if `./scripts/up.sh` fails with a port bind error even though the port is free, use:
+
+```bash
+./scripts/up.sh
+./scripts/cli.sh health --json
+```
 
 ## Security model (short)
 

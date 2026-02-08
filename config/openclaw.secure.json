@@ -13,7 +13,7 @@
   "agents": {
     "defaults": {
       "sandbox": {
-        "mode": "all",
+        "mode": "off",
         "scope": "session",
         "workspaceAccess": "rw",
         "workspaceRoot": "~/.openclaw/sandboxes",

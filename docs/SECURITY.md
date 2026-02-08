@@ -18,6 +18,18 @@
 - If you set the workspace to your real project folder, OpenClaw can of course read/write **everything in that folder**.
 - If you enable channels (Telegram/WhatsApp/etc.), input comes from outside → **prompt-injection risk** stays real.
 
+### Note about OpenClaw \"tool sandboxing\" in this Docker setup
+
+OpenClaw's built-in tool sandboxing uses Docker to spawn sandbox containers **from the Gateway host**.
+When the Gateway itself runs inside Docker (this repo), giving it access to Docker (e.g. mounting `/var/run/docker.sock`)
+would effectively grant it high-privilege control over your host.
+
+For that reason, this wrapper defaults to **sandboxing = off** and relies on:
+
+- container isolation + hardening (read-only rootfs, dropped caps, no-new-privileges)
+- a single, explicit RW workspace mount
+- localhost-only dashboard exposure
+
 ### Best practices (recommended)
 
 - Use a **dedicated workspace folder** (e.g. `~/OpenClawWorkspace`) and copy only what you need into it.

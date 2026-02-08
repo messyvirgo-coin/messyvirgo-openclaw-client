@@ -17,14 +17,14 @@ services:
       - no-new-privileges:true
 
     # Reasonable resource limits (tune if needed)
-    pids_limit: 512
+    pids_limit: 4096
     mem_limit: 4g
     cpus: 2.0
     ulimits:
       nofile:
         soft: 4096
         hard: 8192
-      nproc: 512
+      nproc: 4096
 
   openclaw-cli:
     read_only: true
