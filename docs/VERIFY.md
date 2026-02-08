@@ -1,6 +1,6 @@
 # Verify the setup (quick checklist)
 
-## 1) Confirm the dashboard is localhost-only
+## 1) Confirm the dashboard exposure
 
 - Open: `http://127.0.0.1:18789/`
 - You should need the tokenized URL from:
@@ -9,13 +9,15 @@
 ./scripts/dashboard.sh
 ```
 
-On Linux/macOS, you can also check the port binding:
+You can also check the port binding:
 
 ```bash
 docker ps --format "table {{.Names}}\t{{.Ports}}"
 ```
 
-You should see `127.0.0.1:18789->18789/tcp` (not `0.0.0.0:...`).
+On **Linux** (secure compose), you should see `127.0.0.1:18789->18789/tcp` (not `0.0.0.0:...`).
+
+On **macOS**, this repo uses `docker-compose.macos.yml` which binds to `0.0.0.0` due to a Docker Desktop loopback port-binding quirk. The gateway is still token-authenticated, but treat this as broader network exposure than a strict loopback bind.
 
 ## 2) Confirm the workspace mount is the only RW host path
 
@@ -58,7 +60,7 @@ So the secure default here is:
 
 - `agents.defaults.sandbox.mode: "off"`
 
-This wrapper copies `[config/openclaw.secure.json](../config/openclaw.secure.json)` to `openclaw.json` on first setup (if missing).
+If this repo includes a secure config template (`config/openclaw.secure.json`), the setup script will copy it to `openclaw.json` on first setup (if missing).
 
 ## 5) Run a simple agent message (local test)
 

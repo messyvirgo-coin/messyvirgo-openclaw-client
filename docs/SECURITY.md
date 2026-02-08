@@ -2,8 +2,10 @@
 
 ### What this Docker setup protects well
 
-- **Dashboard is local-only**: ports are bound to `127.0.0.1`.
+- **On Linux (secure compose)**: dashboard ports are bound to `127.0.0.1`.
   - Not reachable from other devices on your network (unless you forward it yourself).
+- **On macOS (Docker Desktop)**: this repo uses `docker-compose.macos.yml` which binds ports to `0.0.0.0` due to a Docker Desktop loopback port-binding quirk.
+  - The gateway is still **token-authenticated**, but network exposure is broader than a strict `127.0.0.1` bind.
 - **Filesystem access is limited**: OpenClaw gets **exactly one** host directory as a mount (the workspace), which you choose deliberately.
   - No access to your entire `$HOME`, fewer accidental secrets.
 - **Tool sandboxing**: shell/read/write/edit runs (per session) in Docker sandboxes with:
@@ -28,7 +30,7 @@ For that reason, this wrapper defaults to **sandboxing = off** and relies on:
 
 - container isolation + hardening (read-only rootfs, dropped caps, no-new-privileges)
 - a single, explicit RW workspace mount
-- localhost-only dashboard exposure
+- localhost-only dashboard exposure where possible (Linux secure compose), and token-authenticated exposure on macOS as noted above
 
 ### Best practices (recommended)
 
