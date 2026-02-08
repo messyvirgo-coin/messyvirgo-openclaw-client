@@ -69,6 +69,22 @@ This prints a tokenized URL that you can open in Safari/Chrome.
 - Wait 10–30 seconds
 - Run `./scripts/setup.sh` again
 
+#### Docker CLI talks to the wrong daemon / API version mismatch
+
+If `./scripts/setup.sh` says Docker is not responding but Docker Desktop shows “running”, a common cause is:
+
+- Docker CLI installed via Homebrew
+- Docker Desktop daemon running a newer API version
+
+This repo’s scripts try to make this more robust on macOS by setting `DOCKER_API_VERSION=1.44` when it’s not already set.
+
+Troubleshooting:
+
+- Run: `docker context use desktop-linux` then `docker info` (you want a normal “Server:” section with no ERROR)
+- Docker menu → Troubleshoot → Restart Docker Desktop; wait until it says running
+- To inspect the daemon logs: `tail -50 ~/Library/Containers/com.docker.docker/Data/log/vm/dockerd.log`
+- If it still fails: Docker menu → Troubleshoot → Clean / Purge data, then retry setup
+
 #### “permission denied” when accessing files
 
 - Make sure the workspace directory actually exists.

@@ -23,7 +23,29 @@ Open Terminal and `cd` into the folder that contains `docker-compose.yml` and th
 ./scripts/down.sh
 ```
 
-## 4) Reset the wrapper `.env` (recommended)
+## 4) Optional: full reset (fresh start)
+
+This stops containers, removes project volumes, and (optionally) deletes config/src/workspace.
+
+Safe default (project-only: containers + volumes):
+
+```bash
+./scripts/reset.sh
+```
+
+Fresh start (also delete OpenClaw config/state + source clone):
+
+```bash
+./scripts/reset.sh --delete-config --delete-src
+```
+
+If you also want to delete the workspace folder (dangerous if it points to a real project directory):
+
+```bash
+./scripts/reset.sh --delete-config --delete-src --delete-workspace
+```
+
+## 5) Reset the wrapper `.env` (recommended)
 
 This repo’s `.env` contains tokens/settings. If things are messy, remove it so setup can regenerate it:
 
@@ -31,7 +53,7 @@ This repo’s `.env` contains tokens/settings. If things are messy, remove it so
 rm -f .env
 ```
 
-## 5) Run the guided setup (rebuilds image + runs onboarding)
+## 6) Run the guided setup (rebuilds image + runs onboarding)
 
 ```bash
 ./scripts/setup.sh
@@ -41,7 +63,7 @@ When asked for the workspace folder:
 
 - Beginner option: accept the default `~/OpenClawWorkspace`
 
-## 6) Docker Desktop “File Sharing” (common macOS issue)
+## 7) Docker Desktop “File Sharing” (common macOS issue)
 
 If you chose a workspace folder outside `~/...`, Docker Desktop must be allowed to access it:
 
@@ -49,7 +71,7 @@ If you chose a workspace folder outside `~/...`, Docker Desktop must be allowed 
 - Add the chosen workspace folder
 - Apply & Restart
 
-## 7) Start OpenClaw and open the dashboard
+## 8) Start OpenClaw and open the dashboard
 
 Start:
 
@@ -65,7 +87,7 @@ Get the tokenized dashboard URL:
 
 Open the printed URL in your browser.
 
-## 8) Telegram bot: make it reply (DM)
+## 9) Telegram bot: make it reply (DM)
 
 1. Find the configured bot username:
 
