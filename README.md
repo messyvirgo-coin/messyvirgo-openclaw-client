@@ -1,6 +1,8 @@
-# OpenClaw (AI Assistant) — Secure Docker Setup (Linux + macOS)
+# OpenClaw (AI Assistant) — Docker wrapper (Linux + macOS)
 
-This repo is a **wrapper** that runs OpenClaw **fully in Docker** with a **localhost-only** dashboard and **exactly one** host folder mounted read/write (the workspace).
+This repo is a **wrapper** that runs [OpenClaw](https://github.com/openclaw/openclaw) **fully in Docker** and aims to keep host exposure minimal (single explicit RW workspace mount, hardened containers).
+
+This code is provided **as-is** and maintained **best-effort**. PRs/issues are welcome, but this repo is not a support channel (see [SUPPORT.md](./SUPPORT.md)).
 
 ## Quickstart (non-technical)
 
@@ -45,8 +47,17 @@ Linux note: if `./scripts/up.sh` fails with a port bind error even though the po
 
 ## Security model (short)
 
-- Dashboard is **local-only**: `http://127.0.0.1:18789/`
+- **Linux (secure compose)**: dashboard ports are bound to `127.0.0.1`.
+- **macOS (Docker Desktop)**: due to a Docker Desktop port-binding quirk, this repo uses `docker-compose.macos.yml` which binds `0.0.0.0` for the dashboard ports. The gateway is still **token-authenticated**, but you should treat this as less strict network exposure and use host firewalling if needed.
 - OpenClaw can only read/write the workspace folder you choose in `setup.sh`
 - Tool execution (shell/read/write/edit) runs in **Docker sandboxes** (per session), **network disabled by default**
 
 More: `[docs/SECURITY.md](docs/SECURITY.md)`
+
+## License
+
+Apache-2.0. See [LICENSE](./LICENSE).
+
+## Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md).

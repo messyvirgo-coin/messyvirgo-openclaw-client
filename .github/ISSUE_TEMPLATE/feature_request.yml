@@ -1,0 +1,32 @@
+name: Feature request
+description: Suggest an improvement to the wrapper/scripts
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the suggestion.
+
+        This repo is a small helper wrapper and is maintained **best-effort**. PRs are welcome, but maintainers may decline changes that increase scope or maintenance burden.
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Problem / motivation
+      description: What problem are you trying to solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: What would you like to see changed?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Any other approaches you considered?
+    validations:
+      required: false
+
