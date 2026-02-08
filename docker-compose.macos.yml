@@ -1,0 +1,9 @@
+# macOS: use this instead of docker-compose.secure.yml so the dashboard works.
+# Docker Desktop often fails with "address already in use" for 127.0.0.1, and
+# Compose merges (concatenates) ports from multiple files, so we use base + this
+# file only on macOS. Same standard ports (18789/18790) as Linux; binds to 0.0.0.0.
+services:
+  openclaw-gateway:
+    ports:
+      - "${OPENCLAW_GATEWAY_PORT:-18789}:18789"
+      - "${OPENCLAW_BRIDGE_PORT:-18790}:18790"

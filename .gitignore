@@ -1,0 +1,11 @@
+.env
+.env.*
+
+# Local clones/build artifacts (created by scripts/setup.sh)
+.openclaw-src/
+
+# Nested/embedded repo if present
+messyvirgo-openclaw-client/
+
+# OS/editor noise
+.DS_Store

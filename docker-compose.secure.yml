@@ -1,0 +1,38 @@
+services:
+  openclaw-gateway:
+    # Expose only on localhost
+    ports:
+      - "127.0.0.1:${OPENCLAW_GATEWAY_PORT:-18789}:18789"
+      - "127.0.0.1:${OPENCLAW_BRIDGE_PORT:-18790}:18790"
+
+    # Hardening
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run
+      - /var/tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+
+    # Reasonable resource limits (tune if needed)
+    pids_limit: 4096
+    mem_limit: 4g
+    cpus: 2.0
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
+      nproc: 4096
+
+  openclaw-cli:
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run
+      - /var/tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
