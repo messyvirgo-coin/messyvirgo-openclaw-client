@@ -7,5 +7,8 @@
 # Nested/embedded repo if present
 messyvirgo-openclaw-client/
 
+# Docker image backups (docker save)
+openclaw-secure-local-*.tar
+
 # OS/editor noise
 .DS_Store
