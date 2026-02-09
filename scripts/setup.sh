@@ -67,7 +67,7 @@ if [[ -z "${OPENCLAW_GATEWAY_TOKEN:-}" ]]; then
   OPENCLAW_GATEWAY_TOKEN="$(random_hex_64)"
 fi
 
-# Write .env (simple overwrite, deterministic keys)
+# Write .env (core keys); preserve optional API keys from existing .env
 cat >"$ENV_FILE" <<EOF
 OPENCLAW_CONFIG_DIR=$OPENCLAW_CONFIG_DIR
 OPENCLAW_WORKSPACE_DIR=$OPENCLAW_WORKSPACE_DIR
@@ -79,6 +79,14 @@ OPENCLAW_GATEWAY_TOKEN=$OPENCLAW_GATEWAY_TOKEN
 OPENCLAW_DOCKER_APT_PACKAGES=${OPENCLAW_DOCKER_APT_PACKAGES:-}
 OPENCLAW_SRC_DIR=$OPENCLAW_SRC_DIR
 EOF
+
+# Preserve optional API keys and settings from existing .env (loaded above via load_env)
+for key in OPENAI_API_KEY OPENROUTER_API_KEY XAPI_IO_API_KEY MOLTBOOK_API_KEY DASHBOARD_X_PORT GITHUB_TOKEN GIT_PAT OPENCLAW_WATCHDOG_TELEGRAM_BOT_TOKEN OPENCLAW_WATCHDOG_TELEGRAM_CHAT_ID; do
+  eval "val=\${$key:-}"
+  if [[ -n "${val:-}" ]]; then
+    echo "${key}=${val}" >> "$ENV_FILE"
+  fi
+done
 
 info "Cloning/updating OpenClaw source"
 if [[ -d "$OPENCLAW_SRC_DIR/.git" ]]; then

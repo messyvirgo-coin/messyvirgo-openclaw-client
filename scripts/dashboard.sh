@@ -21,9 +21,13 @@ if [[ -z "${TOKEN}" ]]; then
 fi
 
 PORT="${OPENCLAW_GATEWAY_PORT:-18789}"
+XPORT="${DASHBOARD_X_PORT:-18788}"
 URL="http://127.0.0.1:${PORT}/?token=${TOKEN}"
+XURL="http://127.0.0.1:${XPORT}/"
 
 echo "$URL"
+echo ""
+info "X Monitor (Messy Virgo accounts): $XURL"
 echo ""
 info "If you see 'gateway token mismatch':"
 info "  1. Restart the gateway so it uses the token from .env: ./scripts/down.sh && ./scripts/up.sh"

@@ -36,6 +36,8 @@ This repo is a **wrapper** that runs OpenClaw **fully in Docker** with a **local
 
 More checklists: `[docs/VERIFY.md](docs/VERIFY.md)`
 
+**API keys:** Setup overwrites `.env`. To keep API keys across setup runs (and OpenClaw updates), use [docs/ENV-API-KEYS.md](docs/ENV-API-KEYS.md): copy `env.api-keys.example` to `.env.api-keys`, add your keys there; they are merged into `.env` automatically when you run `./scripts/up.sh`.
+
 Linux note: if `./scripts/up.sh` fails with a port bind error even though the port is free, use:
 
 ```bash
@@ -45,7 +47,7 @@ Linux note: if `./scripts/up.sh` fails with a port bind error even though the po
 
 ## Security model (short)
 
-- Dashboard is **local-only**: `http://127.0.0.1:18789/` (OpenClaw standard ports: gateway **18789**, bridge **18790** — same on Linux and macOS)
+- **One dashboard** at `http://127.0.0.1:18788/`: X Monitor (Messy Virgo tweets) + OpenClaw Control UI (sessions, tasks) in one page. Gateway also at `http://127.0.0.1:18789/`. See [docs/DASHBOARD.md](docs/DASHBOARD.md). Ports: dashboard **18788**, gateway **18789**, bridge **18790**.
 - OpenClaw can only read/write the workspace folder you choose in `setup.sh`
 - Tool execution (shell/read/write/edit) runs in **Docker sandboxes** (per session), **network disabled by default**
 

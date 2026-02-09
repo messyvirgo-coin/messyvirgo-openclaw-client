@@ -1,15 +1,37 @@
 services:
+  dashboard-x:
+    build:
+      context: ./dashboard-x
+      dockerfile: Dockerfile
+    environment:
+      XAPI_IO_API_KEY: ${XAPI_IO_API_KEY:-}
+      DASHBOARD_X_PORT: ${DASHBOARD_X_PORT:-18788}
+      OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN:-}
+      OPENCLAW_GATEWAY_PORT: ${OPENCLAW_GATEWAY_PORT:-18789}
+      WORKSPACE_DIR: /workspace
+    volumes:
+      - ./dashboard-x:/app
+      - ${OPENCLAW_WORKSPACE_DIR:-${HOME}/OpenClawWorkspace}:/workspace:ro
+    ports:
+      - "${DASHBOARD_X_PORT:-18788}:18788"
+    restart: unless-stopped
+
   openclaw-gateway:
     image: ${OPENCLAW_IMAGE:-openclaw-secure:local}
+    entrypoint: ["/sync-workspace-memory.sh"]
     environment:
       HOME: /home/node
       TERM: xterm-256color
       OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN}
       OPENCLAW_GATEWAY_PORT: ${OPENCLAW_GATEWAY_PORT:-18789}
       MOLTBOOK_API_KEY: ${MOLTBOOK_API_KEY:-}
+      XAPI_IO_API_KEY: ${XAPI_IO_API_KEY:-}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
     volumes:
       - ${OPENCLAW_CONFIG_DIR:-${HOME}/.openclaw-secure}:/home/node/.openclaw
+      - ${OPENCLAW_CONFIG_DIR:-${HOME}/.openclaw-secure}/clawdbot:/home/node/.clawdbot
       - ${OPENCLAW_WORKSPACE_DIR:-${HOME}/OpenClawWorkspace}:/home/node/.openclaw/workspace
+      - ./scripts/sync-workspace-memory.sh:/sync-workspace-memory.sh:ro
     ports:
       - "${OPENCLAW_GATEWAY_PORT:-18789}:18789"
       - "${OPENCLAW_BRIDGE_PORT:-18790}:18790"
@@ -34,8 +56,12 @@ services:
       OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN}
       OPENCLAW_GATEWAY_PORT: ${OPENCLAW_GATEWAY_PORT:-18789}
       BROWSER: echo
+      MOLTBOOK_API_KEY: ${MOLTBOOK_API_KEY:-}
+      XAPI_IO_API_KEY: ${XAPI_IO_API_KEY:-}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
     volumes:
       - ${OPENCLAW_CONFIG_DIR:-${HOME}/.openclaw-secure}:/home/node/.openclaw
+      - ${OPENCLAW_CONFIG_DIR:-${HOME}/.openclaw-secure}/clawdbot:/home/node/.clawdbot
       - ${OPENCLAW_WORKSPACE_DIR:-${HOME}/OpenClawWorkspace}:/home/node/.openclaw/workspace
     stdin_open: true
     tty: true

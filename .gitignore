@@ -3,6 +3,8 @@
 
 # Local clones/build artifacts (created by scripts/setup.sh)
 .openclaw-src/
+.openclaw-skills-repo/
+.x-api-skill-repo/
 
 # Nested/embedded repo if present
 messyvirgo-openclaw-client/

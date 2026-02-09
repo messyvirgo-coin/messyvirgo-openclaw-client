@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Messy Virgo Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --bg-elevated: #12121a;
+      --card: #16161f;
+      --card-hover: #1a1a24;
+      --border: #2a2a38;
+      --border-subtle: #1e1e28;
+      --text: #e8e8ed;
+      --text-soft: #a0a0b0;
+      --muted: #6b6b7b;
+      --accent: #a78bfa;
+      --accent-dim: rgba(167, 139, 250, 0.15);
+      --accent-glow: rgba(167, 139, 250, 0.25);
+      --link: #818cf8;
+      --success: #34d399;
+      --radius: 12px;
+      --radius-sm: 8px;
+      --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+      --shadow-glow: 0 0 40px rgba(167, 139, 250, 0.08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .header {
+      padding: 1rem 1.5rem;
+      background: linear-gradient(180deg, var(--bg-elevated) 0%, var(--bg) 100%);
+      border-bottom: 1px solid var(--border-subtle);
+      flex-shrink: 0;
+      box-shadow: var(--shadow-glow);
+    }
+    .header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 0;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, var(--text) 0%, var(--text-soft) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .header .sub {
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-top: 0.35rem;
+      font-weight: 500;
+    }
+    .panels {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+    }
+    .panel {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+    .panel-memory {
+      flex: 0 0 48vh;
+      min-height: 260px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .panel-x {
+      flex: 1;
+      min-height: 280px;
+    }
+    .panel-header {
+      padding: 0.65rem 1.25rem;
+      background: var(--bg-elevated);
+      border-bottom: 1px solid var(--border-subtle);
+      font-weight: 600;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .panel-header a {
+      font-weight: 500;
+      font-size: 0.8rem;
+      color: var(--link);
+      text-decoration: none;
+      opacity: 0.9;
+    }
+    .panel-header a:hover { text-decoration: underline; opacity: 1; }
+    .panel-body {
+      flex: 1;
+      min-height: 0;
+      overflow: auto;
+      padding: 1.1rem;
+    }
+    .panel-body-memory {
+      background:
+        radial-gradient(circle at 0% 0%, rgba(167,139,250,0.18), transparent 55%),
+        radial-gradient(circle at 100% 0%, rgba(56,189,248,0.12), transparent 55%),
+        var(--card);
+      box-shadow: var(--shadow-glow);
+      border-radius: 0 0 var(--radius) var(--radius);
+    }
+    .panel-header select {
+      margin-left: auto;
+      padding: 0.3rem 0.6rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      font-size: 0.78rem;
+      font-family: inherit;
+      cursor: pointer;
+    }
+    .memory-loading, .memory-error {
+      color: var(--muted);
+      padding: 0.75rem 1rem;
+      font-size: 0.85rem;
+    }
+    .memory-error { color: #f87171; }
+    .memory-content {
+      font-size: 0.84rem;
+      line-height: 1.4;
+      padding: 0.6rem 1.1rem 0.8rem;
+      max-width: 1040px;
+      margin: 0 auto;
+    }
+    .memory-content h1 { font-size: 1.2rem; margin: 0 0 0.4rem 0; }
+    .memory-content h2 { font-size: 1.02rem; margin: 0.6rem 0 0.35rem 0; }
+    .memory-content h3 { font-size: 0.95rem; margin: 0.4rem 0 0.25rem 0; }
+    .memory-content ul, .memory-content ol { margin: 0.2rem 0 0.35rem; padding-left: 1.25rem; }
+    .memory-content li { margin: 0.12rem 0; }
+    .memory-content pre,
+    .memory-content code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      background: #050510;
+      padding: 0.18rem 0.4rem;
+      border-radius: 4px;
+    }
+    .memory-content pre {
+      padding: 0.6rem 0.75rem;
+      overflow-x: auto;
+      margin: 0.35rem 0;
+    }
+    .memory-content blockquote {
+      border-left: 3px solid var(--accent);
+      margin: 0.3rem 0;
+      padding-left: 0.9rem;
+      color: var(--text-soft);
+      font-style: italic;
+    }
+    .memory-content a { color: var(--link); text-decoration: none; }
+    .memory-content a:hover { text-decoration: underline; }
+    .x-section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .refresh {
+      background: linear-gradient(135deg, var(--accent) 0%, #8b5cf6 100%);
+      color: #fff;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      box-shadow: 0 2px 12px var(--accent-dim);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .refresh:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 20px var(--accent-glow);
+    }
+    .refresh:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .grid {
+      display: grid;
+      gap: 1.25rem;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    @media (max-width: 1100px) {
+      .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 600px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      overflow: hidden;
+      transition: border-color 0.2s ease, background 0.2s ease;
+      box-shadow: var(--shadow);
+    }
+    .card:hover {
+      border-color: var(--border);
+      background: var(--card-hover);
+    }
+    .card h2 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin: 0 0 0.75rem 0;
+      letter-spacing: -0.01em;
+    }
+    .card h2 a {
+      color: var(--accent);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .card h2 a:hover { text-decoration: underline; }
+    .card h2 a::before { content: '@'; color: var(--muted); font-weight: 500; }
+    .card-content {
+      font-size: 0.875rem;
+    }
+    .tweet {
+      font-size: 0.8125rem;
+      line-height: 1.45;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text);
+    }
+    .tweet:last-child { border-bottom: none; }
+    .tweet .time {
+      font-size: 0.7rem;
+      color: var(--muted);
+      margin-top: 0.3rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .tweet .stats {
+      font-size: 0.7rem;
+      color: var(--text-soft);
+      margin-top: 0.25rem;
+    }
+    .error { color: #f87171; font-size: 0.875rem; }
+    .loading { color: var(--muted); font-size: 0.875rem; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <h1>Messy Virgo Dashboard</h1>
+    <p class="sub">Memory & tasks from workspace · X Monitor below · <a href="http://127.0.0.1:18789/" target="_blank" rel="noopener" style="color: var(--link);">OpenClaw Control UI</a></p>
+  </header>
+  <div class="panels">
+    <section class="panel panel-memory">
+      <div class="panel-header">Memory — tasks, commitments, directives <select id="memory-date" aria-label="Date"></select></div>
+      <div class="panel-body panel-body-memory" id="memory-body">
+        <div class="memory-loading" id="memory-loading">Loading…</div>
+        <div class="memory-content" id="memory-content" style="display: none;"></div>
+        <div class="memory-error" id="memory-error" style="display: none;"></div>
+      </div>
+    </section>
+    <section class="panel panel-x">
+      <div class="panel-header">X Monitor — Messy Virgo accounts</div>
+      <div class="panel-body">
+        <div class="x-section-header">
+          <span style="color: var(--text-soft); font-size: 0.85rem;">Last 5 tweets per account</span>
+          <button class="refresh" id="refresh" type="button">Refresh tweets</button>
+        </div>
+        <div class="grid" id="grid"></div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const HANDLES = ['MEssyVirgoCoin', 'MessyVirgoBot', 'MessyVirgoF', 'MessyVirgoM'];
+    const TWITTER = 'https://x.com';
+    const MAX_TWEETS = 5;
+
+    function el(tag, attrs, ...children) {
+      const e = document.createElement(tag);
+      if (attrs && typeof attrs === 'object' && !attrs.nodeType) {
+        Object.entries(attrs).forEach(([k, v]) => {
+          if (k === 'className') e.className = v;
+          else if (k === 'href') e.setAttribute('href', v);
+          else if (k.startsWith('on') && typeof v === 'function') e.addEventListener(k.slice(2).toLowerCase(), v);
+          else if (v != null) e.setAttribute(k, v);
+        });
+      } else if (attrs && attrs.nodeType) {
+        children = [attrs, ...children];
+      }
+      children.forEach(c => { if (c != null) e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+      return e;
+    }
+
+    function formatTime(str) {
+      if (!str) return '';
+      try {
+        const d = new Date(str);
+        return isNaN(d.getTime()) ? str : d.toLocaleString();
+      } catch (_) { return str; }
+    }
+
+    function renderTweet(t) {
+      const text = t.text || '';
+      const time = formatTime(t.createdAt);
+      const likes = t.likeCount ?? 0;
+      const retweets = t.retweetCount ?? 0;
+      const replies = t.replyCount ?? 0;
+      const stats = [likes && `${likes} ♥`, retweets && `${retweets} RT`, replies && `${replies} ↩`].filter(Boolean).join(' · ');
+      return el('div', { className: 'tweet' },
+        el('div', null, text),
+        el('div', { className: 'time' }, time),
+        stats ? el('div', { className: 'stats' }, stats) : null
+      );
+    }
+
+    async function loadHandle(handle) {
+      const card = document.getElementById('card-' + handle);
+      const content = card && card.querySelector('.card-content');
+      if (!content) return;
+      content.innerHTML = '<span class="loading">Loading…</span>';
+      try {
+        const r = await fetch('/api/tweets?handle=' + encodeURIComponent(handle));
+        const data = await r.json();
+        if (data.error) {
+          content.innerHTML = '<span class="error">' + (data.error || 'Error') + '</span>';
+          return;
+        }
+        const tweets = (data.tweets || []).slice(0, MAX_TWEETS);
+        content.innerHTML = '';
+        if (tweets.length === 0) {
+          content.appendChild(el('div', { className: 'muted' }, 'No recent tweets.'));
+        } else {
+          tweets.forEach(t => content.appendChild(renderTweet(t)));
+        }
+      } catch (e) {
+        content.innerHTML = '<span class="error">' + e.message + '</span>';
+      }
+    }
+
+    function loadAll() {
+      return Promise.all(HANDLES.map(loadHandle));
+    }
+
+    function renderXGrid() {
+      const grid = document.getElementById('grid');
+      grid.innerHTML = '';
+      HANDLES.forEach(handle => {
+        const card = el('div', { className: 'card', id: 'card-' + handle },
+          el('h2', null, el('a', { href: TWITTER + '/' + handle, target: '_blank', rel: 'noopener' }, handle)),
+          el('div', { className: 'card-content' })
+        );
+        grid.appendChild(card);
+      });
+      loadAll();
+    }
+
+    function todayYYYYMMDD() {
+      const d = new Date();
+      return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+
+    /** Put latest entries first: reverse order of ## sections so most recent is at top. */
+    function reverseMemorySections(text) {
+      if (!text || !text.trim()) return text;
+      const sections = text.split(/\n(?=## )/);
+      if (sections.length <= 1) return text;
+      return sections.reverse().join('\n');
+    }
+
+    function simpleMarkdown(text) {
+      const esc = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      return esc
+        .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+        .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+        .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+        .replace(/^\s*[-*] (.+)$/gm, '<li>$1</li>')
+        .replace(/(<li>.*?<\/li>\n?)+/gs, (m) => '<ul>' + m.trim() + '</ul>')
+        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        .replace(/\n/g, '<br>');
+    }
+
+    async function loadMemoryDays() {
+      const today = todayYYYYMMDD();
+      try {
+        const r = await fetch('/api/memory/days');
+        const data = await r.json();
+        const sel = document.getElementById('memory-date');
+        sel.innerHTML = '';
+        const days = (data.days && data.days.length) ? data.days : [today];
+        if (days.indexOf(today) === -1) days.unshift(today);
+        days.forEach((d) => {
+          const opt = document.createElement('option');
+          opt.value = d;
+          opt.textContent = d;
+          sel.appendChild(opt);
+        });
+        sel.value = days[0];
+        return days[0];
+      } catch (e) {
+        const sel = document.getElementById('memory-date');
+        sel.innerHTML = '<option value="' + today + '">' + today + '</option>';
+        return today;
+      }
+    }
+
+    async function loadMemory(date) {
+      const loading = document.getElementById('memory-loading');
+      const content = document.getElementById('memory-content');
+      const err = document.getElementById('memory-error');
+      loading.style.display = 'block';
+      content.style.display = 'none';
+      err.style.display = 'none';
+      try {
+        const r = await fetch('/api/memory?date=' + encodeURIComponent(date));
+        const data = await r.json();
+        loading.style.display = 'none';
+        if (data.error) {
+          err.textContent = data.error + (data.error.indexOf('memory') !== -1 ? ' (workspace memory/ folder)' : '');
+          err.style.display = 'block';
+          return;
+        }
+        const raw = data.content ? reverseMemorySections(data.content) : '';
+        content.innerHTML = raw ? simpleMarkdown(raw) : '<p class="muted">Empty.</p>';
+        content.style.display = 'block';
+      } catch (e) {
+        loading.style.display = 'none';
+        err.textContent = e.message || 'Failed to load';
+        err.style.display = 'block';
+      }
+    }
+
+    document.getElementById('refresh').addEventListener('click', () => {
+      const btn = document.getElementById('refresh');
+      btn.disabled = true;
+      loadAll().finally(() => { btn.disabled = false; });
+    });
+
+    document.getElementById('memory-date').addEventListener('change', function() {
+      loadMemory(this.value);
+    });
+
+    const REFRESH_INTERVAL_MS = 15 * 60 * 1000; // 15 minutes
+    setInterval(function() {
+      const dateSel = document.getElementById('memory-date');
+      if (dateSel && dateSel.value) loadMemory(dateSel.value);
+      loadAll();
+    }, REFRESH_INTERVAL_MS);
+
+    renderXGrid();
+    (async function initMemory() {
+      const first = await loadMemoryDays();
+      await loadMemory(document.getElementById('memory-date').value || first);
+    })();
+  </script>
+</body>
+</html>
