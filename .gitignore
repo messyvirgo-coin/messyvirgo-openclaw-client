@@ -10,5 +10,8 @@ messyvirgo-openclaw-client/
 # Docker image backups (docker save)
 openclaw-secure-local-*.tar
 
+# Watchdog logs
+scripts/logs/
+
 # OS/editor noise
 .DS_Store
