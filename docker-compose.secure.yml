@@ -22,6 +22,7 @@ services:
       nofile:
         soft: 4096
         hard: 8192
+      nproc: 4096
 
   openclaw-cli:
     read_only: true
