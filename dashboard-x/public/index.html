@@ -264,7 +264,7 @@
   </header>
   <div class="panels">
     <section class="panel panel-memory">
-      <div class="panel-header">Memory — tasks, commitments, directives <select id="memory-date" aria-label="Date"></select></div>
+      <div class="panel-header">Memory — tasks, commitments, directives <select id="memory-date" aria-label="Date"></select> <button class="refresh" id="memory-refresh" type="button">Refresh</button></div>
       <div class="panel-body panel-body-memory" id="memory-body">
         <div class="memory-loading" id="memory-loading">Loading…</div>
         <div class="memory-content" id="memory-content" style="display: none;"></div>
@@ -453,12 +453,13 @@
       loadMemory(this.value);
     });
 
-    const REFRESH_INTERVAL_MS = 15 * 60 * 1000; // 15 minutes
-    setInterval(function() {
+    document.getElementById('memory-refresh').addEventListener('click', function() {
+      const btn = document.getElementById('memory-refresh');
       const dateSel = document.getElementById('memory-date');
-      if (dateSel && dateSel.value) loadMemory(dateSel.value);
-      loadAll();
-    }, REFRESH_INTERVAL_MS);
+      const date = dateSel && dateSel.value ? dateSel.value : todayYYYYMMDD();
+      btn.disabled = true;
+      loadMemory(date).finally(() => { btn.disabled = false; });
+    });
 
     renderXGrid();
     (async function initMemory() {

@@ -21,7 +21,8 @@ So: keep your API keys only in `.env.api-keys` (or put them there after the firs
 - `OPENAI_API_KEY` — OpenAI models
 - `OPENROUTER_API_KEY` — OpenRouter models (e.g. Claude via OpenRouter)
 - `XAPI_IO_API_KEY` — X Monitor dashboard + x-api skill
-- `MOLTBOOK_API_KEY` — Moltbook skill
+- `MOLTBOOK_API_KEY` — Moltbook skill (macro searches, etc.)
+- `BANKR_API_KEY` — Bankr skill (written to `~/.openclaw-secure/clawdbot/skills/bankr/config.json` by `setup-bankr.sh` on each `up.sh`)
 - Optional: `DASHBOARD_X_PORT`, `GITHUB_TOKEN`, `GIT_PAT`, `OPENCLAW_WATCHDOG_*`
 
-Ensure these are passed into the gateway/CLI in `docker-compose.yml` (they are referenced there); the merge only puts them into `.env` so that Compose can substitute them.
+Ensure these are passed into the gateway/CLI in `docker-compose.yml` where needed; the merge only puts them into `.env` so that Compose can substitute them. Bankr reads its key from the config file, not from env.

@@ -1,6 +1,6 @@
 # Moltbook API credentials
 
-To run `./scripts/moltbook.sh` (posts, feed, etc.) you need a Moltbook API key in one of these places.
+To run `./scripts/moltbook.sh` (posts, feed, macro searches, etc.) you need a valid Moltbook API key in one of these places. If you see access denials or "missing" key errors, ensure the key is correct and in `.env.api-keys` (then run `./scripts/up.sh` so it is merged into `.env` and passed to the gateway).
 
 ## Option A: Project `.env` (recommended)
 

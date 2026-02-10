@@ -35,16 +35,16 @@ This creates `$OPENCLAW_CONFIG_DIR/clawdbot/skills/bankr/config.json` from the e
 
 ## Add your API key
 
+**Option A — from .env.api-keys (recommended)**  
+1. Add `BANKR_API_KEY=bk_your_real_key` to `.env.api-keys` (get the key from [bankr.bot/api](https://bankr.bot/api); it must have **Agent API** access).  
+2. Run `./scripts/up.sh`. The merge step copies it into `.env`, then `setup-bankr.sh` writes it into `config.json`.  
+3. If you already had the gateway up, restart so it picks up the file: `./scripts/down.sh && ./scripts/up.sh`.
+
+**Option B — edit config by hand**  
 1. Open the config on the host, for example:
    - `~/.openclaw-secure/clawdbot/skills/bankr/config.json`  
    - or `$OPENCLAW_CONFIG_DIR/clawdbot/skills/bankr/config.json` (if you set that in `.env`).
-
-2. Replace `bk_YOUR_KEY_HERE` with your real Bankr API key (from [bankr.bot/api](https://bankr.bot/api)). The key must have **Agent API** access. Keep `apiUrl` as `https://api.bankr.bot` unless you use a different endpoint.
-
-3. Restart the gateway so it picks up the file:
-   ```bash
-   ./scripts/down.sh
-   ./scripts/up.sh
-   ```
+2. Replace `bk_YOUR_KEY_HERE` with your real Bankr API key. Keep `apiUrl` as `https://api.bankr.bot` unless you use a different endpoint.
+3. Restart the gateway: `./scripts/down.sh && ./scripts/up.sh`.
 
 After that, the bankr skill should be able to read the config. If the skill expects a different JSON shape (e.g. more fields), update the example and your `config.json` to match.

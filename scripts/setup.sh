@@ -78,24 +78,33 @@ OPENCLAW_IMAGE=$OPENCLAW_IMAGE
 OPENCLAW_GATEWAY_TOKEN=$OPENCLAW_GATEWAY_TOKEN
 OPENCLAW_DOCKER_APT_PACKAGES=${OPENCLAW_DOCKER_APT_PACKAGES:-}
 OPENCLAW_SRC_DIR=$OPENCLAW_SRC_DIR
+OPENCLAW_TAG=${OPENCLAW_TAG:-v2026.2.9}
 EOF
 
 # Preserve optional API keys and settings from existing .env (loaded above via load_env)
-for key in OPENAI_API_KEY OPENROUTER_API_KEY XAPI_IO_API_KEY MOLTBOOK_API_KEY DASHBOARD_X_PORT GITHUB_TOKEN GIT_PAT OPENCLAW_WATCHDOG_TELEGRAM_BOT_TOKEN OPENCLAW_WATCHDOG_TELEGRAM_CHAT_ID; do
+for key in OPENAI_API_KEY OPENROUTER_API_KEY XAPI_IO_API_KEY MOLTBOOK_API_KEY BANKR_API_KEY DASHBOARD_X_PORT GITHUB_TOKEN GIT_PAT OPENCLAW_WATCHDOG_TELEGRAM_BOT_TOKEN OPENCLAW_WATCHDOG_TELEGRAM_CHAT_ID; do
   eval "val=\${$key:-}"
   if [[ -n "${val:-}" ]]; then
     echo "${key}=${val}" >> "$ENV_FILE"
   fi
 done
 
+# Pin to a release tag (e.g. v2026.2.9) or leave empty for main
+OPENCLAW_TAG="${OPENCLAW_TAG:-}"
+
 info "Cloning/updating OpenClaw source"
 if [[ -d "$OPENCLAW_SRC_DIR/.git" ]]; then
   git -C "$OPENCLAW_SRC_DIR" fetch --tags --prune
-  git -C "$OPENCLAW_SRC_DIR" checkout main
-  git -C "$OPENCLAW_SRC_DIR" pull --ff-only
+  if [[ -n "$OPENCLAW_TAG" ]]; then
+    git -C "$OPENCLAW_SRC_DIR" checkout "$OPENCLAW_TAG"
+    info "Checked out $OPENCLAW_TAG"
+  else
+    git -C "$OPENCLAW_SRC_DIR" checkout main
+    git -C "$OPENCLAW_SRC_DIR" pull --ff-only
+  fi
 else
   rm -rf "$OPENCLAW_SRC_DIR"
-  git clone https://github.com/openclaw/openclaw.git "$OPENCLAW_SRC_DIR"
+  git clone --depth 1 --branch "${OPENCLAW_TAG:-main}" https://github.com/openclaw/openclaw.git "$OPENCLAW_SRC_DIR"
 fi
 
 info "Building Docker image ($OPENCLAW_IMAGE)"

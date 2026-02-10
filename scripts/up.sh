@@ -8,6 +8,9 @@ source "$SCRIPT_DIR/_common.sh"
 # Merge .env.api-keys into .env so API keys survive setup.sh overwrites (e.g. after OpenClaw updates)
 [[ -f "$ROOT_DIR/scripts/merge-env-api-keys.sh" ]] && "$ROOT_DIR/scripts/merge-env-api-keys.sh"
 
+# If BANKR_API_KEY is in .env, update Bankr config so the gateway has a valid key
+[[ -f "$ROOT_DIR/scripts/setup-bankr.sh" ]] && "$ROOT_DIR/scripts/setup-bankr.sh" 2>/dev/null || true
+
 ensure_docker_running
 load_env
 
