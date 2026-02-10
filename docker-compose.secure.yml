@@ -2,6 +2,9 @@ services:
   openclaw-gateway:
     # Hardening
     read_only: true
+    # Workaround: on some Linux Docker setups, `init: true` + hardening can
+    # fail to exec `/sbin/docker-init` (crash-loop). The gateway works without it.
+    init: false
     tmpfs:
       - /tmp
       - /run
@@ -23,6 +26,7 @@ services:
 
   openclaw-cli:
     read_only: true
+    init: false
     tmpfs:
       - /tmp
       - /run
