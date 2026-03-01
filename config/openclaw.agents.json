@@ -1,12 +1,42 @@
 {
   "agents": {
+    "defaults": {
+      "thinkingDefault": "off",
+      "subagents": {
+        "maxConcurrent": 3,
+        "maxSpawnDepth": 1,
+        "maxChildrenPerAgent": 5,
+        "archiveAfterMinutes": 60
+      }
+    },
     "list": [
       {
-        "id": "default",
+        "id": "main",
         "default": true,
-        "name": "Assistant",
-        "identity": { "name": "Assistant" },
-        "model": "sonnet"
+        "name": "Messy Virgo",
+        "identity": { "name": "Messy Virgo" },
+        "model": "deepinfra/deepseek-ai/DeepSeek-V3.1-Terminus",
+        "subagents": {
+          "allowAgents": ["coder", "researcher", "planner"]
+        }
+      },
+      {
+        "id": "coder",
+        "name": "Coder",
+        "identity": { "name": "Coder" },
+        "model": "deepinfra/moonshotai/Kimi-K2.5"
+      },
+      {
+        "id": "researcher",
+        "name": "Researcher",
+        "identity": { "name": "Researcher" },
+        "model": "deepinfra/deepseek-ai/DeepSeek-V3.2"
+      },
+      {
+        "id": "planner",
+        "name": "Planner",
+        "identity": { "name": "Planner" },
+        "model": "deepinfra/moonshotai/Kimi-K2.5"
       }
     ]
   }
