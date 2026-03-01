@@ -15,7 +15,7 @@
         "default": true,
         "name": "Messy Virgo",
         "identity": { "name": "Messy Virgo" },
-        "model": "deepinfra/deepseek-ai/DeepSeek-V3.1-Terminus",
+        "model": "bankr/gpt-5-mini",
         "subagents": {
           "allowAgents": ["coder", "researcher", "planner"]
         }
@@ -24,19 +24,19 @@
         "id": "coder",
         "name": "Coder",
         "identity": { "name": "Coder" },
-        "model": "deepinfra/moonshotai/Kimi-K2.5"
+        "model": "bankr/qwen3-coder"
       },
       {
         "id": "researcher",
         "name": "Researcher",
         "identity": { "name": "Researcher" },
-        "model": "deepinfra/deepseek-ai/DeepSeek-V3.2"
+        "model": "bankr/gemini-3-flash"
       },
       {
         "id": "planner",
         "name": "Planner",
         "identity": { "name": "Planner" },
-        "model": "deepinfra/moonshotai/Kimi-K2.5"
+        "model": "bankr/kimi-k2.5"
       }
     ]
   }
