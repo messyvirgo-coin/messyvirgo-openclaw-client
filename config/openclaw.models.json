@@ -1,14 +1,37 @@
 {
   "models": {
+    "mode": "merge",
     "providers": {
-      "anthropic": {
-        "apiKey": "${ANTHROPIC_API_KEY}"
+      "deepinfra": {
+        "baseUrl": "https://api.deepinfra.com/v1/openai",
+        "apiKey": "${DEEPINFRA_API_KEY}",
+        "api": "openai-completions",
+        "models": [
+          {
+            "id": "moonshotai/Kimi-K2.5",
+            "name": "Kimi K2.5",
+            "contextWindow": 131072,
+            "maxTokens": 16384
+          },
+          {
+            "id": "deepseek-ai/DeepSeek-V3",
+            "name": "DeepSeek-V3",
+            "contextWindow": 131072,
+            "maxTokens": 8192
+          }
+        ]
       }
     }
   },
   "agents": {
     "defaults": {
-      "model": "sonnet"
+      "model": {
+        "primary": "deepinfra/deepseek-ai/DeepSeek-V3"
+      },
+      "models": {
+        "deepinfra/deepseek-ai/DeepSeek-V3": { "alias": "deepseek" },
+        "deepinfra/moonshotai/Kimi-K2.5": { "alias": "kimi" }
+      }
     }
   }
 }
