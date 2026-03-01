@@ -111,6 +111,30 @@ for f in "$ROOT_DIR"/config/openclaw*.json; do
   fi
 done
 
+info "Deploying workspace templates"
+for agent_dir in "$ROOT_DIR"/config/workspaces/*/; do
+  [[ -d "$agent_dir" ]] || continue
+  agent_id=$(basename "$agent_dir")
+
+  if [[ "$agent_id" == "main" ]]; then
+    target_dir="$OPENCLAW_CONFIG_DIR/workspace"
+  else
+    target_dir="$OPENCLAW_CONFIG_DIR/workspace-$agent_id"
+  fi
+
+  mkdir -p "$target_dir"
+  for f in "$agent_dir"*.md; do
+    [[ -f "$f" ]] || continue
+    dest="$target_dir/$(basename "$f")"
+    if [[ ! -f "$dest" ]]; then
+      cp "$f" "$dest"
+      info "Wrote $dest"
+    else
+      info "$(basename "$f") already exists at $target_dir (leaving untouched)"
+    fi
+  done
+done
+
 info "Running OpenClaw onboarding (interactive)"
 info "Suggested answers:"
 info " - Gateway bind: lan"
