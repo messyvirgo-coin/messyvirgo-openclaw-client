@@ -65,32 +65,47 @@ OpenClaw to load from that path with file watching enabled.
 
 See `skills/README.md` for details and examples.
 
-## Custom Personas / Agents
+## Multi-Agent Architecture
 
-Edit `config/openclaw.agents.json` to define your agents:
+The client ships a 4-agent setup where a main orchestrator (Messy Virgo)
+delegates specialized tasks to sub-agents:
 
-```json5
-{
-  "agents": {
-    "list": [
-      {
-        "id": "default",
-        "default": true,
-        "name": "Assistant",
-        "identity": { "name": "Assistant" },
-        "model": "sonnet"
-      },
-      {
-        "id": "researcher",
-        "name": "Researcher",
-        "identity": { "name": "Research Assistant" },
-        "model": "opus",
-        "systemPrompt": "You are a thorough research assistant..."
-      }
-    ]
-  }
-}
 ```
+Main (Messy Virgo) — DeepSeek V3.1-Terminus
+├── Coder       — Kimi K2.5 (thinking: off)
+├── Researcher  — DeepSeek V3.2
+└── Planner     — Kimi K2.5 (thinking: high)
+```
+
+- **Main** handles direct chat and simple questions. Delegates complex tasks.
+- **Coder** handles code writing, debugging, scripts (Kimi K2.5, no thinking).
+- **Researcher** handles web search, current data, document analysis (DeepSeek V3.2).
+- **Planner** handles multi-step planning, architecture, strategy (Kimi K2.5, deep thinking).
+
+### How it works
+
+The main agent uses `sessions_spawn` to delegate tasks, passing the
+target agent ID and thinking level. Sub-agents report results back
+automatically. Only the main agent can spawn sub-agents (`maxSpawnDepth=1`).
+
+### Workspace templates
+
+Each agent's behavior is defined by Markdown bootstrap files in
+`config/workspaces/<agentId>/`:
+
+| File | Purpose |
+|---|---|
+| `AGENTS.md` | Role definition, guidelines, delegation rules |
+| `SOUL.md` | Personality and communication style (main agent only) |
+
+These are copied to `~/.openclaw/workspace[-<agentId>]/` during setup.
+Existing files are never overwritten, so local edits persist.
+
+### Customizing agents
+
+Edit `config/openclaw.agents.json` to change model assignments, add agents,
+or adjust sub-agent policies. Edit the workspace templates under
+`config/workspaces/` to change agent behavior and instructions.
 
 After editing, restart the gateway to pick up changes.
 
@@ -171,6 +186,11 @@ messyvirgo-openclaw-client/
     openclaw.secure.json              # Security hardening
     openclaw.models.json              # Model/provider config
     openclaw.agents.json              # Agent/persona definitions
+    workspaces/
+      main/AGENTS.md, SOUL.md          # Main agent behavior + persona
+      coder/AGENTS.md                   # Coder sub-agent behavior
+      researcher/AGENTS.md              # Researcher sub-agent behavior
+      planner/AGENTS.md                 # Planner sub-agent behavior
   docker-compose.yml                  # Base services
   docker-compose.secure.yml           # Hardening overlay
   docker-compose.ports.localhost.yml  # Localhost port binding

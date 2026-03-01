@@ -51,6 +51,17 @@ Linux note: if `./scripts/up.sh` fails with a port bind error even though the po
 ./scripts/cli.sh health --json
 ```
 
+## Multi-Agent Setup
+
+This repo ships a pre-configured 4-agent architecture powered by DeepInfra:
+
+- **Messy Virgo** (main) — orchestrator that handles chat and delegates tasks
+- **Coder** — code writing and debugging (Kimi K2.5)
+- **Researcher** — web search and data lookup (DeepSeek V3.2)
+- **Planner** — multi-step planning with deep thinking (Kimi K2.5)
+
+See `docs/STRATEGY.md` for details on customizing agents and models.
+
 ## Security model (short)
 
 - **Linux (secure compose)**: dashboard ports are bound to `127.0.0.1`.
