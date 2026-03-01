@@ -5,5 +5,9 @@
 # Local clones/build artifacts (created by scripts/setup.sh)
 .openclaw-src/
 
+# Ignore user skills (keep README.md tracked)
+skills/*
+!skills/README.md
+
 # OS/editor noise
 .DS_Store

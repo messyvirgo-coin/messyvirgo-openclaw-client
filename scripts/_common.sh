@@ -21,6 +21,7 @@ compose_base() {
     -f "$ROOT_DIR/docker-compose.yml" \
     -f "$ROOT_DIR/docker-compose.secure.yml" \
     -f "$ROOT_DIR/docker-compose.ports.localhost.yml" \
+    -f "$ROOT_DIR/docker-compose.skills.yml" \
     "$@"
 }
 
@@ -29,6 +30,7 @@ compose_linux_hostnet() {
     -f "$ROOT_DIR/docker-compose.yml" \
     -f "$ROOT_DIR/docker-compose.secure.yml" \
     -f "$ROOT_DIR/docker-compose.linux-hostnet.yml" \
+    -f "$ROOT_DIR/docker-compose.skills.yml" \
     "$@"
 }
 

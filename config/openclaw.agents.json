@@ -1,0 +1,13 @@
+{
+  "agents": {
+    "list": [
+      {
+        "id": "default",
+        "default": true,
+        "name": "Assistant",
+        "identity": { "name": "Assistant" },
+        "model": "sonnet"
+      }
+    ]
+  }
+}

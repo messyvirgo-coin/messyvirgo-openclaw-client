@@ -1,0 +1,7 @@
+services:
+  openclaw-gateway:
+    volumes:
+      - ./skills:/home/node/custom-skills:ro
+  openclaw-cli:
+    volumes:
+      - ./skills:/home/node/custom-skills:ro

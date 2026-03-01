@@ -69,6 +69,7 @@ fi
 
 # Write .env (simple overwrite, deterministic keys)
 cat >"$ENV_FILE" <<EOF
+OPENCLAW_GIT_REPO=${OPENCLAW_GIT_REPO:-https://github.com/messyvirgo-coin/messyvirgo-openclaw.git}
 OPENCLAW_CONFIG_DIR=$OPENCLAW_CONFIG_DIR
 OPENCLAW_WORKSPACE_DIR=$OPENCLAW_WORKSPACE_DIR
 OPENCLAW_GATEWAY_PORT=${OPENCLAW_GATEWAY_PORT:-18789}
@@ -87,7 +88,7 @@ if [[ -d "$OPENCLAW_SRC_DIR/.git" ]]; then
   git -C "$OPENCLAW_SRC_DIR" pull --ff-only
 else
   rm -rf "$OPENCLAW_SRC_DIR"
-  git clone https://github.com/openclaw/openclaw.git "$OPENCLAW_SRC_DIR"
+  git clone "${OPENCLAW_GIT_REPO:-https://github.com/messyvirgo-coin/messyvirgo-openclaw.git}" "$OPENCLAW_SRC_DIR"
 fi
 
 info "Building Docker image ($OPENCLAW_IMAGE)"
@@ -97,18 +98,18 @@ docker build \
   -f "$OPENCLAW_SRC_DIR/Dockerfile" \
   "$OPENCLAW_SRC_DIR"
 
-info "Copying secure config template (if missing)"
-if [[ -f "$ROOT_DIR/config/openclaw.secure.json" ]]; then
-  mkdir -p "$OPENCLAW_CONFIG_DIR"
-  if [[ ! -f "$OPENCLAW_CONFIG_DIR/openclaw.json" ]]; then
-    cp "$ROOT_DIR/config/openclaw.secure.json" "$OPENCLAW_CONFIG_DIR/openclaw.json"
-    info "Wrote $OPENCLAW_CONFIG_DIR/openclaw.json"
+info "Deploying config templates"
+mkdir -p "$OPENCLAW_CONFIG_DIR"
+for f in "$ROOT_DIR"/config/openclaw*.json; do
+  [[ -f "$f" ]] || continue
+  dest="$OPENCLAW_CONFIG_DIR/$(basename "$f")"
+  if [[ ! -f "$dest" ]]; then
+    cp "$f" "$dest"
+    info "Wrote $dest"
   else
-    info "Config already exists at $OPENCLAW_CONFIG_DIR/openclaw.json (leaving it untouched)"
+    info "$(basename "$f") already exists at $dest (leaving untouched)"
   fi
-else
-  info "Secure config template not present yet; continuing without it."
-fi
+done
 
 info "Running OpenClaw onboarding (interactive)"
 info "Suggested answers:"

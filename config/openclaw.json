@@ -1,0 +1,13 @@
+{
+  "$include": [
+    "./openclaw.secure.json",
+    "./openclaw.models.json",
+    "./openclaw.agents.json"
+  ],
+  "skills": {
+    "load": {
+      "extraDirs": ["/home/node/custom-skills"],
+      "watch": true
+    }
+  }
+}
