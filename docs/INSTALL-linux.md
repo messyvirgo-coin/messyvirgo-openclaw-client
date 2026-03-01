@@ -55,6 +55,16 @@ Use the tokenized URL printed by `dashboard.sh`.
 ./scripts/down.sh
 ```
 
+### Upgrading
+
+To pull the latest version and restart:
+
+```bash
+./scripts/upgrade.sh
+```
+
+This fetches the latest source, rebuilds the Docker image, and restarts the gateway. Your config and data are untouched.
+
 ### Common issues
 
 #### “permission denied” / “Cannot connect to the Docker daemon”

@@ -36,6 +36,12 @@ This code is provided **as-is** and maintained **best-effort**. PRs/issues are w
 ./scripts/cli-shell.sh
 ```
 
+# Upgrade
+
+```bash
+./scripts/upgrade.sh
+```
+
 More checklists: `[docs/VERIFY.md](docs/VERIFY.md)`
 
 Linux note: if `./scripts/up.sh` fails with a port bind error even though the port is free, use:

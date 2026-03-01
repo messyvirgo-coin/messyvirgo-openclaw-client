@@ -61,6 +61,16 @@ This prints a tokenized URL that you can open in Safari/Chrome.
 ./scripts/down.sh
 ```
 
+### Upgrading
+
+To pull the latest version and restart:
+
+```bash
+./scripts/upgrade.sh
+```
+
+This fetches the latest source, rebuilds the Docker image, and restarts the gateway. Your config and data are untouched.
+
 ### Common issues
 
 #### “Docker is installed but not running”
