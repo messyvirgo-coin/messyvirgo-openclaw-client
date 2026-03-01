@@ -71,15 +71,15 @@ The client ships a 4-agent setup where a main orchestrator (Messy Virgo)
 delegates specialized tasks to sub-agents:
 
 ```
-Main (Messy Virgo) — GPT-5 Mini
-├── Coder       — Qwen3 Coder (thinking: off)
-├── Researcher  — Gemini 3 Flash
+Main (Messy Virgo) — DeepSeek V3.1-Terminus
+├── Coder       — Kimi K2.5 (thinking: off)
+├── Researcher  — DeepSeek V3.2
 └── Planner     — Kimi K2.5 (thinking: high)
 ```
 
-- **Main** handles direct chat and simple questions. Delegates complex tasks (GPT-5 Mini).
-- **Coder** handles code writing, debugging, scripts (Qwen3 Coder, no thinking).
-- **Researcher** handles web search, current data, document analysis (Gemini 3 Flash).
+- **Main** handles direct chat and simple questions. Delegates complex tasks.
+- **Coder** handles code writing, debugging, scripts (Kimi K2.5, no thinking).
+- **Researcher** handles web search, current data, document analysis (DeepSeek V3.2).
 - **Planner** handles multi-step planning, architecture, strategy (Kimi K2.5, deep thinking).
 
 ### How it works

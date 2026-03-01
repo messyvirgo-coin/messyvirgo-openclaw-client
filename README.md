@@ -53,11 +53,11 @@ Linux note: if `./scripts/up.sh` fails with a port bind error even though the po
 
 ## Multi-Agent Setup
 
-This repo ships a pre-configured 4-agent architecture powered by [bankr.bot/llm](https://llm.bankr.bot):
+This repo ships a pre-configured 4-agent architecture powered by DeepInfra:
 
-- **Messy Virgo** (main) — orchestrator that handles chat and delegates tasks (GPT-5 Mini)
-- **Coder** — code writing and debugging (Qwen3 Coder)
-- **Researcher** — web search and data lookup (Gemini 3 Flash)
+- **Messy Virgo** (main) — orchestrator that handles chat and delegates tasks
+- **Coder** — code writing and debugging (Kimi K2.5)
+- **Researcher** — web search and data lookup (DeepSeek V3.2)
 - **Planner** — multi-step planning with deep thinking (Kimi K2.5)
 
 See `docs/STRATEGY.md` for details on customizing agents and models.
