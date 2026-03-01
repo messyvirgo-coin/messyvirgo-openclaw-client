@@ -12,8 +12,12 @@
             "name": "Kimi K2.5"
           },
           {
-            "id": "deepseek-ai/DeepSeek-V3",
-            "name": "DeepSeek-V3"
+            "id": "deepseek-ai/DeepSeek-V3.1-Terminus",
+            "name": "DeepSeek V3.1 Terminus"
+          },
+          {
+            "id": "deepseek-ai/DeepSeek-V3.2",
+            "name": "DeepSeek V3.2"
           }
         ]
       }
@@ -22,11 +26,12 @@
   "agents": {
     "defaults": {
       "model": {
-        "primary": "deepinfra/deepseek-ai/DeepSeek-V3"
+        "primary": "deepinfra/deepseek-ai/DeepSeek-V3.1-Terminus"
       },
       "models": {
-        "deepinfra/deepseek-ai/DeepSeek-V3": { "alias": "deepseek" },
-        "deepinfra/moonshotai/Kimi-K2.5": { "alias": "kimi" }
+        "deepinfra/deepseek-ai/DeepSeek-V3.1-Terminus": { "alias": "terminus" },
+        "deepinfra/moonshotai/Kimi-K2.5": { "alias": "kimi" },
+        "deepinfra/deepseek-ai/DeepSeek-V3.2": { "alias": "v32" }
       }
     }
   }
