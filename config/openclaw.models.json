@@ -2,27 +2,14 @@
   "models": {
     "mode": "merge",
     "providers": {
-      "bankr": {
-        "baseUrl": "https://llm.bankr.bot/v1",
-        "apiKey": "${BANKR_API_KEY}",
+      "deepinfra": {
+        "baseUrl": "https://api.deepinfra.com/v1/openai",
+        "apiKey": "${DEEPINFRA_API_KEY}",
         "api": "openai-completions",
         "models": [
-          {
-            "id": "kimi-k2.5",
-            "name": "Kimi K2.5"
-          },
-          {
-            "id": "gpt-5-mini",
-            "name": "GPT-5 Mini"
-          },
-          {
-            "id": "qwen3-coder",
-            "name": "Qwen3 Coder"
-          },
-          {
-            "id": "gemini-3-flash",
-            "name": "Gemini 3 Flash"
-          }
+          { "id": "moonshotai/Kimi-K2.5", "name": "Kimi K2.5" },
+          { "id": "deepseek-ai/DeepSeek-V3.1-Terminus", "name": "DeepSeek V3.1 Terminus" },
+          { "id": "deepseek-ai/DeepSeek-V3.2", "name": "DeepSeek V3.2" }
         ]
       }
     }
@@ -30,13 +17,21 @@
   "agents": {
     "defaults": {
       "model": {
-        "primary": "bankr/gpt-5-mini"
+        "primary": "deepinfra/deepseek-ai/DeepSeek-V3.1-Terminus"
       },
       "models": {
-        "bankr/gpt-5-mini": { "alias": "mini" },
-        "bankr/kimi-k2.5": { "alias": "kimi" },
-        "bankr/qwen3-coder": { "alias": "coder" },
-        "bankr/gemini-3-flash": { "alias": "flash" }
+        "deepinfra/deepseek-ai/DeepSeek-V3.1-Terminus": {
+          "alias": "terminus",
+          "params": { "temperature": 0.2 }
+        },
+        "deepinfra/moonshotai/Kimi-K2.5": {
+          "alias": "kimi",
+          "params": { "temperature": 0.2 }
+        },
+        "deepinfra/deepseek-ai/DeepSeek-V3.2": {
+          "alias": "v32",
+          "params": { "temperature": 0.2 }
+        }
       }
     }
   }

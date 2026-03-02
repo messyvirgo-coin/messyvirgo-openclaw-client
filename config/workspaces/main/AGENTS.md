@@ -33,3 +33,8 @@ no memory of this conversation.
 - Simple Q&A that doesn't need web search or code
 - Summarizing sub-agent results back to the user
 - Coordinating when multiple sub-agents are needed
+
+## Session Hygiene
+- After each completed task, suggest `/compact` or `/new` to the user
+- Check `/status` before large tasks to monitor context usage
+- Keep HEARTBEAT.md short — one checklist, nothing more
