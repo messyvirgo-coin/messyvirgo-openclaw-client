@@ -5,11 +5,55 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/_common.sh"
 load_env
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+SYNC_WORKSPACES=0
+DRY_RUN=0
+CLEANUP_BOOTSTRAP=0
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --sync-workspaces)
+      SYNC_WORKSPACES=1
+      ;;
+    --dry-run)
+      DRY_RUN=1
+      ;;
+    --cleanup-bootstrap)
+      CLEANUP_BOOTSTRAP=1
+      ;;
+    -h|--help)
+      cat <<'EOF'
+Usage: ./scripts/upgrade.sh [options]
+
+Options:
+  --sync-workspaces    Overwrite changed workspace templates (creates .bak timestamped backups)
+  --dry-run            Print what workspace deployment would change
+  --cleanup-bootstrap  Remove BOOTSTRAP.md from deployed workspaces (creates backup first)
+  -h, --help           Show this help
+EOF
+      exit 0
+      ;;
+    *)
+      die "Unknown option: $1"
+      ;;
+  esac
+  shift
+done
 
 ensure_docker_running
 
 if [[ -z "${OPENCLAW_SRC_DIR:-}" ]]; then
   die "OPENCLAW_SRC_DIR is not set. Run scripts/setup.sh first."
+fi
+
+if [[ -z "${OPENCLAW_WORKSPACES_DIR:-}" ]]; then
+  if [[ -n "${OPENCLAW_WORKSPACE_DIR:-}" ]]; then
+    OPENCLAW_WORKSPACES_DIR="$(dirname "$OPENCLAW_WORKSPACE_DIR")"
+  elif [[ -n "${OPENCLAW_CONFIG_DIR:-}" ]]; then
+    OPENCLAW_WORKSPACES_DIR="$HOME/OpenClawWorkspaces"
+  else
+    OPENCLAW_WORKSPACES_DIR="$HOME/OpenClawWorkspaces"
+  fi
 fi
 
 if [[ ! -d "$OPENCLAW_SRC_DIR/.git" ]]; then
@@ -27,6 +71,13 @@ docker build \
   -t "$OPENCLAW_IMAGE" \
   -f "$OPENCLAW_SRC_DIR/Dockerfile" \
   "$OPENCLAW_SRC_DIR"
+
+deploy_workspace_templates \
+  "$ROOT_DIR" \
+  "$OPENCLAW_WORKSPACES_DIR" \
+  "$SYNC_WORKSPACES" \
+  "$DRY_RUN" \
+  "$CLEANUP_BOOTSTRAP"
 
 info "Restarting gateway"
 compose down openclaw-gateway

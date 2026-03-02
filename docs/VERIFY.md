@@ -19,11 +19,27 @@ On **Linux** (secure compose), you should see `127.0.0.1:18789->18789/tcp` (not 
 
 On **macOS**, this repo uses `docker-compose.macos.yml` which binds to `0.0.0.0` due to a Docker Desktop loopback port-binding quirk. The gateway is still token-authenticated, but treat this as broader network exposure than a strict loopback bind.
 
-## 2) Confirm the workspace mount is the only RW host path
+## 2) Confirm per-agent workspaces are present and mapped
 
-Your `.env` defines the only RW host mount:
+Your `.env` should define:
 
+- `OPENCLAW_WORKSPACES_DIR=...`
 - `OPENCLAW_WORKSPACE_DIR=...`
+
+`OPENCLAW_WORKSPACE_DIR` should normally be `<OPENCLAW_WORKSPACES_DIR>/main`.
+
+Check host-side directories:
+
+```bash
+ls -la "$OPENCLAW_WORKSPACES_DIR"
+```
+
+You should see at least:
+
+- `main/`
+- `coder/`
+- `researcher/`
+- `planner/`
 
 Sanity check inside the container:
 
@@ -37,7 +53,7 @@ Linux host-network workaround:
 ./scripts/cli.sh status
 ```
 
-And verify your Compose volumes in `docker-compose.yml` only mount:
+And verify your Compose volumes in `docker-compose.yml` include:
 
 - `${OPENCLAW_CONFIG_DIR}:/home/node/.openclaw`
 - `${OPENCLAW_WORKSPACE_DIR}:/home/node/.openclaw/workspace`
@@ -62,8 +78,21 @@ So the secure default here is:
 
 If this repo includes a secure config template (`config/openclaw.secure.json`), the setup script will copy it to `openclaw.json` on first setup (if missing).
 
-## 5) Run a simple agent message (local test)
+## 5) Run simple per-agent identity checks
+
+Test each agent explicitly:
 
 ```bash
-./scripts/cli.sh agent --session-id localtest --message "Say hello and tell me which workspace folder you can access."
+./scripts/cli.sh agent --agent main --message "State your name in one sentence."
+./scripts/cli.sh agent --agent coder --message "State your name in one sentence."
+./scripts/cli.sh agent --agent researcher --message "State your name in one sentence."
+./scripts/cli.sh agent --agent planner --message "State your name in one sentence."
+```
+
+If an agent behaves like first-run onboarding ("Who am I?"), that workspace
+still has a `BOOTSTRAP.md`. Remove it (or run setup/upgrade with
+`--cleanup-bootstrap`) and restart the gateway.
+
+```bash
+./scripts/down.sh && ./scripts/up.sh
 ```

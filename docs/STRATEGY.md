@@ -2,7 +2,7 @@
 
 ## Two-Repo Architecture
 
-```
+```text
 messyvirgo-openclaw          (fork — clean mirror of openclaw/openclaw)
 messyvirgo-openclaw-client   (client — Docker wrapper, configs, skills, docs)
 ```
@@ -27,21 +27,17 @@ git push origin main
 Then in the client repo, run `./scripts/upgrade.sh` to pull the latest fork
 code, rebuild the Docker image, and restart the gateway.
 
-## Config Layering
+## Config Strategy
 
-OpenClaw supports `$include` directives in `openclaw.json` that deep-merge
-multiple JSON5 files. The client repo ships these config fragments:
+This client repo currently uses a single config template:
 
 | File | Purpose |
-|---|---|
-| `config/openclaw.json` | Master template — includes the others, sets skill dirs |
-| `config/openclaw.secure.json` | Security hardening (sandbox, logging, discovery) |
-| `config/openclaw.models.json` | Model provider keys and default model |
-| `config/openclaw.agents.json` | Agent/persona definitions |
+| --- | --- |
+| `config/openclaw.json` | Unified gateway, model, agent, and skills configuration |
 
-During `setup.sh`, these are copied to `$OPENCLAW_CONFIG_DIR` (default
-`~/.openclaw-secure`). Files are never overwritten if they already exist,
-so local edits are preserved across upgrades.
+During `setup.sh`, `config/openclaw.json` is copied to `$OPENCLAW_CONFIG_DIR`
+(default `~/.openclaw-secure`) if it does not already exist. Existing config
+is left untouched unless you replace it manually.
 
 ### Environment Variable Substitution
 
@@ -53,7 +49,7 @@ before running compose.
 
 Place skill directories under `skills/` in the client repo:
 
-```
+```text
 skills/
   my-skill/
     SKILL.md
@@ -70,16 +66,16 @@ See `skills/README.md` for details and examples.
 The client ships a 4-agent setup where a main orchestrator (Messy Virgo)
 delegates specialized tasks to sub-agents:
 
-```
-Main (Messy Virgo) — DeepSeek V3.1-Terminus
-├── Coder       — Kimi K2.5 (thinking: off)
-├── Researcher  — DeepSeek V3.2
+```text
+Main (Messy Virgo) — Gemini 2.5 Flash
+├── Coder       — Qwen3 Coder
+├── Researcher  — Gemini 2.5 Flash
 └── Planner     — Kimi K2.5 (thinking: high)
 ```
 
 - **Main** handles direct chat and simple questions. Delegates complex tasks.
-- **Coder** handles code writing, debugging, scripts (Kimi K2.5, no thinking).
-- **Researcher** handles web search, current data, document analysis (DeepSeek V3.2).
+- **Coder** handles code writing, debugging, scripts (Qwen3 Coder).
+- **Researcher** handles web search, current data, document analysis (Gemini 2.5 Flash).
 - **Planner** handles multi-step planning, architecture, strategy (Kimi K2.5, deep thinking).
 
 ### How it works
@@ -94,16 +90,29 @@ Each agent's behavior is defined by Markdown bootstrap files in
 `config/workspaces/<agentId>/`:
 
 | File | Purpose |
-|---|---|
+| --- | --- |
 | `AGENTS.md` | Role definition, guidelines, delegation rules |
 | `SOUL.md` | Personality and communication style (main agent only) |
 
-These are copied to `~/.openclaw/workspace[-<agentId>]/` during setup.
-Existing files are never overwritten, so local edits persist.
+These are deployed to:
+
+- `main` -> `$OPENCLAW_WORKSPACES_DIR/main`
+- `coder` -> `$OPENCLAW_WORKSPACES_DIR/coder`
+- `researcher` -> `$OPENCLAW_WORKSPACES_DIR/researcher`
+- `planner` -> `$OPENCLAW_WORKSPACES_DIR/planner`
+
+By default, changed files are preserved. You can opt into safe sync on setup/upgrade:
+
+```bash
+./scripts/setup.sh --sync-workspaces
+./scripts/upgrade.sh --sync-workspaces
+```
+
+Both commands create timestamped `.bak` backups before overwriting changed template files.
 
 ### Customizing agents
 
-Edit `config/openclaw.agents.json` to change model assignments, add agents,
+Edit `config/openclaw.json` to change model assignments, add agents,
 or adjust sub-agent policies. Edit the workspace templates under
 `config/workspaces/` to change agent behavior and instructions.
 
@@ -169,23 +178,25 @@ cd ../messyvirgo-openclaw-client
 ```
 
 The upgrade script:
+
 1. Pulls latest from your fork (`git pull --ff-only`)
 2. Rebuilds the Docker image
 3. Restarts the gateway container
 
-Your config files in `$OPENCLAW_CONFIG_DIR` are untouched — only the
-Docker image changes.
+By default, your config and workspace files remain untouched. To refresh
+workspace templates with backups, use:
+
+```bash
+./scripts/upgrade.sh --sync-workspaces
+```
 
 ## File Layout
 
-```
+```text
 messyvirgo-openclaw-client/
   .env.example                        # Template with all env vars
   config/
-    openclaw.json                     # Master config (includes others)
-    openclaw.secure.json              # Security hardening
-    openclaw.models.json              # Model/provider config
-    openclaw.agents.json              # Agent/persona definitions
+    openclaw.json                     # Unified runtime config
     workspaces/
       main/AGENTS.md, SOUL.md          # Main agent behavior + persona
       coder/AGENTS.md                   # Coder sub-agent behavior

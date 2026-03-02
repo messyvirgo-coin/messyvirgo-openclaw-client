@@ -1,17 +1,19 @@
 # OpenClaw Optimization Reference
 
-Configuration applied in `config/openclaw.models.json` and `config/openclaw.agents.json`.
+Configuration applied in `config/openclaw.json`.
 
 ---
 
 ## Model Params: temperature 0.2
-**File:** `openclaw.models.json` → `agents.defaults.models[*].params`
 
-Consistent temperature improves prompt cache hit rates. Applied to all three models.
+**Field:** `agents.defaults.models[*].params`
+
+Consistent temperature improves prompt cache hit rates. Applied to all configured models.
 
 ---
 
 ## Context Window Cap: 50K tokens
+
 **Field:** `agents.defaults.contextTokens`
 
 Caps the effective context window to encourage session resets and reduce runaway cost.
@@ -20,6 +22,7 @@ Use `/compact` or `/new` when approaching the limit.
 ---
 
 ## Context Pruning
+
 **Field:** `agents.defaults.contextPruning`
 
 ```json
@@ -31,6 +34,7 @@ Prunes messages older than 30 minutes of inactivity, keeping the last 3 assistan
 ---
 
 ## Compaction: Safeguard Mode
+
 **Field:** `agents.defaults.compaction`
 
 ```json
@@ -42,26 +46,29 @@ Reserves 32K tokens headroom to prevent context overflow during compaction.
 ---
 
 ## Heartbeat: 30-Minute Interval
+
 **Field:** `agents.defaults.heartbeat`
 
 ```json
-{ "every": "30m", "model": "deepinfra/deepseek-ai/DeepSeek-V3.2", "includeReasoning": false }
+{ "every": "30m", "model": "bankr/gpt-5-nano" }
 ```
 
-Uses the cheapest model (DeepSeek V3.2) for background heartbeat runs.
+Uses the cheapest configured model (`gpt-5-nano`) for background heartbeat runs.
 Keep `HEARTBEAT.md` minimal — an empty or comment-only file skips the API call entirely.
 
 ---
 
-## Thinking: Off by Default
+## Thinking: Low by Default
+
 **Field:** `agents.defaults.thinkingDefault`
 
-Global default is `off`. Enable per-task with `/think:high`. The planner agent is spawned
+Global default is `low`. Increase per-task with `/think:high` when needed. The planner agent is spawned
 with `thinking:high` by the main agent when needed (see `config/workspaces/main/AGENTS.md`).
 
 ---
 
 ## Memory: Curated MEMORY.md + Daily Logs
+
 **Workspace convention** (see `config/workspaces/main/SOUL.md`)
 
 - `MEMORY.md` is auto-loaded at every startup — keep it short and curated
