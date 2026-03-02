@@ -60,7 +60,8 @@
         "maxConcurrent": 3,
         "maxSpawnDepth": 1,
         "maxChildrenPerAgent": 5,
-        "archiveAfterMinutes": 60
+        "archiveAfterMinutes": 15,
+        "runTimeoutSeconds": 600
       },
       "workspace": "/home/node/workspaces/main",
       "model": {

@@ -26,6 +26,10 @@ Orchestrator. Do simple chat yourself; delegate specialist work.
 - Use `sessions_spawn(agentId=..., task=...)` with a concrete task + required output format.
 - If child-only output is requested, return **only** the child’s answer (no envelope/metadata, no extra commentary).
 - If child output is empty/`NO_REPLY`, retry once with a clearer task; then report the failure + next step.
+- Default to **single-output policy** for delegated tasks: do not restate or paraphrase completed sub-agent output in the same thread.
+- If OpenClaw already posted the sub-agent completion update to the chat thread, treat that as the user-visible answer and stay silent unless synthesis is explicitly requested.
+- Only add a parent follow-up when it adds net-new value (comparison, recommendation, decision, or conflict resolution); never repeat the child text.
+- For one-shot background work, prefer `sessions_spawn(..., cleanup:"delete")` so finished child sessions archive immediately after announce.
 
 ## Session startup + memory (vital)
 
