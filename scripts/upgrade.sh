@@ -46,14 +46,23 @@ if [[ -z "${OPENCLAW_SRC_DIR:-}" ]]; then
   die "OPENCLAW_SRC_DIR is not set. Run scripts/setup.sh first."
 fi
 
+DEFAULT_CONFIG_DIR="${OPENCLAW_CONFIG_DIR:-$HOME/.openclaw-secure}"
 if [[ -z "${OPENCLAW_WORKSPACES_DIR:-}" ]]; then
   if [[ -n "${OPENCLAW_WORKSPACE_DIR:-}" ]]; then
-    OPENCLAW_WORKSPACES_DIR="$(dirname "$OPENCLAW_WORKSPACE_DIR")"
+    LEGACY_PARENT_DIR="$(dirname "$OPENCLAW_WORKSPACE_DIR")"
+    if [[ "$LEGACY_PARENT_DIR" == "$HOME" ]]; then
+      OPENCLAW_WORKSPACES_DIR="$DEFAULT_CONFIG_DIR/workspaces"
+    else
+      OPENCLAW_WORKSPACES_DIR="$LEGACY_PARENT_DIR"
+    fi
   elif [[ -n "${OPENCLAW_CONFIG_DIR:-}" ]]; then
     OPENCLAW_WORKSPACES_DIR="$HOME/OpenClawWorkspaces"
   else
     OPENCLAW_WORKSPACES_DIR="$HOME/OpenClawWorkspaces"
   fi
+fi
+if [[ "$OPENCLAW_WORKSPACES_DIR" == "$HOME" || "$OPENCLAW_WORKSPACES_DIR" == "/" ]]; then
+  die "Refusing unsafe workspaces root '$OPENCLAW_WORKSPACES_DIR'. Use a dedicated subdirectory (for example $DEFAULT_CONFIG_DIR/workspaces)."
 fi
 
 if [[ ! -d "$OPENCLAW_SRC_DIR/.git" ]]; then
