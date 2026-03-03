@@ -1,5 +1,6 @@
 services:
   openclaw-gateway:
-    # Bridge port (expose only on localhost; gateway port is in docker-compose.yml)
+    # Expose only on localhost (bridge + gateway ports)
     ports:
+      - "127.0.0.1:${OPENCLAW_GATEWAY_PORT:-18789}:${OPENCLAW_GATEWAY_PORT:-18789}"
       - "127.0.0.1:${OPENCLAW_BRIDGE_PORT:-18790}:${OPENCLAW_BRIDGE_PORT:-18790}"

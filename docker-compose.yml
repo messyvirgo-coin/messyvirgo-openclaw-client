@@ -12,8 +12,6 @@ services:
       - ${OPENCLAW_CONFIG_DIR:-${HOME}/.openclaw-secure}:/home/node/.openclaw
       - ${OPENCLAW_WORKSPACES_DIR:-${HOME}/OpenClawWorkspaces}:/home/node/workspaces
       - ${OPENCLAW_WORKSPACE_DIR:-${HOME}/OpenClawWorkspace}:/home/node/.openclaw/workspace
-    ports:
-      - "127.0.0.1:${OPENCLAW_GATEWAY_PORT:-18789}:${OPENCLAW_GATEWAY_PORT:-18789}"
     init: true
     restart: unless-stopped
     command:
