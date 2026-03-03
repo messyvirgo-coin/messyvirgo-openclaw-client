@@ -1,9 +1,196 @@
 {
-  "$include": [
-    "./openclaw.secure.json",
-    "./openclaw.models.json",
-    "./openclaw.agents.json"
-  ],
+  "discovery": {
+    "mdns": {
+      "mode": "minimal"
+    }
+  },
+  "logging": {
+    "redactSensitive": "tools"
+  },
+  "tools": {
+    "web": {
+      "search": {
+        "provider": "brave",
+        "apiKey": "${BRAVE_API_KEY}",
+        "maxResults": 5,
+        "timeoutSeconds": 30
+      },
+      "fetch": {
+        "enabled": true
+      }
+    }
+  },
+  "session": {
+    "dmScope": "per-channel-peer"
+  },
+  "models": {
+    "mode": "merge",
+    "providers": {
+      "bankr": {
+        "baseUrl": "https://llm.bankr.bot/v1",
+        "apiKey": "${BANKR_API_KEY}",
+        "api": "openai-completions",
+        "models": [
+          { "id": "qwen3-coder",      "name": "Qwen3 Coder" },
+          { "id": "gemini-2.5-flash", "name": "Gemini 2.5 Flash" },
+          { "id": "kimi-k2.5",        "name": "Kimi K2.5" },
+          { "id": "gpt-5-nano",       "name": "GPT-5 Nano" }
+        ]
+      }
+    }
+  },
+  "agents": {
+    "defaults": {
+      "thinkingDefault": "low",
+      "contextTokens": 50000,
+      "contextPruning": {
+        "mode": "cache-ttl",
+        "ttl": "30m",
+        "keepLastAssistants": 3
+      },
+      "compaction": {
+        "mode": "safeguard",
+        "reserveTokensFloor": 32000
+      },
+      "heartbeat": {
+        "every": "30m",
+        "model": "bankr/gpt-5-nano"
+      },
+      "subagents": {
+        "maxConcurrent": 3,
+        "maxSpawnDepth": 1,
+        "maxChildrenPerAgent": 5,
+        "archiveAfterMinutes": 15,
+        "runTimeoutSeconds": 600
+      },
+      "workspace": "/home/node/workspaces/main",
+      "model": {
+        "primary": "bankr/qwen3-coder"
+      },
+      "models": {
+        "bankr/qwen3-coder": {
+          "alias": "qwen-coder",
+          "params": { "temperature": 0.2 }
+        },
+        "bankr/gemini-2.5-flash": {
+          "alias": "gemini-flash",
+          "params": { "temperature": 0.2 }
+        },
+        "bankr/kimi-k2.5": {
+          "alias": "kimi",
+          "params": { "temperature": 0.2 }
+        },
+        "bankr/gpt-5-nano": {
+          "alias": "gpt-nano",
+          "params": { "temperature": 0.2 }
+        }
+      },
+      "sandbox": {
+        "mode": "off",
+        "scope": "session",
+        "workspaceAccess": "rw",
+        "workspaceRoot": "~/.openclaw/sandboxes",
+        "docker": {
+          "image": "openclaw-sandbox:bookworm-slim",
+          "workdir": "/workspace",
+          "readOnlyRoot": true,
+          "tmpfs": ["/tmp", "/var/tmp", "/run"],
+          "network": "none",
+          "user": "1000:1000",
+          "capDrop": ["ALL"],
+          "pidsLimit": 256,
+          "memory": "1g",
+          "memorySwap": "2g",
+          "cpus": 1,
+          "ulimits": {
+            "nofile": { "soft": 1024, "hard": 2048 },
+            "nproc": 256
+          },
+          "env": {
+            "LANG": "C.UTF-8"
+          }
+        },
+        "prune": {
+          "idleHours": 24,
+          "maxAgeDays": 7
+        }
+      }
+    },
+    "list": [
+      {
+        "id": "main",
+        "default": true,
+        "name": "Messy Virgo",
+        "identity": { "name": "Messy Virgo" },
+        "workspace": "/home/node/workspaces/main",
+        "model": "bankr/qwen3-coder",
+        "subagents": {
+          "allowAgents": ["coder", "researcher", "planner"]
+        }
+      },
+      {
+        "id": "coder",
+        "name": "Coder",
+        "identity": { "name": "Coder" },
+        "workspace": "/home/node/workspaces/coder",
+        "model": "bankr/qwen3-coder",
+        "subagents": {
+          "thinking": "medium"
+        }
+      },
+      {
+        "id": "researcher",
+        "name": "Researcher",
+        "identity": { "name": "Researcher" },
+        "workspace": "/home/node/workspaces/researcher",
+        "model": "bankr/gemini-2.5-flash",
+        "subagents": {
+          "thinking": "high"
+        }
+      },
+      {
+        "id": "planner",
+        "name": "Planner",
+        "identity": { "name": "Planner" },
+        "workspace": "/home/node/workspaces/planner",
+        "model": "bankr/kimi-k2.5",
+        "subagents": {
+          "thinking": "high"
+        }
+      }
+    ]
+  },
+  "gateway": {
+    "mode": "local",
+    "bind": "lan",
+    "auth": {
+      "mode": "token",
+      "token": "${OPENCLAW_GATEWAY_TOKEN}"
+    },
+    "controlUi": {
+      "dangerouslyAllowHostHeaderOriginFallback": true
+    },
+    "tailscale": {
+      "mode": "off",
+      "resetOnExit": false
+    }
+  },
+  "commands": {
+    "native": "auto",
+    "nativeSkills": "auto",
+    "restart": true,
+    "ownerDisplay": "raw"
+  },
+  "hooks": {
+    "internal": {
+      "enabled": true,
+      "entries": {
+        "session-memory": {
+          "enabled": true
+        }
+      }
+    }
+  },
   "skills": {
     "load": {
       "extraDirs": ["/home/node/custom-skills"],

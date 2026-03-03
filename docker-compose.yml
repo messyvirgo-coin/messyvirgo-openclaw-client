@@ -6,8 +6,11 @@ services:
       TERM: xterm-256color
       OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN}
       OPENCLAW_GATEWAY_PORT: ${OPENCLAW_GATEWAY_PORT:-18789}
+      BANKR_API_KEY: ${BANKR_API_KEY:-}
+      BRAVE_API_KEY: ${BRAVE_API_KEY:-}
     volumes:
       - ${OPENCLAW_CONFIG_DIR:-${HOME}/.openclaw-secure}:/home/node/.openclaw
+      - ${OPENCLAW_WORKSPACES_DIR:-${HOME}/OpenClawWorkspaces}:/home/node/workspaces
       - ${OPENCLAW_WORKSPACE_DIR:-${HOME}/OpenClawWorkspace}:/home/node/.openclaw/workspace
     init: true
     restart: unless-stopped
@@ -29,9 +32,12 @@ services:
       TERM: xterm-256color
       OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN}
       OPENCLAW_GATEWAY_PORT: ${OPENCLAW_GATEWAY_PORT:-18789}
+      BANKR_API_KEY: ${BANKR_API_KEY:-}
+      BRAVE_API_KEY: ${BRAVE_API_KEY:-}
       BROWSER: echo
     volumes:
       - ${OPENCLAW_CONFIG_DIR:-${HOME}/.openclaw-secure}:/home/node/.openclaw
+      - ${OPENCLAW_WORKSPACES_DIR:-${HOME}/OpenClawWorkspaces}:/home/node/workspaces
       - ${OPENCLAW_WORKSPACE_DIR:-${HOME}/OpenClawWorkspace}:/home/node/.openclaw/workspace
     stdin_open: true
     tty: true

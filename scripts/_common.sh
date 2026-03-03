@@ -55,7 +55,9 @@ is_gateway_hostnet_running() {
 
 compose() {
   # Auto-select the right compose stack.
-  if ! is_macos && [[ -f "$ROOT_DIR/docker-compose.linux-hostnet.yml" ]] && is_gateway_hostnet_running; then
+  # Linux: use host networking (avoids Docker bridge NAT issues with device pairing).
+  # macOS: use bridge networking with localhost port mapping (Docker Desktop requirement).
+  if ! is_macos && [[ -f "$ROOT_DIR/docker-compose.linux-hostnet.yml" ]]; then
     compose_linux_hostnet "$@"
   else
     compose_base "$@"
@@ -108,4 +110,154 @@ ensure_docker_running() {
   if ! docker compose version >/dev/null 2>&1; then
     die "Docker Compose v2 is not available. Install/enable 'docker compose'."
   fi
+}
+
+workspace_dir_for_agent() {
+  local workspace_root="$1"
+  local agent_id="$2"
+  echo "$workspace_root/$agent_id"
+}
+
+sync_directory_contents() {
+  local source_dir="$1"
+  local target_dir="$2"
+  local sync_mode="${3:-0}"
+  local dry_run="${4:-0}"
+  local ts="$5"
+  local label="${6:-assets}"
+
+  [[ -d "$source_dir" ]] || return 0
+
+  if [[ "$dry_run" == "1" ]]; then
+    info "[dry-run] would ensure $label dir: $target_dir"
+  else
+    mkdir -p "$target_dir"
+  fi
+
+  local src
+  for src in "$source_dir"/*; do
+    [[ -e "$src" ]] || continue
+    local name dest
+    name="$(basename "$src")"
+    dest="$target_dir/$name"
+
+    if [[ ! -e "$dest" ]]; then
+      if [[ "$dry_run" == "1" ]]; then
+        info "[dry-run] would create $dest"
+      else
+        cp -R "$src" "$dest"
+        info "Wrote $dest"
+      fi
+      continue
+    fi
+
+    if cmp -s "$src" "$dest" 2>/dev/null; then
+      info "$label item already up to date at $dest"
+      continue
+    fi
+
+    if [[ "$sync_mode" == "1" ]]; then
+      local backup_path
+      backup_path="$dest.bak.$ts"
+      if [[ "$dry_run" == "1" ]]; then
+        info "[dry-run] would backup $dest -> $backup_path"
+        info "[dry-run] would overwrite $dest from $source_dir"
+      else
+        cp -R "$dest" "$backup_path"
+        rm -rf "$dest"
+        cp -R "$src" "$dest"
+        info "Updated $dest (backup: $backup_path)"
+      fi
+    else
+      info "$dest already exists (leaving untouched)"
+    fi
+  done
+}
+
+deploy_workspace_templates() {
+  local repo_root="$1"
+  local workspace_root="$2"
+  local sync_workspaces="${3:-0}"
+  local dry_run="${4:-0}"
+  local cleanup_bootstrap="${5:-0}"
+  local ts
+  ts="$(date +%Y%m%d-%H%M%S)"
+
+  info "Deploying workspace templates"
+  for agent_dir in "$repo_root"/config/workspaces/*/; do
+    [[ -d "$agent_dir" ]] || continue
+    local agent_id target_dir
+    agent_id="$(basename "$agent_dir")"
+    target_dir="$(workspace_dir_for_agent "$workspace_root" "$agent_id")"
+
+    if [[ "$dry_run" == "1" ]]; then
+      info "[dry-run] would ensure workspace dir: $target_dir"
+    else
+      mkdir -p "$target_dir"
+    fi
+
+    for f in "$agent_dir"*.md; do
+      [[ -f "$f" ]] || continue
+      local dest file_name
+      file_name="$(basename "$f")"
+      dest="$target_dir/$file_name"
+
+      if [[ ! -f "$dest" ]]; then
+        if [[ "$dry_run" == "1" ]]; then
+          info "[dry-run] would create $dest"
+        else
+          cp "$f" "$dest"
+          info "Wrote $dest"
+        fi
+        continue
+      fi
+
+      if cmp -s "$f" "$dest"; then
+        info "$file_name already up to date at $target_dir"
+        continue
+      fi
+
+      if [[ "$sync_workspaces" == "1" ]]; then
+        local backup_path
+        backup_path="$dest.bak.$ts"
+        if [[ "$dry_run" == "1" ]]; then
+          info "[dry-run] would backup $dest -> $backup_path"
+          info "[dry-run] would overwrite $dest from template"
+        else
+          cp "$dest" "$backup_path"
+          cp "$f" "$dest"
+          info "Updated $dest (backup: $backup_path)"
+        fi
+      else
+        info "$file_name already exists at $target_dir (leaving untouched)"
+      fi
+    done
+
+    if [[ "$cleanup_bootstrap" == "1" ]]; then
+      local bootstrap_path
+      bootstrap_path="$target_dir/BOOTSTRAP.md"
+      if [[ -f "$bootstrap_path" ]]; then
+        local bootstrap_backup
+        bootstrap_backup="$bootstrap_path.bak.$ts"
+        if [[ "$dry_run" == "1" ]]; then
+          info "[dry-run] would backup and remove $bootstrap_path"
+        else
+          cp "$bootstrap_path" "$bootstrap_backup"
+          rm -f "$bootstrap_path"
+          info "Removed $bootstrap_path (backup: $bootstrap_backup)"
+        fi
+      fi
+    fi
+
+    # Optional per-agent avatar assets.
+    # Source: assets/avatars/<agent-id>/...
+    # Target: <workspace>/<agent-id>/avatars/...
+    sync_directory_contents \
+      "$repo_root/assets/avatars/$agent_id" \
+      "$target_dir/avatars" \
+      "$sync_workspaces" \
+      "$dry_run" \
+      "$ts" \
+      "avatar ($agent_id)"
+  done
 }

@@ -2,6 +2,7 @@ services:
   openclaw-gateway:
     # Linux-only workaround: avoid Docker port publishing (-p) entirely.
     # This keeps things localhost-only by forcing the gateway to bind loopback.
+    # Keep explicit empty ports override as a guard when merging compose files.
     network_mode: host
     ports: []
   openclaw-cli:

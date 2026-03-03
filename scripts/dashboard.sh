@@ -21,7 +21,7 @@ if [[ -z "${TOKEN}" ]]; then
 fi
 
 PORT="${OPENCLAW_GATEWAY_PORT:-18789}"
-URL="http://127.0.0.1:${PORT}/?token=${TOKEN}"
+URL="http://127.0.0.1:${PORT}/#token=${TOKEN}"
 
 echo "$URL"
 echo ""
