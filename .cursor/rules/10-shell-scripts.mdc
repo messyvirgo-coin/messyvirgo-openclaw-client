@@ -1,0 +1,13 @@
+---
+description: Safe editing rules for wrapper shell scripts
+globs: scripts/**/*.sh
+alwaysApply: false
+---
+
+# Shell Script Rules
+
+- Preserve Linux + macOS bash compatibility.
+- Prefer extending shared helpers in `scripts/_common.sh` over duplicating logic.
+- Keep `setup.sh` and `upgrade.sh` non-destructive by default; never overwrite user config or workspaces unless an explicit sync/cleanup flag is present.
+- Do not print secrets, tokens, or full credential-bearing URLs.
+- Keep path checks and "refuse unsafe directory" guards intact when touching `OPENCLAW_*` paths.

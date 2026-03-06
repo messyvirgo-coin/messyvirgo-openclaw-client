@@ -1,0 +1,30 @@
+---
+description: Core Cursor guidance for the Messy Virgo OpenClaw wrapper repo
+alwaysApply: true
+---
+
+# Wrapper Repo Rules
+
+- Treat this repository as the deployment wrapper around OpenClaw, not the main OpenClaw source tree.
+- The OpenClaw source is cloned from `OPENCLAW_GIT_REPO` into `OPENCLAW_SRC_DIR`; in local dev it may exist as the sibling repo `../messyvirgo-openclaw`.
+- Keep the source fork clean and upstream-syncable; put Messy Virgo customizations in this repo unless a source-level change is truly required.
+- Keep changes small and reviewable; avoid broad refactors without clear need.
+- Do not hardcode secrets, tokens, private URLs, or machine-specific paths.
+- If behavior changes, update docs or comments in the same PR when needed.
+
+## Primary Customization Areas
+
+- Prefer editing `config/openclaw.json` for models, gateway settings, agents, and skills loading.
+- Prefer editing `config/workspaces/**` for agent instructions and workspace bootstrap files.
+- Prefer editing `skills/**` for custom OpenClaw skills mounted into the container.
+- Prefer editing `docker-compose*.yml` and `scripts/*.sh` for deployment, hardening, and wrapper behavior.
+
+## Security And Upgrade Expectations
+
+- Preserve the secure-wrapper model: explicit mounts only, hardened containers, token-authenticated gateway, and no unnecessary host exposure.
+- `setup.sh` and `upgrade.sh` should preserve deployed user config/workspaces by default; only overwrite templates when sync flags explicitly request it.
+
+## Validation Defaults
+
+- Run only the smallest relevant checks first (lint/tests for touched areas).
+- Report what was verified and what still needs manual validation.

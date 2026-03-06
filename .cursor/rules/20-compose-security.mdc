@@ -1,0 +1,12 @@
+---
+description: Preserve container hardening and explicit mounts in compose files
+globs: docker-compose*.yml
+alwaysApply: false
+---
+
+# Compose Rules
+
+- Preserve the wrapper security model: explicit mounts only, no broad host mounts, and no accidental Docker socket exposure.
+- Keep gateway auth token-based unless the user explicitly changes the threat model.
+- Be careful changing port binds, especially localhost-only behavior and the documented macOS exception.
+- Do not weaken hardening defaults such as read-only rootfs, dropped capabilities, tmpfs mounts, and `no-new-privileges` without a clear reason.
