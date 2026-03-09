@@ -88,6 +88,11 @@ Verify:
 ./scripts/upgrade.sh
 ```
 
+Why not use "Update now" in the UI?
+
+- This wrapper runs OpenClaw from a Docker image, so in-app self-update is typically skipped with `reason: "not-git-install"` (runtime path is usually `/app`).
+- In container/immutable deployments, the correct update path is: sync fork -> rebuild image -> restart container via `./scripts/upgrade.sh`.
+
 If you want to apply updated wrapper config templates (including security
 defaults) to an existing deployment, run:
 

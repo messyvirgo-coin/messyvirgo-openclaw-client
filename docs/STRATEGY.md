@@ -196,6 +196,10 @@ The upgrade script:
 2. Rebuilds the Docker image
 3. Restarts the gateway container
 
+Note on UI updates: in this wrapper, OpenClaw runs from a container image
+(`reason: "not-git-install"` in update status is expected), so "Update now" in
+the UI is informational only. Use the deployment-level flow above.
+
 By default, your config and workspace files remain untouched. To refresh
 workspace templates with backups, use:
 
