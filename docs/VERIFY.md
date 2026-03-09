@@ -40,6 +40,7 @@ You should see at least:
 - `coder/`
 - `researcher/`
 - `planner/`
+- `messy-funds-mngr/`
 
 Sanity check inside the container:
 
@@ -87,6 +88,7 @@ Test each agent explicitly:
 ./scripts/cli.sh agent --agent coder --message "State your name in one sentence."
 ./scripts/cli.sh agent --agent researcher --message "State your name in one sentence."
 ./scripts/cli.sh agent --agent planner --message "State your name in one sentence."
+./scripts/cli.sh agent --agent messy-funds-mngr --message "State your name in one sentence."
 ```
 
 If an agent behaves like first-run onboarding ("Who am I?"), that workspace
@@ -96,3 +98,33 @@ still has a `BOOTSTRAP.md`. Remove it (or run setup/upgrade with
 ```bash
 ./scripts/down.sh && ./scripts/up.sh
 ```
+
+## 6) Verify shared Messy Virgo MCP runtime wiring
+
+Ensure these env values exist in `.env`:
+
+- `MESSY_VIRGO_MCP_URL`
+- `MESSY_VIRGO_API_KEY`
+
+If your MCP runs on your host (for example `http://localhost:8000/mcp`), keep that
+value in `.env`. The wrapper rewrites it to `host.docker.internal` in deployed
+`mcporter.json` so containers can reach it.
+
+Then validate runtime registration from the CLI container:
+
+```bash
+docker compose run --rm --entrypoint sh openclaw-cli -lc 'mcporter list messy-virgo-funds'
+```
+
+Missing-key safety check:
+
+```bash
+MESSY_VIRGO_MCP_URL=https://example.invalid/mcp MESSY_VIRGO_API_KEY= docker compose -f docker-compose.yml config >/dev/null
+./scripts/up.sh
+```
+
+When URL is set but key is empty, gateway startup fails fast with:
+`MESSY_VIRGO_API_KEY is required when MESSY_VIRGO_MCP_URL is set.`
+
+If the key is present but invalid, funds MCP tool calls should fail with an
+authorization error. That is expected and safer than silent fallback.

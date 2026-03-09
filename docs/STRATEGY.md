@@ -29,13 +29,14 @@ code, rebuild the Docker image, and restart the gateway.
 
 ## Config Strategy
 
-This client repo currently uses a single config template:
+This client repo uses two runtime config templates:
 
 | File | Purpose |
 | --- | --- |
 | `config/openclaw.json` | Unified gateway, model, agent, and skills configuration |
+| `config/mcporter.json` | Shared MCP runtime registration for instance-level MCP servers |
 
-During `setup.sh`, `config/openclaw.json` is copied to `$OPENCLAW_CONFIG_DIR`
+During `setup.sh`, `config/openclaw.json` and `config/mcporter.json` are copied to `$OPENCLAW_CONFIG_DIR`
 (default `~/.openclaw-secure`) if it does not already exist. Existing config
 is left untouched unless you replace it manually.
 
@@ -44,6 +45,14 @@ is left untouched unless you replace it manually.
 Config values like `${ANTHROPIC_API_KEY}` are resolved at runtime from the
 container's environment. Set API keys in your `.env` file or export them
 before running compose.
+
+For the shared Messy Virgo funds MCP runtime, set:
+
+- `MESSY_VIRGO_MCP_URL`
+- `MESSY_VIRGO_API_KEY`
+
+The wrapper also sets `MCPORTER_CONFIG=/home/node/.openclaw/mcporter.json` for
+gateway and CLI containers so MCP server registration happens once per instance.
 
 ## Custom Skills
 
@@ -63,20 +72,23 @@ See `skills/README.md` for details and examples.
 
 ## Multi-Agent Architecture
 
-The client ships a 4-agent setup where a main orchestrator (Messy Virgo)
+The client ships a multi-agent setup where a main orchestrator (Messy Virgo)
 delegates specialized tasks to sub-agents:
 
 ```text
 Main (Messy Virgo) — Gemini 2.5 Flash
 ├── Coder       — Qwen3 Coder
 ├── Researcher  — Gemini 2.5 Flash
-└── Planner     — Kimi K2.5 (thinking: high)
+├── Planner     — Kimi K2.5 (thinking: high)
+└── Messy Funds Manager — Kimi K2.5 (funds MCP specialist)
 ```
 
 - **Main** handles direct chat and simple questions. Delegates complex tasks.
 - **Coder** handles code writing, debugging, scripts (Qwen3 Coder).
 - **Researcher** handles web search, current data, document analysis (Gemini 2.5 Flash).
 - **Planner** handles multi-step planning, architecture, strategy (Kimi K2.5, deep thinking).
+- **Messy Funds Manager** handles funds operations workflows using the shared
+  instance-level MCP runtime configured by this wrapper.
 
 ### How it works
 
@@ -100,6 +112,7 @@ These are deployed to:
 - `coder` -> `$OPENCLAW_WORKSPACES_DIR/coder`
 - `researcher` -> `$OPENCLAW_WORKSPACES_DIR/researcher`
 - `planner` -> `$OPENCLAW_WORKSPACES_DIR/planner`
+- `messy-funds-mngr` -> `$OPENCLAW_WORKSPACES_DIR/messy-funds-mngr`
 
 By default, changed files are preserved. You can opt into safe sync on setup/upgrade:
 
@@ -197,11 +210,13 @@ messyvirgo-openclaw-client/
   .env.example                        # Template with all env vars
   config/
     openclaw.json                     # Unified runtime config
+    mcporter.json                     # Shared MCP runtime config
     workspaces/
       main/AGENTS.md, SOUL.md          # Main agent behavior + persona
       coder/AGENTS.md                   # Coder sub-agent behavior
       researcher/AGENTS.md              # Researcher sub-agent behavior
       planner/AGENTS.md                 # Planner sub-agent behavior
+      messy-funds-mngr/AGENTS.md        # Funds manager behavior
   docker-compose.yml                  # Base services
   docker-compose.secure.yml           # Hardening overlay
   docker-compose.ports.localhost.yml  # Localhost port binding

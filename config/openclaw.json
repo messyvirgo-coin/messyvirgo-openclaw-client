@@ -90,26 +90,6 @@
         "scope": "session",
         "workspaceAccess": "rw",
         "workspaceRoot": "~/.openclaw/sandboxes",
-        "docker": {
-          "image": "openclaw-sandbox:bookworm-slim",
-          "workdir": "/workspace",
-          "readOnlyRoot": true,
-          "tmpfs": ["/tmp", "/var/tmp", "/run"],
-          "network": "none",
-          "user": "1000:1000",
-          "capDrop": ["ALL"],
-          "pidsLimit": 256,
-          "memory": "1g",
-          "memorySwap": "2g",
-          "cpus": 1,
-          "ulimits": {
-            "nofile": { "soft": 1024, "hard": 2048 },
-            "nproc": 256
-          },
-          "env": {
-            "LANG": "C.UTF-8"
-          }
-        },
         "prune": {
           "idleHours": 24,
           "maxAgeDays": 7
@@ -125,7 +105,7 @@
         "workspace": "/home/node/workspaces/main",
         "model": "bankr/qwen3-coder",
         "subagents": {
-          "allowAgents": ["coder", "researcher", "planner"]
+          "allowAgents": ["coder", "researcher", "planner", "messy-funds-mngr"]
         }
       },
       {
@@ -157,6 +137,45 @@
         "subagents": {
           "thinking": "high"
         }
+      },
+      {
+        "id": "messy-funds-mngr",
+        "name": "Messy Funds Manager",
+        "identity": { "name": "Messy Funds Manager" },
+        "workspace": "/home/node/workspaces/messy-funds-mngr",
+        "model": "bankr/qwen3-coder",
+        "tools": {
+          "allow": [
+            "read",
+            "write",
+            "edit",
+            "apply_patch",
+            "exec",
+            "process",
+            "browser",
+            "cron",
+            "session_status",
+            "sessions_list",
+            "sessions_history",
+            "sessions_send",
+            "sessions_spawn",
+            "web_search",
+            "web_fetch",
+            "memory_search",
+            "memory_get"
+          ],
+          "deny": [
+            "bash",
+            "canvas",
+            "gateway",
+            "image",
+            "message",
+            "nodes"
+          ]
+        },
+        "subagents": {
+          "allowAgents": ["researcher", "planner"]
+        }
       }
     ]
   },
@@ -165,10 +184,19 @@
     "bind": "lan",
     "auth": {
       "mode": "token",
-      "token": "${OPENCLAW_GATEWAY_TOKEN}"
+      "token": "${OPENCLAW_GATEWAY_TOKEN}",
+      "rateLimit": {
+        "maxAttempts": 10,
+        "windowMs": 60000,
+        "lockoutMs": 300000
+      }
     },
     "controlUi": {
-      "dangerouslyAllowHostHeaderOriginFallback": true
+      "dangerouslyAllowHostHeaderOriginFallback": false,
+      "allowedOrigins": [
+        "http://127.0.0.1:${OPENCLAW_GATEWAY_PORT}",
+        "http://localhost:${OPENCLAW_GATEWAY_PORT}"
+      ]
     },
     "tailscale": {
       "mode": "off",
@@ -195,6 +223,13 @@
     "load": {
       "extraDirs": ["/home/node/custom-skills"],
       "watch": true
+    }
+  },
+  "plugins": {
+    "entries": {
+      "telegram": {
+        "enabled": true
+      }
     }
   }
 }

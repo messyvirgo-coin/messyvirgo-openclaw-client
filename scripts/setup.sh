@@ -108,6 +108,7 @@ fi
 OPENCLAW_WORKSPACE_DIR="$OPENCLAW_WORKSPACES_DIR/main"
 
 mkdir -p "$OPENCLAW_CONFIG_DIR"
+chmod 700 "$OPENCLAW_CONFIG_DIR"
 mkdir -p "$OPENCLAW_WORKSPACES_DIR"
 mkdir -p "$(dirname "$OPENCLAW_SRC_DIR")"
 
@@ -119,6 +120,8 @@ fi
 cat >"$ENV_FILE" <<EOF
 BANKR_API_KEY=${BANKR_API_KEY:-}
 BRAVE_API_KEY=${BRAVE_API_KEY:-}
+MESSY_VIRGO_MCP_URL=${MESSY_VIRGO_MCP_URL:-}
+MESSY_VIRGO_API_KEY=${MESSY_VIRGO_API_KEY:-}
 OPENCLAW_GIT_REPO=${OPENCLAW_GIT_REPO:-https://github.com/messyvirgo-coin/messyvirgo-openclaw.git}
 OPENCLAW_CONFIG_DIR=$OPENCLAW_CONFIG_DIR
 OPENCLAW_WORKSPACES_DIR=$OPENCLAW_WORKSPACES_DIR
@@ -149,9 +152,15 @@ docker build \
   -f "$OPENCLAW_SRC_DIR/Dockerfile" \
   "$OPENCLAW_SRC_DIR"
 
+# Add mcporter CLI for MCP tool discovery (messy-funds-mngr agent)
+if [[ -f "$ROOT_DIR/Dockerfile.mcporter" ]]; then
+  info "Adding mcporter CLI to image"
+  docker build -t "$OPENCLAW_IMAGE" -f "$ROOT_DIR/Dockerfile.mcporter" "$ROOT_DIR"
+fi
+
 info "Deploying config templates"
 mkdir -p "$OPENCLAW_CONFIG_DIR"
-for f in "$ROOT_DIR"/config/openclaw*.json; do
+for f in "$ROOT_DIR"/config/openclaw*.json "$ROOT_DIR"/config/mcporter.json; do
   [[ -f "$f" ]] || continue
   dest="$OPENCLAW_CONFIG_DIR/$(basename "$f")"
   if [[ ! -f "$dest" ]]; then
@@ -162,6 +171,7 @@ for f in "$ROOT_DIR"/config/openclaw*.json; do
   fi
 done
 info "Note: existing config templates in $OPENCLAW_CONFIG_DIR are preserved; merge template changes into your deployed openclaw.json manually."
+render_mcporter_config
 
 deploy_workspace_templates \
   "$ROOT_DIR" \
@@ -194,8 +204,25 @@ if auth.get("mode") != "token":
 if auth.get("token") != "${OPENCLAW_GATEWAY_TOKEN}":
     auth["token"] = "${OPENCLAW_GATEWAY_TOKEN}"
     changed = True
-if not ui.get("dangerouslyAllowHostHeaderOriginFallback"):
-    ui["dangerouslyAllowHostHeaderOriginFallback"] = True
+if ui.get("dangerouslyAllowHostHeaderOriginFallback") is not False:
+    ui["dangerouslyAllowHostHeaderOriginFallback"] = False
+    changed = True
+allowed = ui.get("allowedOrigins")
+required_origins = [
+    "http://127.0.0.1:${OPENCLAW_GATEWAY_PORT}",
+    "http://localhost:${OPENCLAW_GATEWAY_PORT}",
+]
+if not isinstance(allowed, list) or sorted(allowed) != sorted(required_origins):
+    ui["allowedOrigins"] = required_origins
+    changed = True
+rate = auth.get("rateLimit")
+required_rate = {
+    "maxAttempts": 10,
+    "windowMs": 60000,
+    "lockoutMs": 300000,
+}
+if not isinstance(rate, dict) or rate != required_rate:
+    auth["rateLimit"] = required_rate
     changed = True
 if changed:
     with open(path, "w") as f:

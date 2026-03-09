@@ -7,6 +7,7 @@ source "$SCRIPT_DIR/_common.sh"
 load_env
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 SYNC_WORKSPACES=0
+SYNC_CONFIG=0
 DRY_RUN=0
 CLEANUP_BOOTSTRAP=0
 
@@ -14,6 +15,9 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --sync-workspaces)
       SYNC_WORKSPACES=1
+      ;;
+    --sync-config)
+      SYNC_CONFIG=1
       ;;
     --dry-run)
       DRY_RUN=1
@@ -27,6 +31,7 @@ Usage: ./scripts/upgrade.sh [options]
 
 Options:
   --sync-workspaces    Overwrite changed workspace templates (creates .bak timestamped backups)
+  --sync-config        Overwrite changed config templates (creates .bak timestamped backups)
   --dry-run            Print what workspace deployment would change
   --cleanup-bootstrap  Remove BOOTSTRAP.md from deployed workspaces (creates backup first)
   -h, --help           Show this help
@@ -80,6 +85,35 @@ docker build \
   -t "$OPENCLAW_IMAGE" \
   -f "$OPENCLAW_SRC_DIR/Dockerfile" \
   "$OPENCLAW_SRC_DIR"
+
+# Add mcporter CLI for MCP tool discovery (messy-funds-mngr agent)
+if [[ -f "$ROOT_DIR/Dockerfile.mcporter" ]]; then
+  info "Adding mcporter CLI to image"
+  docker build -t "$OPENCLAW_IMAGE" -f "$ROOT_DIR/Dockerfile.mcporter" "$ROOT_DIR"
+fi
+
+info "Ensuring config templates exist"
+mkdir -p "$OPENCLAW_CONFIG_DIR"
+chmod 700 "$OPENCLAW_CONFIG_DIR"
+ts="$(date +%Y%m%d-%H%M%S)"
+for f in "$ROOT_DIR"/config/openclaw*.json "$ROOT_DIR"/config/mcporter.json; do
+  [[ -f "$f" ]] || continue
+  dest="$OPENCLAW_CONFIG_DIR/$(basename "$f")"
+  if [[ ! -f "$dest" ]]; then
+    cp "$f" "$dest"
+    info "Wrote $dest"
+  elif cmp -s "$f" "$dest"; then
+    info "$(basename "$f") already up to date at $dest"
+  elif [[ "$SYNC_CONFIG" == "1" ]]; then
+    backup_path="$dest.bak.$ts"
+    cp "$dest" "$backup_path"
+    cp "$f" "$dest"
+    info "Updated $dest (backup: $backup_path)"
+  else
+    info "$(basename "$f") already exists at $dest (leaving untouched)"
+  fi
+done
+render_mcporter_config
 
 deploy_workspace_templates \
   "$ROOT_DIR" \

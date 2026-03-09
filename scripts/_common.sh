@@ -71,6 +71,83 @@ load_env() {
   fi
 }
 
+render_mcporter_config() {
+  local config_dir="${OPENCLAW_CONFIG_DIR:-$HOME/.openclaw-secure}"
+  local mcporter_path="$config_dir/mcporter.json"
+  [[ -f "$mcporter_path" ]] || return 0
+
+  python3 - "$mcporter_path" "${MESSY_VIRGO_MCP_URL:-}" <<'PY'
+import json
+import sys
+from urllib.parse import urlsplit, urlunsplit
+
+path = sys.argv[1]
+url = sys.argv[2]
+
+def normalize_host_url(raw: str) -> str:
+    if not raw:
+        return raw
+    try:
+        parts = urlsplit(raw)
+    except Exception:
+        return raw
+
+    if parts.hostname in {"localhost", "127.0.0.1", "::1"}:
+        port = f":{parts.port}" if parts.port else ""
+        netloc = f"host.docker.internal{port}"
+        return urlunsplit((parts.scheme, netloc, parts.path, parts.query, parts.fragment))
+    return raw
+
+resolved_url = normalize_host_url(url)
+
+with open(path) as f:
+    cfg = json.load(f)
+
+changed = False
+servers = cfg.get("mcpServers", {})
+for server in servers.values():
+    base = server.get("baseUrl")
+    if isinstance(base, str) and "${MESSY_VIRGO_MCP_URL}" in base:
+        server["baseUrl"] = resolved_url
+        changed = True
+    elif isinstance(base, str):
+        normalized = normalize_host_url(base)
+        if normalized != base:
+            server["baseUrl"] = normalized
+            changed = True
+
+    # Normalize legacy auth style to explicit header auth that mcporter
+    # understands consistently across versions.
+    token_env = server.get("bearerTokenEnv")
+    if isinstance(token_env, str) and token_env:
+        headers = server.get("headers")
+        if not isinstance(headers, dict):
+            headers = {}
+        auth_header = f"Bearer ${{{token_env}}}"
+        if headers.get("Authorization") != auth_header:
+            headers["Authorization"] = auth_header
+            server["headers"] = headers
+            changed = True
+        server.pop("bearerTokenEnv", None)
+        changed = True
+
+    headers = server.get("headers")
+    if isinstance(headers, dict):
+        auth_value = headers.get("Authorization")
+        if isinstance(auth_value, str) and "$env:MESSY_VIRGO_API_KEY" in auth_value:
+            headers["Authorization"] = auth_value.replace(
+                "$env:MESSY_VIRGO_API_KEY", "${MESSY_VIRGO_API_KEY}"
+            )
+            server["headers"] = headers
+            changed = True
+
+if changed:
+    with open(path, "w") as f:
+        json.dump(cfg, f, indent=2)
+        f.write("\n")
+PY
+}
+
 os_name() {
   uname -s | tr '[:upper:]' '[:lower:]'
 }
