@@ -105,15 +105,26 @@ with open(path) as f:
 
 changed = False
 servers = cfg.get("mcpServers", {})
-for server in servers.values():
+for server_name, server in servers.items():
     base = server.get("baseUrl")
     if isinstance(base, str) and "${MESSY_VIRGO_MCP_URL}" in base:
-        server["baseUrl"] = resolved_url
-        changed = True
+        # Keep the template intact when URL is unset so a later run can still
+        # materialize a real value from env.
+        if resolved_url:
+            server["baseUrl"] = resolved_url
+            changed = True
     elif isinstance(base, str):
         normalized = normalize_host_url(base)
         if normalized != base:
             server["baseUrl"] = normalized
+            changed = True
+        # Recover from older runs that replaced the template with "".
+        elif (
+            not base
+            and resolved_url
+            and server_name == "messy-virgo-funds"
+        ):
+            server["baseUrl"] = resolved_url
             changed = True
 
     # Normalize legacy auth style to explicit header auth that mcporter
