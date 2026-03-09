@@ -167,8 +167,6 @@ Next steps for Telegram (first-time DM pairing):
      ./scripts/cli.sh config set channels.telegram.allowFrom '["<YOUR_ID>"]' --strict-json
      ./scripts/cli.sh config set channels.telegram.groupAllowFrom '["<YOUR_ID>"]' --strict-json
      ./scripts/down.sh && ./scripts/up.sh
-
-   See docs/TELEGRAM-PERMISSIONS.md for all options and recommended settings.
 EOF
 fi
 

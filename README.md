@@ -82,8 +82,6 @@ Verify:
 ./scripts/cli.sh agents bindings
 ```
 
-See [`docs/TELEGRAM-PERMISSIONS.md`](docs/TELEGRAM-PERMISSIONS.md) for a full list of Telegram channel options and recommended settings for trading/funds bots.
-
 ## Upgrade
 
 ```bash
@@ -112,7 +110,7 @@ This repo ships a pre-configured multi-agent architecture:
 
 - **Messy Virgo** (main) — orchestrator that handles chat and delegates tasks
 - **Coder** — code writing and debugging (Kimi K2.5)
-- **Researcher** — web search and data lookup (DeepSeek V3.2)
+- **Researcher** — web search and data lookup (Gemini 2.5 Flash)
 - **Planner** — multi-step planning with deep thinking (Kimi K2.5)
 - **Messy Funds Manager** — finance/funds operations specialist via shared MCP runtime
 

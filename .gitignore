@@ -11,3 +11,6 @@ skills/*
 
 # OS/editor noise
 .DS_Store
+
+# Cursor debug logs
+.cursor/debug-*.log
