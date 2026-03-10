@@ -71,6 +71,83 @@ load_env() {
   fi
 }
 
+ensure_openclaw_runtime_config() {
+  local config_dir="${OPENCLAW_CONFIG_DIR:-$HOME/.openclaw-secure}"
+  local openclaw_path="$config_dir/openclaw.json"
+  [[ -f "$openclaw_path" ]] || return 0
+
+  python3 - "$openclaw_path" <<'PY'
+import json
+import sys
+
+path = sys.argv[1]
+with open(path) as f:
+    cfg = json.load(f)
+
+changed = False
+agents = cfg.get("agents", {}).get("list", [])
+target = None
+for agent in agents:
+    if isinstance(agent, dict) and agent.get("id") == "messy-funds-mngr":
+        target = agent
+        break
+
+if isinstance(target, dict):
+    tools = target.get("tools")
+    if not isinstance(tools, dict):
+        tools = {}
+        target["tools"] = tools
+        changed = True
+
+    allow = tools.get("allow")
+    if not isinstance(allow, list):
+        allow = []
+        tools["allow"] = allow
+        changed = True
+
+    required_allow = [
+        "read",
+        "write",
+        "edit",
+        "apply_patch",
+        "exec",
+        "process",
+        "browser",
+        "cron",
+        "session_status",
+        "sessions_list",
+        "sessions_history",
+        "sessions_send",
+        "sessions_spawn",
+        "web_search",
+        "web_fetch",
+        "memory_search",
+        "memory_get",
+    ]
+    for item in required_allow:
+        if item not in allow:
+            allow.append(item)
+            changed = True
+
+    deny = tools.get("deny")
+    if not isinstance(deny, list):
+        deny = []
+        tools["deny"] = deny
+        changed = True
+
+    required_deny = ["bash", "canvas", "gateway", "image", "message", "nodes"]
+    for item in required_deny:
+        if item not in deny:
+            deny.append(item)
+            changed = True
+
+if changed:
+    with open(path, "w") as f:
+        json.dump(cfg, f, indent=2)
+        f.write("\n")
+PY
+}
+
 render_mcporter_config() {
   local config_dir="${OPENCLAW_CONFIG_DIR:-$HOME/.openclaw-secure}"
   local mcporter_path="$config_dir/mcporter.json"

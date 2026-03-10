@@ -81,7 +81,7 @@ git -C "$OPENCLAW_SRC_DIR" pull --ff-only
 
 info "Rebuilding Docker image ($OPENCLAW_IMAGE)"
 docker build \
-  --build-arg "OPENCLAW_DOCKER_APT_PACKAGES=${OPENCLAW_DOCKER_APT_PACKAGES:-}" \
+  --build-arg "OPENCLAW_DOCKER_APT_PACKAGES=${OPENCLAW_DOCKER_APT_PACKAGES:-jq}" \
   -t "$OPENCLAW_IMAGE" \
   -f "$OPENCLAW_SRC_DIR/Dockerfile" \
   "$OPENCLAW_SRC_DIR"
@@ -114,6 +114,7 @@ for f in "$ROOT_DIR"/config/openclaw*.json "$ROOT_DIR"/config/mcporter.json; do
   fi
 done
 render_mcporter_config
+ensure_openclaw_runtime_config
 
 deploy_workspace_templates \
   "$ROOT_DIR" \
