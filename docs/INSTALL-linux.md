@@ -55,7 +55,7 @@ From the repo folder:
 The script prompts for 4 values:
 
 - **Config/state directory**: where OpenClaw stores local state on your host
-- **Per-agent workspaces root**: parent folder containing `main`, `coder`, `researcher`, and `planner`
+- **Per-agent workspaces root**: parent folder containing `messy`, `coder`, `researcher`, and `planner`
 - **OpenClaw source clone directory**: local source checkout used to build the Docker image
 - **Docker image tag**: image name to build locally
 
@@ -117,7 +117,7 @@ From the repo folder:
 Optional identity check for the built-in wrapper agents:
 
 ```bash
-./scripts/cli.sh agent --agent main --message "State your name in one sentence."
+./scripts/cli.sh agent --agent messy --message "State your name in one sentence."
 ./scripts/cli.sh agent --agent coder --message "State your name in one sentence."
 ./scripts/cli.sh agent --agent researcher --message "State your name in one sentence."
 ./scripts/cli.sh agent --agent planner --message "State your name in one sentence."

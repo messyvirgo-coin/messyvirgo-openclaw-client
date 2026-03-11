@@ -105,7 +105,7 @@ OPENCLAW_IMAGE="$(prompt_default "Docker image tag to build" "$DEFAULT_IMAGE")"
 if [[ "$OPENCLAW_WORKSPACES_DIR" == "$HOME" || "$OPENCLAW_WORKSPACES_DIR" == "/" ]]; then
   die "Refusing unsafe workspaces root '$OPENCLAW_WORKSPACES_DIR'. Use a dedicated subdirectory (for example $DEFAULT_CONFIG_DIR/workspaces)."
 fi
-OPENCLAW_WORKSPACE_DIR="$OPENCLAW_WORKSPACES_DIR/main"
+OPENCLAW_WORKSPACE_DIR="$OPENCLAW_WORKSPACES_DIR/messy"
 
 mkdir -p "$OPENCLAW_CONFIG_DIR"
 chmod 700 "$OPENCLAW_CONFIG_DIR"
@@ -228,7 +228,7 @@ compose up -d openclaw-gateway
 
 info "Done."
 info "Workspaces root: $OPENCLAW_WORKSPACES_DIR"
-info "Main workspace:  $OPENCLAW_WORKSPACE_DIR"
+info "Default workspace: $OPENCLAW_WORKSPACE_DIR"
 info "Config/state:    $OPENCLAW_CONFIG_DIR"
 echo ""
 echo "  Dashboard: http://127.0.0.1:${OPENCLAW_GATEWAY_PORT:-18789}/#token=${OPENCLAW_GATEWAY_TOKEN}"

@@ -63,7 +63,7 @@
         "archiveAfterMinutes": 15,
         "runTimeoutSeconds": 600
       },
-      "workspace": "/home/node/workspaces/main",
+      "workspace": "/home/node/workspaces/messy",
       "model": {
         "primary": "bankr/qwen3-coder"
       },
@@ -98,11 +98,11 @@
     },
     "list": [
       {
-        "id": "main",
+        "id": "messy",
         "default": true,
         "name": "Messy Virgo",
         "identity": { "name": "Messy Virgo" },
-        "workspace": "/home/node/workspaces/main",
+        "workspace": "/home/node/workspaces/messy",
         "model": "bankr/qwen3-coder",
         "subagents": {
           "allowAgents": ["coder", "researcher", "planner"]
@@ -170,6 +170,14 @@
     "restart": true,
     "ownerDisplay": "raw"
   },
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "dmPolicy": "pairing",
+      "groupPolicy": "open",
+      "streaming": "partial"
+    }
+  },
   "hooks": {
     "internal": {
       "enabled": true,
@@ -184,6 +192,13 @@
     "load": {
       "extraDirs": ["/home/node/custom-skills"],
       "watch": true
+    }
+  },
+  "plugins": {
+    "entries": {
+      "telegram": {
+        "enabled": true
+      }
     }
   }
 }
