@@ -1,6 +1,0 @@
-# Extend OpenClaw image with mcporter CLI for MCP tool discovery/calls.
-# Built after setup.sh produces openclaw-secure:local.
-FROM openclaw-secure:local
-USER root
-RUN npm install -g mcporter@0.7.3
-USER node

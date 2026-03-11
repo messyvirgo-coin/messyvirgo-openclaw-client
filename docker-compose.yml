@@ -8,22 +8,21 @@ services:
       OPENCLAW_GATEWAY_PORT: ${OPENCLAW_GATEWAY_PORT:-18789}
       BANKR_API_KEY: ${BANKR_API_KEY:-}
       BRAVE_API_KEY: ${BRAVE_API_KEY:-}
-      MESSY_VIRGO_MCP_URL: ${MESSY_VIRGO_MCP_URL:-}
-      MESSY_VIRGO_API_KEY: ${MESSY_VIRGO_API_KEY:-}
-      MCPORTER_CONFIG: /home/node/.openclaw/mcporter.json
     volumes:
       - ${OPENCLAW_CONFIG_DIR:-${HOME}/.openclaw-secure}:/home/node/.openclaw
       - ${OPENCLAW_WORKSPACES_DIR:-${HOME}/OpenClawWorkspaces}:/home/node/workspaces
       - ${OPENCLAW_WORKSPACE_DIR:-${HOME}/OpenClawWorkspace}:/home/node/.openclaw/workspace
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     init: true
     restart: unless-stopped
     command:
       [
-        "sh",
-        "-lc",
-        "if [ -n \"${MESSY_VIRGO_MCP_URL}\" ] && [ -z \"${MESSY_VIRGO_API_KEY}\" ]; then echo 'ERROR: MESSY_VIRGO_API_KEY is required when MESSY_VIRGO_MCP_URL is set.' >&2; exit 64; fi; exec node dist/index.js gateway --bind ${OPENCLAW_GATEWAY_BIND:-lan} --port ${OPENCLAW_GATEWAY_PORT:-18789}"
+        "node",
+        "dist/index.js",
+        "gateway",
+        "--bind",
+        "${OPENCLAW_GATEWAY_BIND:-lan}",
+        "--port",
+        "${OPENCLAW_GATEWAY_PORT:-18789}"
       ]
 
   openclaw-cli:
@@ -35,16 +34,11 @@ services:
       OPENCLAW_GATEWAY_PORT: ${OPENCLAW_GATEWAY_PORT:-18789}
       BANKR_API_KEY: ${BANKR_API_KEY:-}
       BRAVE_API_KEY: ${BRAVE_API_KEY:-}
-      MESSY_VIRGO_MCP_URL: ${MESSY_VIRGO_MCP_URL:-}
-      MESSY_VIRGO_API_KEY: ${MESSY_VIRGO_API_KEY:-}
-      MCPORTER_CONFIG: /home/node/.openclaw/mcporter.json
       BROWSER: echo
     volumes:
       - ${OPENCLAW_CONFIG_DIR:-${HOME}/.openclaw-secure}:/home/node/.openclaw
       - ${OPENCLAW_WORKSPACES_DIR:-${HOME}/OpenClawWorkspaces}:/home/node/workspaces
       - ${OPENCLAW_WORKSPACE_DIR:-${HOME}/OpenClawWorkspace}:/home/node/.openclaw/workspace
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     stdin_open: true
     tty: true
     init: true

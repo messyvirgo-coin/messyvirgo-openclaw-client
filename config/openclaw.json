@@ -105,7 +105,7 @@
         "workspace": "/home/node/workspaces/main",
         "model": "bankr/qwen3-coder",
         "subagents": {
-          "allowAgents": ["coder", "researcher", "planner", "messy-funds-mngr"]
+          "allowAgents": ["coder", "researcher", "planner"]
         }
       },
       {
@@ -136,45 +136,6 @@
         "model": "bankr/kimi-k2.5",
         "subagents": {
           "thinking": "high"
-        }
-      },
-      {
-        "id": "messy-funds-mngr",
-        "name": "Messy Funds Manager",
-        "identity": { "name": "Messy Funds Manager" },
-        "workspace": "/home/node/workspaces/messy-funds-mngr",
-        "model": "bankr/qwen3-coder",
-        "tools": {
-          "allow": [
-            "read",
-            "write",
-            "edit",
-            "apply_patch",
-            "exec",
-            "process",
-            "browser",
-            "cron",
-            "session_status",
-            "sessions_list",
-            "sessions_history",
-            "sessions_send",
-            "sessions_spawn",
-            "web_search",
-            "web_fetch",
-            "memory_search",
-            "memory_get"
-          ],
-          "deny": [
-            "bash",
-            "canvas",
-            "gateway",
-            "image",
-            "message",
-            "nodes"
-          ]
-        },
-        "subagents": {
-          "allowAgents": ["researcher", "planner"]
         }
       }
     ]
@@ -223,13 +184,6 @@
     "load": {
       "extraDirs": ["/home/node/custom-skills"],
       "watch": true
-    }
-  },
-  "plugins": {
-    "entries": {
-      "telegram": {
-        "enabled": true
-      }
     }
   }
 }

@@ -7,8 +7,6 @@ source "$SCRIPT_DIR/_common.sh"
 
 ensure_docker_running
 load_env
-render_mcporter_config
-ensure_openclaw_runtime_config
 
 CONFIG_DIR="${OPENCLAW_CONFIG_DIR:-$HOME/.openclaw-secure}"
 if [[ -d "$CONFIG_DIR" ]]; then

@@ -1,13 +1,12 @@
----
-description: Keep Messy Virgo customizations in wrapper config and workspace templates
+description: Keep wrapper config generic and pack-aware
 globs: config/**
 alwaysApply: false
 ---
 
 # Config Rules
 
-- Treat `config/` as the main customization layer for this repo.
-- Put model/provider settings, gateway defaults, agent lists, and skills loading in `config/openclaw.json`.
-- Put agent behavior and bootstrap instructions in `config/workspaces/**`.
-- Preserve the default agent topology (`main`, `coder`, `researcher`, `planner`) unless the change intentionally migrates it everywhere.
-- Prefer wrapper-level config changes over modifying the OpenClaw source fork for Messy Virgo-specific behavior.
+- Treat `config/` in this repo as wrapper baseline config, not pack-owned agent definitions.
+- Keep `config/openclaw.json` focused on secure wrapper defaults (gateway auth, baseline models/tools, safe runtime defaults).
+- Do not reintroduce pack-managed agent templates under `config/workspaces/**` in this repo.
+- Prefer adding/modifying agent topology, personas, and pack-specific runtime config in `../messyvirgo-openclaw-agents`.
+- Prefer wrapper-level config changes over modifying the OpenClaw source fork for deployment behavior.

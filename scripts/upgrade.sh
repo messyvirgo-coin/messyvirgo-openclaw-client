@@ -86,17 +86,11 @@ docker build \
   -f "$OPENCLAW_SRC_DIR/Dockerfile" \
   "$OPENCLAW_SRC_DIR"
 
-# Add mcporter CLI for MCP tool discovery (messy-funds-mngr agent)
-if [[ -f "$ROOT_DIR/Dockerfile.mcporter" ]]; then
-  info "Adding mcporter CLI to image"
-  docker build -t "$OPENCLAW_IMAGE" -f "$ROOT_DIR/Dockerfile.mcporter" "$ROOT_DIR"
-fi
-
 info "Ensuring config templates exist"
 mkdir -p "$OPENCLAW_CONFIG_DIR"
 chmod 700 "$OPENCLAW_CONFIG_DIR"
 ts="$(date +%Y%m%d-%H%M%S)"
-for f in "$ROOT_DIR"/config/openclaw*.json "$ROOT_DIR"/config/mcporter.json; do
+for f in "$ROOT_DIR"/config/openclaw*.json; do
   [[ -f "$f" ]] || continue
   dest="$OPENCLAW_CONFIG_DIR/$(basename "$f")"
   if [[ ! -f "$dest" ]]; then
@@ -113,8 +107,6 @@ for f in "$ROOT_DIR"/config/openclaw*.json "$ROOT_DIR"/config/mcporter.json; do
     info "$(basename "$f") already exists at $dest (leaving untouched)"
   fi
 done
-render_mcporter_config
-ensure_openclaw_runtime_config
 
 deploy_workspace_templates \
   "$ROOT_DIR" \

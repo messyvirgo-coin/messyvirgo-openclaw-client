@@ -120,8 +120,6 @@ fi
 cat >"$ENV_FILE" <<EOF
 BANKR_API_KEY=${BANKR_API_KEY:-}
 BRAVE_API_KEY=${BRAVE_API_KEY:-}
-MESSY_VIRGO_MCP_URL=${MESSY_VIRGO_MCP_URL:-}
-MESSY_VIRGO_API_KEY=${MESSY_VIRGO_API_KEY:-}
 OPENCLAW_GIT_REPO=${OPENCLAW_GIT_REPO:-https://github.com/messyvirgo-coin/messyvirgo-openclaw.git}
 OPENCLAW_CONFIG_DIR=$OPENCLAW_CONFIG_DIR
 OPENCLAW_WORKSPACES_DIR=$OPENCLAW_WORKSPACES_DIR
@@ -152,15 +150,9 @@ docker build \
   -f "$OPENCLAW_SRC_DIR/Dockerfile" \
   "$OPENCLAW_SRC_DIR"
 
-# Add mcporter CLI for MCP tool discovery (messy-funds-mngr agent)
-if [[ -f "$ROOT_DIR/Dockerfile.mcporter" ]]; then
-  info "Adding mcporter CLI to image"
-  docker build -t "$OPENCLAW_IMAGE" -f "$ROOT_DIR/Dockerfile.mcporter" "$ROOT_DIR"
-fi
-
 info "Deploying config templates"
 mkdir -p "$OPENCLAW_CONFIG_DIR"
-for f in "$ROOT_DIR"/config/openclaw*.json "$ROOT_DIR"/config/mcporter.json; do
+for f in "$ROOT_DIR"/config/openclaw*.json; do
   [[ -f "$f" ]] || continue
   dest="$OPENCLAW_CONFIG_DIR/$(basename "$f")"
   if [[ ! -f "$dest" ]]; then
@@ -171,7 +163,6 @@ for f in "$ROOT_DIR"/config/openclaw*.json "$ROOT_DIR"/config/mcporter.json; do
   fi
 done
 info "Note: existing config templates in $OPENCLAW_CONFIG_DIR are preserved; merge template changes into your deployed openclaw.json manually."
-render_mcporter_config
 
 deploy_workspace_templates \
   "$ROOT_DIR" \
@@ -231,7 +222,6 @@ if changed:
     print("==> Patched gateway config in " + path)
 PY
 fi
-ensure_openclaw_runtime_config
 
 info "Starting gateway"
 compose up -d openclaw-gateway

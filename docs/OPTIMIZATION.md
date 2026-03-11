@@ -62,14 +62,13 @@ Keep `HEARTBEAT.md` minimal — an empty or comment-only file skips the API call
 
 **Field:** `agents.defaults.thinkingDefault`
 
-Global default is `low`. Increase per-task with `/think:high` when needed. The planner agent is spawned
-with `thinking:high` by the main agent when needed (see `config/workspaces/main/AGENTS.md`).
+Global default is `low`. Increase per-task with `/think:high` when needed.
 
 ---
 
 ## Memory: Curated MEMORY.md + Daily Logs
 
-**Workspace convention** (see `config/workspaces/main/SOUL.md`)
+**Workspace convention** (pack-managed by your active agent profile)
 
 - `MEMORY.md` is auto-loaded at every startup — keep it short and curated
 - `memory/YYYY-MM-DD.md` is indexed but not auto-loaded; use it for session notes
