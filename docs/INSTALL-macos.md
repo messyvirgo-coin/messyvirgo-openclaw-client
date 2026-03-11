@@ -39,7 +39,8 @@ cp .env.example .env
 
 Open `.env` and set any values you already have:
 
-- `BANKR_API_KEY` for the configured model provider
+- `OPENROUTER_API_KEY` for OpenRouter model provider
+- `BANKR_API_KEY` if you also enable Bankr models
 - `BRAVE_API_KEY` for web search
 
 You can leave other defaults alone for a first install.
@@ -55,7 +56,7 @@ In Terminal, from the repo folder:
 The script prompts for 4 values:
 
 - **Config/state directory**: where OpenClaw stores local state on your host
-- **Per-agent workspaces root**: parent folder containing `messy`, `coder`, `researcher`, and `planner`
+- **Per-agent workspaces root**: parent folder containing `mv-messy`, `mv-coder`, `mv-researcher`, and `mv-planner`
 - **OpenClaw source clone directory**: local source checkout used to build the Docker image
 - **Docker image tag**: image name to build locally
 
@@ -125,10 +126,10 @@ From the repo folder:
 Optional identity check for the built-in wrapper agents:
 
 ```bash
-./scripts/cli.sh agent --agent messy --message "State your name in one sentence."
-./scripts/cli.sh agent --agent coder --message "State your name in one sentence."
-./scripts/cli.sh agent --agent researcher --message "State your name in one sentence."
-./scripts/cli.sh agent --agent planner --message "State your name in one sentence."
+./scripts/cli.sh agent --agent mv-messy --message "State your name in one sentence."
+./scripts/cli.sh agent --agent mv-coder --message "State your name in one sentence."
+./scripts/cli.sh agent --agent mv-researcher --message "State your name in one sentence."
+./scripts/cli.sh agent --agent mv-planner --message "State your name in one sentence."
 ```
 
 ## 7) Start/stop later

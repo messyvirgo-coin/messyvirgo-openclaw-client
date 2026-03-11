@@ -50,7 +50,7 @@ Reserves 32K tokens headroom to prevent context overflow during compaction.
 **Field:** `agents.defaults.heartbeat`
 
 ```json
-{ "every": "30m", "model": "bankr/gpt-5-nano" }
+{ "every": "30m", "model": "openrouter/openai/gpt-5-nano" }
 ```
 
 Uses the cheapest configured model (`gpt-5-nano`) for background heartbeat runs.

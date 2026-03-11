@@ -105,7 +105,7 @@ OPENCLAW_IMAGE="$(prompt_default "Docker image tag to build" "$DEFAULT_IMAGE")"
 if [[ "$OPENCLAW_WORKSPACES_DIR" == "$HOME" || "$OPENCLAW_WORKSPACES_DIR" == "/" ]]; then
   die "Refusing unsafe workspaces root '$OPENCLAW_WORKSPACES_DIR'. Use a dedicated subdirectory (for example $DEFAULT_CONFIG_DIR/workspaces)."
 fi
-OPENCLAW_WORKSPACE_DIR="$OPENCLAW_WORKSPACES_DIR/messy"
+OPENCLAW_WORKSPACE_DIR="$OPENCLAW_WORKSPACES_DIR/mv-messy"
 
 mkdir -p "$OPENCLAW_CONFIG_DIR"
 chmod 700 "$OPENCLAW_CONFIG_DIR"
@@ -119,6 +119,7 @@ fi
 # Write .env (simple overwrite, deterministic keys)
 cat >"$ENV_FILE" <<EOF
 BANKR_API_KEY=${BANKR_API_KEY:-}
+OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
 BRAVE_API_KEY=${BRAVE_API_KEY:-}
 OPENCLAW_GIT_REPO=${OPENCLAW_GIT_REPO:-https://github.com/messyvirgo-coin/messyvirgo-openclaw.git}
 OPENCLAW_CONFIG_DIR=$OPENCLAW_CONFIG_DIR

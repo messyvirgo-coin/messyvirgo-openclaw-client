@@ -36,6 +36,17 @@
           { "id": "kimi-k2.5",        "name": "Kimi K2.5" },
           { "id": "gpt-5-nano",       "name": "GPT-5 Nano" }
         ]
+      },
+      "openrouter": {
+        "baseUrl": "https://openrouter.ai/api/v1",
+        "apiKey": "${OPENROUTER_API_KEY}",
+        "api": "openai-completions",
+        "models": [
+          { "id": "moonshotai/kimi-k2.5", "name": "Kimi K2.5" },
+          { "id": "x-ai/grok-4.1-fast", "name": "Grok 4.1 Fast" },
+          { "id": "minimax/minimax-m2.5", "name": "miniMax M2.5" },
+          { "id": "openai/gpt-5-nano", "name": "GPT-5 Nano" }
+        ]
       }
     }
   },
@@ -54,7 +65,7 @@
       },
       "heartbeat": {
         "every": "30m",
-        "model": "bankr/gpt-5-nano"
+        "model": "openrouter/openai/gpt-5-nano"
       },
       "subagents": {
         "maxConcurrent": 3,
@@ -63,9 +74,9 @@
         "archiveAfterMinutes": 15,
         "runTimeoutSeconds": 600
       },
-      "workspace": "/home/node/workspaces/messy",
+      "workspace": "/home/node/workspaces/mv-messy",
       "model": {
-        "primary": "bankr/qwen3-coder"
+        "primary": "openrouter/x-ai/grok-4.1-fast"
       },
       "models": {
         "bankr/qwen3-coder": {
@@ -83,6 +94,22 @@
         "bankr/gpt-5-nano": {
           "alias": "gpt-nano",
           "params": { "temperature": 0.2 }
+        },
+        "openrouter/x-ai/grok-4.1-fast": {
+          "alias": "grok-fast",
+          "params": { "temperature": 0.2 }
+        },
+        "openrouter/minimax/minimax-m2.5": {
+          "alias": "minimax-m2.5",
+          "params": { "temperature": 0.2 }
+        },
+        "openrouter/moonshotai/kimi-k2.5": {
+          "alias": "kimi",
+          "params": { "temperature": 0.2 }
+        },
+        "openrouter/openai/gpt-5-nano": {
+          "alias": "gpt-nano",
+          "params": { "temperature": 0.2 }
         }
       },
       "sandbox": {
@@ -98,42 +125,42 @@
     },
     "list": [
       {
-        "id": "messy",
+        "id": "mv-messy",
         "default": true,
         "name": "Messy Virgo",
         "identity": { "name": "Messy Virgo" },
-        "workspace": "/home/node/workspaces/messy",
-        "model": "bankr/qwen3-coder",
+        "workspace": "/home/node/workspaces/mv-messy",
+        "model": "openrouter/x-ai/grok-4.1-fast",
         "subagents": {
-          "allowAgents": ["coder", "researcher", "planner"]
+          "allowAgents": ["mv-coder", "mv-researcher", "mv-planner"]
         }
       },
       {
-        "id": "coder",
-        "name": "Coder",
-        "identity": { "name": "Coder" },
-        "workspace": "/home/node/workspaces/coder",
-        "model": "bankr/qwen3-coder",
+        "id": "mv-coder",
+        "name": "Messy Michael (Coder)",
+        "identity": { "name": "Messy Michael (Coder)" },
+        "workspace": "/home/node/workspaces/mv-coder",
+        "model": "openrouter/minimax/minimax-m2.5",
         "subagents": {
           "thinking": "medium"
         }
       },
       {
-        "id": "researcher",
-        "name": "Researcher",
-        "identity": { "name": "Researcher" },
-        "workspace": "/home/node/workspaces/researcher",
-        "model": "bankr/gemini-2.5-flash",
+        "id": "mv-researcher",
+        "name": "Messy Anna (Researcher)",
+        "identity": { "name": "Messy Anna (Researcher)" },
+        "workspace": "/home/node/workspaces/mv-researcher",
+        "model": "openrouter/x-ai/grok-4.1-fast",
         "subagents": {
           "thinking": "high"
         }
       },
       {
-        "id": "planner",
-        "name": "Planner",
-        "identity": { "name": "Planner" },
-        "workspace": "/home/node/workspaces/planner",
-        "model": "bankr/kimi-k2.5",
+        "id": "mv-planner",
+        "name": "Messy Franco (Planner)",
+        "identity": { "name": "Messy Franco (Planner)" },
+        "workspace": "/home/node/workspaces/mv-planner",
+        "model": "openrouter/moonshotai/kimi-k2.5",
         "subagents": {
           "thinking": "high"
         }
