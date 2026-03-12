@@ -70,7 +70,7 @@ skills, and managed config overlays should live in a separate repository.
 
 For Messy Virgo trading-team agents, use:
 
-- `/home/michaelh/Git/messyvirgo-openclaw-agents`
+- `../messyvirgo-openclaw-agents`
 
 Typical flow:
 
