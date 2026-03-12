@@ -31,6 +31,8 @@ services:
     environment:
       HOME: /home/node
       TERM: xterm-256color
+      # npm needs a writable cache path when running in read-only containers.
+      NPM_CONFIG_CACHE: ${OPENCLAW_NPM_CACHE_DIR:-/tmp/.npm}
       OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN}
       OPENCLAW_GATEWAY_PORT: ${OPENCLAW_GATEWAY_PORT:-18789}
       BANKR_API_KEY: ${BANKR_API_KEY:-}

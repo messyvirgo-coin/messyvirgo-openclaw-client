@@ -103,6 +103,7 @@ fi
 DEFAULT_SRC_DIR="${OPENCLAW_SRC_DIR:-$DEFAULT_CONFIG_DIR/openclaw-src}"
 DEFAULT_GIT_REPO="${OPENCLAW_GIT_REPO:-https://github.com/messyvirgo-coin/messyvirgo-openclaw}"
 DEFAULT_IMAGE="${OPENCLAW_IMAGE:-openclaw-secure:local}"
+DEFAULT_NPM_VERSION="${OPENCLAW_NPM_VERSION:-11.11.1}"
 
 if [[ "$INTERACTIVE" == "1" ]]; then
   OPENCLAW_CONFIG_DIR="$(prompt_default "Host config/state directory" "$DEFAULT_CONFIG_DIR")"
@@ -117,6 +118,7 @@ else
   OPENCLAW_GIT_REPO="$DEFAULT_GIT_REPO"
   OPENCLAW_IMAGE="$DEFAULT_IMAGE"
 fi
+OPENCLAW_NPM_VERSION="${OPENCLAW_NPM_VERSION:-$DEFAULT_NPM_VERSION}"
 if [[ "$OPENCLAW_WORKSPACES_DIR" == "$HOME" || "$OPENCLAW_WORKSPACES_DIR" == "/" ]]; then
   die "Refusing unsafe workspaces root '$OPENCLAW_WORKSPACES_DIR'. Use a dedicated subdirectory (for example $DEFAULT_CONFIG_DIR/workspaces)."
 fi
@@ -147,6 +149,7 @@ OPENCLAW_GATEWAY_TOKEN=$OPENCLAW_GATEWAY_TOKEN
 OPENCLAW_DOCKER_APT_PACKAGES=${OPENCLAW_DOCKER_APT_PACKAGES:-jq}
 OPENCLAW_SRC_DIR=$OPENCLAW_SRC_DIR
 OPENCLAW_GIT_REPO=$OPENCLAW_GIT_REPO
+OPENCLAW_NPM_VERSION=$OPENCLAW_NPM_VERSION
 EOF
 
 info "Cloning/updating OpenClaw source"
@@ -160,12 +163,23 @@ else
   git clone "$OPENCLAW_GIT_REPO" "$OPENCLAW_SRC_DIR"
 fi
 
+info "Applying wrapper source patches"
+"$SCRIPT_DIR/patch-openclaw-source.sh" "$OPENCLAW_SRC_DIR"
+
 info "Building Docker image ($OPENCLAW_IMAGE)"
 docker build \
   --build-arg "OPENCLAW_DOCKER_APT_PACKAGES=${OPENCLAW_DOCKER_APT_PACKAGES:-jq}" \
   -t "$OPENCLAW_IMAGE" \
   -f "$OPENCLAW_SRC_DIR/Dockerfile" \
   "$OPENCLAW_SRC_DIR"
+
+info "Pinning npm in runtime image ($OPENCLAW_NPM_VERSION)"
+docker build \
+  --build-arg "BASE_IMAGE=$OPENCLAW_IMAGE" \
+  --build-arg "OPENCLAW_NPM_VERSION=$OPENCLAW_NPM_VERSION" \
+  -t "$OPENCLAW_IMAGE" \
+  -f "$ROOT_DIR/docker/npm-overlay.Dockerfile" \
+  "$ROOT_DIR"
 
 info "Deploying config templates"
 mkdir -p "$OPENCLAW_CONFIG_DIR"

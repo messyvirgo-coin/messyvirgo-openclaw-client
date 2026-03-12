@@ -53,6 +53,9 @@ fi
 if [[ -z "${OPENCLAW_GIT_REPO:-}" ]]; then
   OPENCLAW_GIT_REPO="https://github.com/messyvirgo-coin/messyvirgo-openclaw"
 fi
+if [[ -z "${OPENCLAW_NPM_VERSION:-}" ]]; then
+  OPENCLAW_NPM_VERSION="11.11.1"
+fi
 
 DEFAULT_CONFIG_DIR="${OPENCLAW_CONFIG_DIR:-$HOME/.openclaw-secure}"
 if [[ -z "${OPENCLAW_WORKSPACES_DIR:-}" ]]; then
@@ -83,12 +86,23 @@ git -C "$OPENCLAW_SRC_DIR" fetch --tags --prune
 git -C "$OPENCLAW_SRC_DIR" checkout main
 git -C "$OPENCLAW_SRC_DIR" pull --ff-only
 
+info "Applying wrapper source patches"
+"$SCRIPT_DIR/patch-openclaw-source.sh" "$OPENCLAW_SRC_DIR"
+
 info "Rebuilding Docker image ($OPENCLAW_IMAGE)"
 docker build \
   --build-arg "OPENCLAW_DOCKER_APT_PACKAGES=${OPENCLAW_DOCKER_APT_PACKAGES:-jq}" \
   -t "$OPENCLAW_IMAGE" \
   -f "$OPENCLAW_SRC_DIR/Dockerfile" \
   "$OPENCLAW_SRC_DIR"
+
+info "Pinning npm in runtime image ($OPENCLAW_NPM_VERSION)"
+docker build \
+  --build-arg "BASE_IMAGE=$OPENCLAW_IMAGE" \
+  --build-arg "OPENCLAW_NPM_VERSION=$OPENCLAW_NPM_VERSION" \
+  -t "$OPENCLAW_IMAGE" \
+  -f "$ROOT_DIR/docker/npm-overlay.Dockerfile" \
+  "$ROOT_DIR"
 
 info "Ensuring config templates exist"
 mkdir -p "$OPENCLAW_CONFIG_DIR"

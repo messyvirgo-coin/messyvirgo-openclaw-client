@@ -54,7 +54,7 @@ defaults) to an existing deployment, run:
 ./scripts/upgrade.sh --sync-config
 ```
 
-More checklists: `[docs/VERIFY.md](docs/VERIFY.md)`
+More checklists: `[docs/VERIFY.md](docs/VERIFY.md)` · Plugins: `[docs/PLUGINS.md](docs/PLUGINS.md)`
 
 Linux note: if `./scripts/up.sh` fails with a port bind error even though the port is free, use:
 

@@ -1,0 +1,7 @@
+ARG BASE_IMAGE=openclaw-secure:local
+FROM ${BASE_IMAGE}
+
+ARG OPENCLAW_NPM_VERSION=11.11.1
+USER root
+RUN npm install -g "npm@${OPENCLAW_NPM_VERSION}"
+USER node
