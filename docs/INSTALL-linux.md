@@ -53,14 +53,16 @@ From the repo folder:
 ./scripts/setup.sh
 ```
 
-The script prompts for 4 values:
+`setup.sh` reads config from `.env` and uses defaults from `.env.example` when values are missing.
 
-- **Config/state directory**: where OpenClaw stores local state on your host
-- **Per-agent workspaces root**: parent folder containing `main`, `mv-coder`, `mv-researcher`, and `mv-planner`
-- **OpenClaw source clone directory**: local source checkout used to build the Docker image
-- **Docker image tag**: image name to build locally
+Important values you can edit in `.env` before running setup:
 
-For a first install, the defaults are usually fine.
+- **`OPENCLAW_GIT_REPO`**: source repo to clone/pull (default: Messy Virgo fork; optional: upstream OpenClaw repo)
+- **`OPENCLAW_SRC_DIR`**: local source checkout used to build the Docker image
+- **`OPENCLAW_IMAGE`**: image name to build locally
+- **`OPENCLAW_CONFIG_DIR`** and **`OPENCLAW_WORKSPACES_DIR`**: host state/workspace paths
+
+If you prefer prompts, run `./scripts/setup.sh --interactive`.
 
 Important:
 

@@ -50,6 +50,9 @@ ensure_docker_running
 if [[ -z "${OPENCLAW_SRC_DIR:-}" ]]; then
   die "OPENCLAW_SRC_DIR is not set. Run scripts/setup.sh first."
 fi
+if [[ -z "${OPENCLAW_GIT_REPO:-}" ]]; then
+  OPENCLAW_GIT_REPO="https://github.com/messyvirgo-coin/messyvirgo-openclaw"
+fi
 
 DEFAULT_CONFIG_DIR="${OPENCLAW_CONFIG_DIR:-$HOME/.openclaw-secure}"
 if [[ -z "${OPENCLAW_WORKSPACES_DIR:-}" ]]; then
@@ -74,7 +77,8 @@ if [[ ! -d "$OPENCLAW_SRC_DIR/.git" ]]; then
   die "No git repo at $OPENCLAW_SRC_DIR. Run scripts/setup.sh first."
 fi
 
-info "Pulling latest from fork"
+info "Pulling latest from configured repo"
+git -C "$OPENCLAW_SRC_DIR" remote set-url origin "$OPENCLAW_GIT_REPO"
 git -C "$OPENCLAW_SRC_DIR" fetch --tags --prune
 git -C "$OPENCLAW_SRC_DIR" checkout main
 git -C "$OPENCLAW_SRC_DIR" pull --ff-only

@@ -104,7 +104,9 @@
           },
           {
             "id": "x-ai/grok-4.1-fast",
-            "name": "Grok 4.1 Fast"
+            "name": "Grok 4.1 Fast",
+            "contextWindow": 256000,
+            "maxTokens": 8192
           }
         ]
       }
