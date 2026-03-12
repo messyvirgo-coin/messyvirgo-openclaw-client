@@ -27,12 +27,12 @@ Your `.env` should define:
 - `OPENCLAW_WORKSPACE_DIR=...` (single workspace folder used as the default mount)
 - provider keys for enabled model backends (`OPENROUTER_API_KEY` and/or `BANKR_API_KEY`)
 
-`OPENCLAW_WORKSPACE_DIR` should normally be a subdirectory inside `OPENCLAW_WORKSPACES_DIR`, usually `<OPENCLAW_WORKSPACES_DIR>/mv-messy`.
+`OPENCLAW_WORKSPACE_DIR` should normally be a subdirectory inside `OPENCLAW_WORKSPACES_DIR`, usually `<OPENCLAW_WORKSPACES_DIR>/main`.
 
 Example:
 
 - `OPENCLAW_WORKSPACES_DIR=$HOME/OpenClawWorkspaces`
-- `OPENCLAW_WORKSPACE_DIR=$HOME/OpenClawWorkspaces/mv-messy`
+- `OPENCLAW_WORKSPACE_DIR=$HOME/OpenClawWorkspaces/main`
 
 Check host-side directories:
 
@@ -42,7 +42,7 @@ ls -la "$OPENCLAW_WORKSPACES_DIR"
 
 You should see at least:
 
-- `mv-messy/`
+- `main/`
 - `mv-coder/`
 - `mv-researcher/`
 - `mv-planner/`
@@ -89,7 +89,7 @@ If this repo includes a secure config template (`config/openclaw.secure.json`), 
 Test each agent explicitly:
 
 ```bash
-./scripts/cli.sh agent --agent mv-messy --message "State your name in one sentence."
+./scripts/cli.sh agent --agent main --message "State your name in one sentence."
 ./scripts/cli.sh agent --agent mv-coder --message "State your name in one sentence."
 ./scripts/cli.sh agent --agent mv-researcher --message "State your name in one sentence."
 ./scripts/cli.sh agent --agent mv-planner --message "State your name in one sentence."

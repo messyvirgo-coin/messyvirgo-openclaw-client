@@ -42,10 +42,70 @@
         "apiKey": "${OPENROUTER_API_KEY}",
         "api": "openai-completions",
         "models": [
-          { "id": "moonshotai/kimi-k2.5", "name": "Kimi K2.5" },
-          { "id": "x-ai/grok-4.1-fast", "name": "Grok 4.1 Fast" },
-          { "id": "minimax/minimax-m2.5", "name": "miniMax M2.5" },
-          { "id": "openai/gpt-5-nano", "name": "GPT-5 Nano" }
+          {
+            "id": "minimax/minimax-m2.5",
+            "name": "MiniMax M2.5",
+            "contextWindow": 205000,
+            "maxTokens": 8192
+          },
+          {
+            "id": "google/gemini-2.5-flash-lite",
+            "name": "Gemini Flash-Lite",
+            "contextWindow": 1000000,
+            "maxTokens": 8192
+          },
+          {
+            "id": "google/gemini-2.5-flash",
+            "name": "Gemini 2.5 Flash",
+            "contextWindow": 1000000,
+            "maxTokens": 8192
+          },
+          {
+            "id": "anthropic/claude-haiku-4-5",
+            "name": "Claude Haiku 4.5",
+            "contextWindow": 200000,
+            "maxTokens": 8192
+          },
+          {
+            "id": "anthropic/claude-sonnet-4-6",
+            "name": "Claude Sonnet 4.6",
+            "contextWindow": 1000000,
+            "maxTokens": 8192
+          },
+          {
+            "id": "anthropic/claude-opus-4-6",
+            "name": "Claude Opus 4.6",
+            "contextWindow": 1000000,
+            "maxTokens": 8192
+          },
+          {
+            "id": "deepseek/deepseek-v3.2",
+            "name": "DeepSeek V3.2",
+            "contextWindow": 164000,
+            "maxTokens": 8192
+          },
+          {
+            "id": "moonshotai/kimi-k2.5",
+            "name": "Kimi K2.5",
+            "contextWindow": 262000,
+            "maxTokens": 8192
+          },
+          {
+            "id": "z-ai/glm-5",
+            "name": "GLM-5",
+            "contextWindow": 205000,
+            "maxTokens": 8192
+          },
+          {
+            "id": "openai/gpt-5-mini",
+            "name": "GPT-5 Mini",
+            "contextWindow": 128000,
+            "maxTokens": 8192
+          },
+          {
+            "id": "x-ai/grok-4.1-fast",
+            "name": "Grok 4.1 Fast"
+          }
         ]
       }
     }
@@ -56,59 +116,87 @@
       "contextTokens": 50000,
       "contextPruning": {
         "mode": "cache-ttl",
-        "ttl": "30m",
-        "keepLastAssistants": 3
+        "ttl": "1h"
       },
       "compaction": {
         "mode": "safeguard",
-        "reserveTokensFloor": 32000
+        "reserveTokensFloor": 32000,
+        "memoryFlush": {
+          "enabled": true,
+          "softThresholdTokens": 4000
+        }        
       },
       "heartbeat": {
-        "every": "30m",
-        "model": "openrouter/openai/gpt-5-nano"
+        "every": "55m",
+        "model": "openrouter/google/gemini-2.5-flash-lite",
+        "target": "last"
       },
       "subagents": {
-        "maxConcurrent": 3,
-        "maxSpawnDepth": 1,
-        "maxChildrenPerAgent": 5,
-        "archiveAfterMinutes": 15,
-        "runTimeoutSeconds": 600
+        "maxConcurrent": 8
       },
-      "workspace": "/home/node/workspaces/mv-messy",
+      "workspace": "/home/node/workspaces/main",
       "model": {
         "primary": "openrouter/x-ai/grok-4.1-fast"
       },
       "models": {
         "bankr/qwen3-coder": {
-          "alias": "qwen-coder",
+          "alias": "bk-qwen-coder",
           "params": { "temperature": 0.2 }
         },
         "bankr/gemini-2.5-flash": {
-          "alias": "gemini-flash",
+          "alias": "bk-gemini-flash",
           "params": { "temperature": 0.2 }
         },
         "bankr/kimi-k2.5": {
-          "alias": "kimi",
+          "alias": "bk-kimi",
           "params": { "temperature": 0.2 }
         },
         "bankr/gpt-5-nano": {
-          "alias": "gpt-nano",
+          "alias": "bk-gpt-nano",
           "params": { "temperature": 0.2 }
         },
         "openrouter/x-ai/grok-4.1-fast": {
-          "alias": "grok-fast",
+          "alias": "or-grok",
           "params": { "temperature": 0.2 }
         },
         "openrouter/minimax/minimax-m2.5": {
-          "alias": "minimax-m2.5",
+          "alias": "or-minimax",
+          "params": { "temperature": 0.2 }
+        },
+        "openrouter/google/gemini-2.5-flash-lite": {
+          "alias": "or-flashlite",
+          "params": { "temperature": 0.2 }
+        },
+        "openrouter/google/gemini-2.5-flash": {
+          "alias": "or-flash",
+          "params": { "temperature": 0.2 }
+        },
+        "openrouter/deepseek/deepseek-v3.2": {
+          "alias": "or-deepseek",
           "params": { "temperature": 0.2 }
         },
         "openrouter/moonshotai/kimi-k2.5": {
-          "alias": "kimi",
+          "alias": "or-kimi",
           "params": { "temperature": 0.2 }
         },
-        "openrouter/openai/gpt-5-nano": {
-          "alias": "gpt-nano",
+        "openrouter/z-ai/glm-5": {
+          "alias": "or-glm",
+          "params": { "temperature": 0.2 }
+        },
+        "openrouter/anthropic/claude-haiku-4-5": {
+          "alias": "or-haiku",
+          "params": { "temperature": 0.2 }
+        },
+        "openrouter/anthropic/claude-sonnet-4-6": {
+          "alias": "or-sonnet",
+          "params": { "temperature": 0.2 }
+        },
+        "openrouter/anthropic/claude-opus-4-6": {
+          "alias": "or-opus",
+          "params": { "temperature": 0.2 }
+        },
+        "openrouter/openai/gpt-5-mini": {
+          "alias": "or-gpt",
           "params": { "temperature": 0.2 }
         }
       },
@@ -125,11 +213,11 @@
     },
     "list": [
       {
-        "id": "mv-messy",
+        "id": "main",
         "default": true,
         "name": "Messy Virgo",
         "identity": { "name": "Messy Virgo" },
-        "workspace": "/home/node/workspaces/mv-messy",
+        "workspace": "/home/node/workspaces/main",
         "model": "openrouter/x-ai/grok-4.1-fast",
         "subagents": {
           "allowAgents": ["mv-coder", "mv-researcher", "mv-planner"]

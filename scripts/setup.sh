@@ -105,7 +105,7 @@ OPENCLAW_IMAGE="$(prompt_default "Docker image tag to build" "$DEFAULT_IMAGE")"
 if [[ "$OPENCLAW_WORKSPACES_DIR" == "$HOME" || "$OPENCLAW_WORKSPACES_DIR" == "/" ]]; then
   die "Refusing unsafe workspaces root '$OPENCLAW_WORKSPACES_DIR'. Use a dedicated subdirectory (for example $DEFAULT_CONFIG_DIR/workspaces)."
 fi
-OPENCLAW_WORKSPACE_DIR="$OPENCLAW_WORKSPACES_DIR/mv-messy"
+OPENCLAW_WORKSPACE_DIR="$OPENCLAW_WORKSPACES_DIR/main"
 
 mkdir -p "$OPENCLAW_CONFIG_DIR"
 chmod 700 "$OPENCLAW_CONFIG_DIR"
