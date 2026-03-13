@@ -100,25 +100,30 @@ Notes:
 
 ## 5) Approve the first device pairing
 
-On a fresh install, the browser may show `pairing required`. If that happens, approve the pending device from the host terminal:
+On a fresh install, the browser may show `pairing required`. On macOS, use the gateway-container workaround below to approve the pending device:
 
 ```bash
-./scripts/cli.sh devices list
-./scripts/cli.sh devices approve <requestId>
+bash -lc 'source ./scripts/_common.sh; compose exec -T openclaw-gateway node /app/openclaw.mjs devices list'
+bash -lc 'source ./scripts/_common.sh; compose exec -T openclaw-gateway node /app/openclaw.mjs devices approve <requestId>'
 ```
 
 How to get `<requestId>`:
 
-1. Run `./scripts/cli.sh devices list`
+1. Run `bash -lc 'source ./scripts/_common.sh; compose exec -T openclaw-gateway node /app/openclaw.mjs devices list'`
 2. Find the pending pairing entry for your browser/device
 3. Copy its `requestId` value
-4. Run `./scripts/cli.sh devices approve <requestId>` with that exact value
+4. Run `bash -lc 'source ./scripts/_common.sh; compose exec -T openclaw-gateway node /app/openclaw.mjs devices approve <requestId>'` with that exact value
 
 If there are multiple pending entries, approve the newest one first (or approve each pending request once).
 
 Then refresh the dashboard page.
 
 If you are using a different browser profile, incognito window, or another device, you may need to approve a new pairing request again.
+
+Why this workaround exists on macOS:
+
+- `./scripts/cli.sh devices list` or `./scripts/cli.sh devices approve ...` may fail on Docker Desktop with a gateway websocket error such as `gateway closed (1006 abnormal closure)` or `gateway timeout after 10000ms`
+- running the same `openclaw` command inside `openclaw-gateway` avoids that macOS container-to-gateway loopback issue
 
 ## 6) Two ways to run CLI commands
 
@@ -371,7 +376,13 @@ Troubleshooting:
 ### Dashboard opens but pairing keeps looping
 
 1. Make sure you opened the full tokenized URL from `./scripts/dashboard.sh`
-2. Approve the pending device with `./scripts/cli.sh devices list` and `./scripts/cli.sh devices approve <requestId>`
+2. On macOS, approve the pending device with:
+
+```bash
+bash -lc 'source ./scripts/_common.sh; compose exec -T openclaw-gateway node /app/openclaw.mjs devices list'
+bash -lc 'source ./scripts/_common.sh; compose exec -T openclaw-gateway node /app/openclaw.mjs devices approve <requestId>'
+```
+
 3. If needed, restart and reopen:
 
 ```bash
