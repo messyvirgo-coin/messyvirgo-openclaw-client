@@ -137,4 +137,8 @@ info "Restarting gateway"
 compose down openclaw-gateway
 compose up -d openclaw-gateway
 
+if ! compose exec -T openclaw-gateway sh -lc 'command -v mcporter >/dev/null 2>&1'; then
+  die "mcporter is missing in the runtime image. Re-run upgrade after pulling latest wrapper changes."
+fi
+
 info "Upgrade complete"

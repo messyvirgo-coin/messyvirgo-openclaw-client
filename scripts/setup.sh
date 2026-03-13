@@ -257,6 +257,10 @@ fi
 info "Starting gateway"
 compose up -d openclaw-gateway
 
+if ! compose exec -T openclaw-gateway sh -lc 'command -v mcporter >/dev/null 2>&1'; then
+  die "mcporter is missing in the runtime image. Re-run setup after pulling latest wrapper changes."
+fi
+
 info "Done."
 info "Workspaces root: $OPENCLAW_WORKSPACES_DIR"
 info "Default workspace: $OPENCLAW_WORKSPACE_DIR"

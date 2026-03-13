@@ -45,7 +45,17 @@ Open `.env` and set any values you already have:
 - `BANKR_API_KEY` if you also enable Bankr models
 - `BRAVE_API_KEY` for web search
 
-You can leave other defaults alone for a first install.
+If you plan to install the Messy Virgo Agents & Skills Pack, add these values now:
+
+- `MESSY_VIRGO_MCP_URL` with value `https://api.messyvirgo.com/mcp`
+- `MESSY_VIRGO_API_KEY` with your API key
+
+Other values you can optionally edit in `.env` before running setup:
+
+- **`OPENCLAW_GIT_REPO`**: source repo to clone/pull (default: Messy Virgo fork; optional: upstream OpenClaw repo)
+- **`OPENCLAW_SRC_DIR`**: local source checkout used to build the Docker image
+- **`OPENCLAW_IMAGE`**: image name to build locally
+- **`OPENCLAW_CONFIG_DIR`** and **`OPENCLAW_WORKSPACES_DIR`**: host state/workspace paths
 
 ## 2) Run one-time setup
 
@@ -56,13 +66,6 @@ From the repo folder:
 ```
 
 `setup.sh` reads config from `.env` and uses defaults from `.env.example` when values are missing.
-
-Important values you can edit in `.env` before running setup:
-
-- **`OPENCLAW_GIT_REPO`**: source repo to clone/pull (default: Messy Virgo fork; optional: upstream OpenClaw repo)
-- **`OPENCLAW_SRC_DIR`**: local source checkout used to build the Docker image
-- **`OPENCLAW_IMAGE`**: image name to build locally
-- **`OPENCLAW_CONFIG_DIR`** and **`OPENCLAW_WORKSPACES_DIR`**: host state/workspace paths
 
 If you prefer prompts, run `./scripts/setup.sh --interactive`.
 
@@ -111,7 +114,7 @@ If you are using a different browser profile, incognito window, or another devic
 
 ## 5) Two ways to run CLI commands
 
-You can run the same OpenClaw CLI in either of these ways:
+You can run / execute the OpenClaw CLI in the docker container with either of these ways:
 
 Option A: one command at a time from the host:
 
@@ -157,7 +160,7 @@ Skip this section if you only want the secure client wrapper and built-in agents
 
 ### 7.1 Add Messy Virgo credentials
 
-If you want to install Messy Virgo agents, add these values to this repo's `.env` before installing the agent pack:
+If you want to install Messy Virgo agents, make sure you added these values to this repo's `.env` before installing the agent pack:
 
 ```bash
 MESSY_VIRGO_MCP_URL=https://api.messyvirgo.com/mcp
@@ -172,10 +175,9 @@ Use the `messyvirgo-openclaw-agents` repo:
 
 - Git repo: `https://github.com/messyvirgo-coin/messyvirgo-openclaw-agents`
 
-In your local checkout of that repo:
+In your local checkout of the agent's repo (set real path to this client repo):
 
 ```bash
-cd /path/to/messyvirgo-openclaw-agents
 set -a
 source /path/to/messyvirgo-openclaw-client/.env
 set +a
@@ -184,15 +186,37 @@ set +a
 
 Replace `<profile>` with the agent profile you want to install, for example `mv-t1`.
 
-### 7.3 Register a Telegram channel back in this repo
-
-Return to your local `messyvirgo-openclaw-client` checkout after the pack install:
+Example for `mv-t1` profile:
 
 ```bash
-cd /path/to/messyvirgo-openclaw-client
+set -a
+source ../messyvirgo-openclaw-client/.env
+set +a
+./scripts/install.sh --target wrapper --profile mv-t1
 ```
 
-You can use either command style below.
+Return to your local `messyvirgo-openclaw-client` checkout after the pack install and restart the gateway to be on the safe side:
+
+```bash
+./scripts/down.sh
+./scripts/up.sh
+```
+
+MCP runtime note:
+
+- The pack writes one global MCP runtime config at `OPENCLAW_CONFIG_DIR/mcporter.json` (wrapper default: `~/.openclaw-secure/mcporter.json`).
+- You do **not** need a `mcporter.json` in each agent workspace.
+- Wrapper images built from this repo include `mcporter` and auto-read that global config path.
+
+Quick MCP verification (optional, recommended):
+
+```bash
+./scripts/cli.sh agent --local --agent mv-t1-mngr --message "Run mcporter call messy-virgo-funds.list_accessible_funds and return only the JSON output."
+```
+
+### 7.3 Register a Telegram channel back in this repo
+
+To register a telegram channel for an agent, you can use either command style below.
 
 Host wrapper style:
 
@@ -209,27 +233,49 @@ openclaw channels add --channel telegram --account <account> --name "<agent-name
 openclaw agents bind --agent <agent-name> --bind telegram:<account>
 ```
 
-Example naming:
+In the following we skip providing both styles. Simply exchange `./scripts/cli.sh` with `openclaw` in the interactive shell.
 
-- `<account>`: `mv-t1`
-- `<agent-name>`: `mv-t1-mngr`
+Full example to register the 'Messy Virgo Team 1' Manager-Agent:
+
+```bash
+./scripts/cli.sh channels add --channel telegram --account mv-t1 --name "mv-t1-mngr" --token "<telegram_bot_token>"
+./scripts/cli.sh agents bind --agent mv-t1-mngr --bind telegram:mv-t1
+```
 
 ### 7.4 Choose Telegram group policy
 
 Open access:
 
 ```bash
+# default
 ./scripts/cli.sh config set channels.telegram.groupPolicy '"open"'
+
+# per account
 ./scripts/cli.sh config set channels.telegram.accounts.<account>.groupPolicy '"open"'
 ```
 
 Restricted access to specific Telegram users:
 
 ```bash
+# per account
 ./scripts/cli.sh config set channels.telegram.accounts.<account>.groupAllowFrom '["tg:<telegram_user_id>"]'
 ```
 
 Replace `<telegram_user_id>` with the Telegram user ID you want to allow. This guide does not yet cover how to look up that ID.
+
+Full example for the 'Messy Virgo Team 1' Manager-Agent:
+
+```bash
+./scripts/cli.sh config set channels.telegram.groupPolicy '"open"'
+./scripts/cli.sh config set channels.telegram.accounts.mv-t1.groupPolicy '"open"'
+```
+
+Mandatory restart after channel changes
+
+```bash
+./scripts/down.sh
+./scripts/up.sh
+```
 
 ### 7.5 Verify the channel and bindings
 
@@ -238,27 +284,15 @@ Replace `<telegram_user_id>` with the Telegram user ID you want to allow. This g
 ./scripts/cli.sh agents list --bindings
 ```
 
-Or from the interactive shell:
+### 7.6 Approve Telegram pairing codes
+
+Your telegram bot should have asked you to pair and provided you with a code. If not, say politely 'Hi'.
 
 ```bash
-openclaw channels list
-openclaw agents list --bindings
+./scripts/cli.sh pairing approve telegram <pairing_code>
 ```
 
-### 7.6 Restart after channel changes
-
-```bash
-./scripts/down.sh
-./scripts/up.sh
-```
-
-### 7.7 Approve Telegram pairing codes
-
-When Telegram gives you a pairing code, approve it with:
-
-```bash
-openclaw pairing approve telegram <pairing_code>
-```
+Done. Have a chat!
 
 ## 8) Start/stop later
 
