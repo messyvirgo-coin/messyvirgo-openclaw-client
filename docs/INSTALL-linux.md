@@ -1,13 +1,15 @@
 # Linux install (beginner-friendly)
 
-This guide covers the generic OpenClaw Docker wrapper only:
+This guide always starts with the secure OpenClaw client in this repo, then optionally shows how to install Messy Virgo agents and connect Telegram:
 
-- installing the wrapper
+- installing the secure client wrapper
 - opening the dashboard
 - approving the first browser/device pairing
 - running basic smoke checks
+- optionally installing agents from `messyvirgo-openclaw-agents`
+- optionally registering Telegram channels/bindings for those agents
 
-Messy Virgo pack install, MCP runtime config, and pack-specific verification belong in the `messyvirgo-openclaw-agents` repo.
+The agent pack itself still lives in the separate `messyvirgo-openclaw-agents` repo, but the Telegram channel registration happens back in this repo.
 
 ## 0) Requirements
 
@@ -107,7 +109,28 @@ Then refresh the dashboard page.
 
 If you are using a different browser profile, incognito window, or another device, you may need to approve a new pairing request again.
 
-## 5) Run quick smoke checks
+## 5) Two ways to run CLI commands
+
+You can run the same OpenClaw CLI in either of these ways:
+
+Option A: one command at a time from the host:
+
+```bash
+./scripts/cli.sh status
+./scripts/cli.sh channels list
+```
+
+Option B: open an interactive shell, then use the `openclaw` helper inside it:
+
+```bash
+./scripts/cli-shell.sh
+openclaw status
+openclaw channels list
+```
+
+Use `./scripts/cli.sh ...` when you want a single command from the host terminal. Use `./scripts/cli-shell.sh` when you want an interactive CLI session and shorter `openclaw ...` commands.
+
+## 6) Run quick smoke checks
 
 From the repo folder:
 
@@ -128,7 +151,116 @@ Optional identity check for the built-in wrapper agents:
 
 If an agent behaves like first-run onboarding, the workspace may still contain a `BOOTSTRAP.md`. Restart after cleanup or rerun setup with the appropriate cleanup option.
 
-## 6) Start/stop later
+## 7) Optional: install Messy Virgo agents and register Telegram
+
+Skip this section if you only want the secure client wrapper and built-in agents.
+
+### 7.1 Add Messy Virgo credentials
+
+If you want to install Messy Virgo agents, add these values to this repo's `.env` before installing the agent pack:
+
+```bash
+MESSY_VIRGO_MCP_URL=https://api.messyvirgo.com/mcp
+MESSY_VIRGO_API_KEY=<your_messy_virgo_api_key>
+```
+
+Do not commit real keys or bot tokens.
+
+### 7.2 Install the agent pack from the agents repo
+
+Use the `messyvirgo-openclaw-agents` repo:
+
+- Git repo: `https://github.com/messyvirgo-coin/messyvirgo-openclaw-agents`
+
+In your local checkout of that repo:
+
+```bash
+cd /path/to/messyvirgo-openclaw-agents
+set -a
+source /path/to/messyvirgo-openclaw-client/.env
+set +a
+./scripts/install.sh --target wrapper --profile <profile>
+```
+
+Replace `<profile>` with the agent profile you want to install, for example `mv-t1`.
+
+### 7.3 Register a Telegram channel back in this repo
+
+Return to your local `messyvirgo-openclaw-client` checkout after the pack install:
+
+```bash
+cd /path/to/messyvirgo-openclaw-client
+```
+
+You can use either command style below.
+
+Host wrapper style:
+
+```bash
+./scripts/cli.sh channels add --channel telegram --account <account> --name "<agent-name>" --token "<telegram_bot_token>"
+./scripts/cli.sh agents bind --agent <agent-name> --bind telegram:<account>
+```
+
+Interactive shell style:
+
+```bash
+./scripts/cli-shell.sh
+openclaw channels add --channel telegram --account <account> --name "<agent-name>" --token "<telegram_bot_token>"
+openclaw agents bind --agent <agent-name> --bind telegram:<account>
+```
+
+Example naming:
+
+- `<account>`: `mv-t1`
+- `<agent-name>`: `mv-t1-mngr`
+
+### 7.4 Choose Telegram group policy
+
+Open access:
+
+```bash
+./scripts/cli.sh config set channels.telegram.groupPolicy '"open"'
+./scripts/cli.sh config set channels.telegram.accounts.<account>.groupPolicy '"open"'
+```
+
+Restricted access to specific Telegram users:
+
+```bash
+./scripts/cli.sh config set channels.telegram.accounts.<account>.groupAllowFrom '["tg:<telegram_user_id>"]'
+```
+
+Replace `<telegram_user_id>` with the Telegram user ID you want to allow. This guide does not yet cover how to look up that ID.
+
+### 7.5 Verify the channel and bindings
+
+```bash
+./scripts/cli.sh channels list
+./scripts/cli.sh agents list --bindings
+```
+
+Or from the interactive shell:
+
+```bash
+openclaw channels list
+openclaw agents list --bindings
+```
+
+### 7.6 Restart after channel changes
+
+```bash
+./scripts/down.sh
+./scripts/up.sh
+```
+
+### 7.7 Approve Telegram pairing codes
+
+When Telegram gives you a pairing code, approve it with:
+
+```bash
+openclaw pairing approve telegram <pairing_code>
+```
+
+## 8) Start/stop later
 
 Start:
 
@@ -148,7 +280,7 @@ Stop:
 ./scripts/down.sh
 ```
 
-## 7) Upgrade later
+## 9) Upgrade later
 
 To pull the latest source, rebuild the image, and restart:
 
