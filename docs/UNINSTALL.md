@@ -7,7 +7,7 @@ The wrapper reset script is cross-platform and already handles platform-specific
 ## 1) Go to the wrapper repo
 
 ```bash
-cd /home/michaelh/Git/messyvirgo-openclaw-client
+cd /path/to/messyvirgo-openclaw-client
 ```
 
 ## 2) Stop running containers
