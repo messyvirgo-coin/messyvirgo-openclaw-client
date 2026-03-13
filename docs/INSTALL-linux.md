@@ -175,6 +175,13 @@ Use the `messyvirgo-openclaw-agents` repo:
 
 - Git repo: `https://github.com/messyvirgo-coin/messyvirgo-openclaw-agents`
 
+If you still need to clone it:
+
+```bash
+git clone https://github.com/messyvirgo-coin/messyvirgo-openclaw-agents.git
+cd messyvirgo-openclaw-agents
+```
+
 In your local checkout of the agent's repo (set real path to this client repo):
 
 ```bash
