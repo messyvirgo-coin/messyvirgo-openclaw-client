@@ -14,6 +14,7 @@ ENV_FILE="$ROOT_DIR/.env"
 SYNC_WORKSPACES=0
 DRY_RUN=0
 CLEANUP_BOOTSTRAP=0
+INTERACTIVE=0
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -26,6 +27,9 @@ while [[ $# -gt 0 ]]; do
     --cleanup-bootstrap)
       CLEANUP_BOOTSTRAP=1
       ;;
+    --interactive)
+      INTERACTIVE=1
+      ;;
     -h|--help)
       cat <<'EOF'
 Usage: ./scripts/setup.sh [options]
@@ -34,6 +38,7 @@ Options:
   --sync-workspaces    Overwrite changed workspace templates (creates .bak timestamped backups)
   --dry-run            Print what workspace deployment would change
   --cleanup-bootstrap  Remove BOOTSTRAP.md from deployed workspaces (creates backup first)
+  --interactive        Prompt for config values instead of using .env/defaults
   -h, --help           Show this help
 EOF
       exit 0
@@ -96,18 +101,31 @@ else
   DEFAULT_WORKSPACES_DIR="$HOME/OpenClawWorkspaces"
 fi
 DEFAULT_SRC_DIR="${OPENCLAW_SRC_DIR:-$DEFAULT_CONFIG_DIR/openclaw-src}"
+DEFAULT_GIT_REPO="${OPENCLAW_GIT_REPO:-https://github.com/messyvirgo-coin/messyvirgo-openclaw}"
 DEFAULT_IMAGE="${OPENCLAW_IMAGE:-openclaw-secure:local}"
+DEFAULT_NPM_VERSION="${OPENCLAW_NPM_VERSION:-11.11.1}"
 
-OPENCLAW_CONFIG_DIR="$(prompt_default "Host config/state directory" "$DEFAULT_CONFIG_DIR")"
-OPENCLAW_WORKSPACES_DIR="$(prompt_default "Host root directory for per-agent workspaces" "$DEFAULT_WORKSPACES_DIR")"
-OPENCLAW_SRC_DIR="$(prompt_default "Where to clone OpenClaw source (for building)" "$DEFAULT_SRC_DIR")"
-OPENCLAW_IMAGE="$(prompt_default "Docker image tag to build" "$DEFAULT_IMAGE")"
+if [[ "$INTERACTIVE" == "1" ]]; then
+  OPENCLAW_CONFIG_DIR="$(prompt_default "Host config/state directory" "$DEFAULT_CONFIG_DIR")"
+  OPENCLAW_WORKSPACES_DIR="$(prompt_default "Host root directory for per-agent workspaces" "$DEFAULT_WORKSPACES_DIR")"
+  OPENCLAW_SRC_DIR="$(prompt_default "Where to clone OpenClaw source (for building)" "$DEFAULT_SRC_DIR")"
+  OPENCLAW_GIT_REPO="$(prompt_default "OpenClaw Git repo URL to clone/pull" "$DEFAULT_GIT_REPO")"
+  OPENCLAW_IMAGE="$(prompt_default "Docker image tag to build" "$DEFAULT_IMAGE")"
+else
+  OPENCLAW_CONFIG_DIR="$DEFAULT_CONFIG_DIR"
+  OPENCLAW_WORKSPACES_DIR="$DEFAULT_WORKSPACES_DIR"
+  OPENCLAW_SRC_DIR="$DEFAULT_SRC_DIR"
+  OPENCLAW_GIT_REPO="$DEFAULT_GIT_REPO"
+  OPENCLAW_IMAGE="$DEFAULT_IMAGE"
+fi
+OPENCLAW_NPM_VERSION="${OPENCLAW_NPM_VERSION:-$DEFAULT_NPM_VERSION}"
 if [[ "$OPENCLAW_WORKSPACES_DIR" == "$HOME" || "$OPENCLAW_WORKSPACES_DIR" == "/" ]]; then
   die "Refusing unsafe workspaces root '$OPENCLAW_WORKSPACES_DIR'. Use a dedicated subdirectory (for example $DEFAULT_CONFIG_DIR/workspaces)."
 fi
 OPENCLAW_WORKSPACE_DIR="$OPENCLAW_WORKSPACES_DIR/main"
 
 mkdir -p "$OPENCLAW_CONFIG_DIR"
+chmod 700 "$OPENCLAW_CONFIG_DIR"
 mkdir -p "$OPENCLAW_WORKSPACES_DIR"
 mkdir -p "$(dirname "$OPENCLAW_SRC_DIR")"
 
@@ -118,8 +136,8 @@ fi
 # Write .env (simple overwrite, deterministic keys)
 cat >"$ENV_FILE" <<EOF
 BANKR_API_KEY=${BANKR_API_KEY:-}
+OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
 BRAVE_API_KEY=${BRAVE_API_KEY:-}
-OPENCLAW_GIT_REPO=${OPENCLAW_GIT_REPO:-https://github.com/messyvirgo-coin/messyvirgo-openclaw.git}
 OPENCLAW_CONFIG_DIR=$OPENCLAW_CONFIG_DIR
 OPENCLAW_WORKSPACES_DIR=$OPENCLAW_WORKSPACES_DIR
 OPENCLAW_WORKSPACE_DIR=$OPENCLAW_WORKSPACE_DIR
@@ -128,26 +146,40 @@ OPENCLAW_BRIDGE_PORT=${OPENCLAW_BRIDGE_PORT:-18790}
 OPENCLAW_GATEWAY_BIND=${OPENCLAW_GATEWAY_BIND:-lan}
 OPENCLAW_IMAGE=$OPENCLAW_IMAGE
 OPENCLAW_GATEWAY_TOKEN=$OPENCLAW_GATEWAY_TOKEN
-OPENCLAW_DOCKER_APT_PACKAGES=${OPENCLAW_DOCKER_APT_PACKAGES:-}
+OPENCLAW_DOCKER_APT_PACKAGES=${OPENCLAW_DOCKER_APT_PACKAGES:-jq}
 OPENCLAW_SRC_DIR=$OPENCLAW_SRC_DIR
+OPENCLAW_GIT_REPO=$OPENCLAW_GIT_REPO
+OPENCLAW_NPM_VERSION=$OPENCLAW_NPM_VERSION
 EOF
 
 info "Cloning/updating OpenClaw source"
 if [[ -d "$OPENCLAW_SRC_DIR/.git" ]]; then
+  git -C "$OPENCLAW_SRC_DIR" remote set-url origin "$OPENCLAW_GIT_REPO"
   git -C "$OPENCLAW_SRC_DIR" fetch --tags --prune
   git -C "$OPENCLAW_SRC_DIR" checkout main
   git -C "$OPENCLAW_SRC_DIR" pull --ff-only
 else
   rm -rf "$OPENCLAW_SRC_DIR"
-  git clone "${OPENCLAW_GIT_REPO:-https://github.com/messyvirgo-coin/messyvirgo-openclaw.git}" "$OPENCLAW_SRC_DIR"
+  git clone "$OPENCLAW_GIT_REPO" "$OPENCLAW_SRC_DIR"
 fi
+
+info "Applying wrapper source patches"
+"$SCRIPT_DIR/patch-openclaw-source.sh" "$OPENCLAW_SRC_DIR"
 
 info "Building Docker image ($OPENCLAW_IMAGE)"
 docker build \
-  --build-arg "OPENCLAW_DOCKER_APT_PACKAGES=${OPENCLAW_DOCKER_APT_PACKAGES:-}" \
+  --build-arg "OPENCLAW_DOCKER_APT_PACKAGES=${OPENCLAW_DOCKER_APT_PACKAGES:-jq}" \
   -t "$OPENCLAW_IMAGE" \
   -f "$OPENCLAW_SRC_DIR/Dockerfile" \
   "$OPENCLAW_SRC_DIR"
+
+info "Pinning npm in runtime image ($OPENCLAW_NPM_VERSION)"
+docker build \
+  --build-arg "BASE_IMAGE=$OPENCLAW_IMAGE" \
+  --build-arg "OPENCLAW_NPM_VERSION=$OPENCLAW_NPM_VERSION" \
+  -t "$OPENCLAW_IMAGE" \
+  -f "$ROOT_DIR/docker/npm-overlay.Dockerfile" \
+  "$ROOT_DIR"
 
 info "Deploying config templates"
 mkdir -p "$OPENCLAW_CONFIG_DIR"
@@ -194,8 +226,25 @@ if auth.get("mode") != "token":
 if auth.get("token") != "${OPENCLAW_GATEWAY_TOKEN}":
     auth["token"] = "${OPENCLAW_GATEWAY_TOKEN}"
     changed = True
-if not ui.get("dangerouslyAllowHostHeaderOriginFallback"):
-    ui["dangerouslyAllowHostHeaderOriginFallback"] = True
+if ui.get("dangerouslyAllowHostHeaderOriginFallback") is not False:
+    ui["dangerouslyAllowHostHeaderOriginFallback"] = False
+    changed = True
+allowed = ui.get("allowedOrigins")
+required_origins = [
+    "http://127.0.0.1:${OPENCLAW_GATEWAY_PORT}",
+    "http://localhost:${OPENCLAW_GATEWAY_PORT}",
+]
+if not isinstance(allowed, list) or sorted(allowed) != sorted(required_origins):
+    ui["allowedOrigins"] = required_origins
+    changed = True
+rate = auth.get("rateLimit")
+required_rate = {
+    "maxAttempts": 10,
+    "windowMs": 60000,
+    "lockoutMs": 300000,
+}
+if not isinstance(rate, dict) or rate != required_rate:
+    auth["rateLimit"] = required_rate
     changed = True
 if changed:
     with open(path, "w") as f:
@@ -210,7 +259,7 @@ compose up -d openclaw-gateway
 
 info "Done."
 info "Workspaces root: $OPENCLAW_WORKSPACES_DIR"
-info "Main workspace:  $OPENCLAW_WORKSPACE_DIR"
+info "Default workspace: $OPENCLAW_WORKSPACE_DIR"
 info "Config/state:    $OPENCLAW_CONFIG_DIR"
 echo ""
 echo "  Dashboard: http://127.0.0.1:${OPENCLAW_GATEWAY_PORT:-18789}/#token=${OPENCLAW_GATEWAY_TOKEN}"

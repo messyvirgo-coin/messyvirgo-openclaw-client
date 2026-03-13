@@ -32,6 +32,8 @@ For that reason, this wrapper defaults to **sandboxing = off** and relies on:
 - a single, explicit RW workspace mount
 - localhost-only dashboard exposure where possible (Linux secure compose), and token-authenticated exposure on macOS as noted above
 
+**Why `sandbox.docker` is omitted from `config/openclaw.json`:** With `agents.defaults.sandbox.mode: "off"`, the nested `sandbox.docker` block is inactive. This wrapper intentionally avoids Docker sandbox spawning from inside the gateway container (it would require Docker socket access and weaken host security). Keeping the block caused confusion and warnings in some versions. If you enable `sandbox.mode` in the future, add a `sandbox.docker` block (image, workdir, caps, network, etc.) — see OpenClaw upstream config for the schema.
+
 ### Best practices (recommended)
 
 - Use a **dedicated workspace folder** (e.g. `~/OpenClawWorkspace`) and copy only what you need into it.

@@ -7,11 +7,12 @@ services:
       OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN}
       OPENCLAW_GATEWAY_PORT: ${OPENCLAW_GATEWAY_PORT:-18789}
       BANKR_API_KEY: ${BANKR_API_KEY:-}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
       BRAVE_API_KEY: ${BRAVE_API_KEY:-}
     volumes:
       - ${OPENCLAW_CONFIG_DIR:-${HOME}/.openclaw-secure}:/home/node/.openclaw
       - ${OPENCLAW_WORKSPACES_DIR:-${HOME}/OpenClawWorkspaces}:/home/node/workspaces
-      - ${OPENCLAW_WORKSPACE_DIR:-${HOME}/OpenClawWorkspace}:/home/node/.openclaw/workspace
+      - ${OPENCLAW_WORKSPACE_DIR:-${HOME}/OpenClawWorkspaces/main}:/home/node/.openclaw/workspace
     init: true
     restart: unless-stopped
     command:
@@ -22,7 +23,7 @@ services:
         "--bind",
         "${OPENCLAW_GATEWAY_BIND:-lan}",
         "--port",
-        "${OPENCLAW_GATEWAY_PORT:-18789}",
+        "${OPENCLAW_GATEWAY_PORT:-18789}"
       ]
 
   openclaw-cli:
@@ -30,15 +31,18 @@ services:
     environment:
       HOME: /home/node
       TERM: xterm-256color
+      # npm needs a writable cache path when running in read-only containers.
+      NPM_CONFIG_CACHE: ${OPENCLAW_NPM_CACHE_DIR:-/tmp/.npm}
       OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN}
       OPENCLAW_GATEWAY_PORT: ${OPENCLAW_GATEWAY_PORT:-18789}
       BANKR_API_KEY: ${BANKR_API_KEY:-}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
       BRAVE_API_KEY: ${BRAVE_API_KEY:-}
       BROWSER: echo
     volumes:
       - ${OPENCLAW_CONFIG_DIR:-${HOME}/.openclaw-secure}:/home/node/.openclaw
       - ${OPENCLAW_WORKSPACES_DIR:-${HOME}/OpenClawWorkspaces}:/home/node/workspaces
-      - ${OPENCLAW_WORKSPACE_DIR:-${HOME}/OpenClawWorkspace}:/home/node/.openclaw/workspace
+      - ${OPENCLAW_WORKSPACE_DIR:-${HOME}/OpenClawWorkspaces/main}:/home/node/.openclaw/workspace
     stdin_open: true
     tty: true
     init: true

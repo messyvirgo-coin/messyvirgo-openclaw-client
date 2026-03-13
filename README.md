@@ -36,13 +36,25 @@ This code is provided **as-is** and maintained **best-effort**. PRs/issues are w
 ./scripts/cli-shell.sh
 ```
 
-# Upgrade
+## Upgrade
 
 ```bash
 ./scripts/upgrade.sh
 ```
 
-More checklists: `[docs/VERIFY.md](docs/VERIFY.md)`
+Why not use "Update now" in the UI?
+
+- This wrapper runs OpenClaw from a Docker image, so in-app self-update is typically skipped with `reason: "not-git-install"` (runtime path is usually `/app`).
+- In container/immutable deployments, the correct update path is: sync fork -> rebuild image -> restart container via `./scripts/upgrade.sh`.
+
+If you want to apply updated wrapper config templates (including security
+defaults) to an existing deployment, run:
+
+```bash
+./scripts/upgrade.sh --sync-config
+```
+
+More checklists: `[docs/VERIFY.md](docs/VERIFY.md)` · Plugins: `[docs/PLUGINS.md](docs/PLUGINS.md)`
 
 Linux note: if `./scripts/up.sh` fails with a port bind error even though the port is free, use:
 
@@ -51,25 +63,34 @@ Linux note: if `./scripts/up.sh` fails with a port bind error even though the po
 ./scripts/cli.sh health --json
 ```
 
-## Multi-Agent Setup
+## Agent Packs
 
-This repo ships a pre-configured 4-agent architecture powered by DeepInfra:
+This repository is now a generic secure deployment wrapper. Pack-specific agents,
+skills, and managed config overlays should live in a separate repository.
 
-- **Messy Virgo** (main) — orchestrator that handles chat and delegates tasks
-- **Coder** — code writing and debugging (Kimi K2.5)
-- **Researcher** — web search and data lookup (DeepSeek V3.2)
-- **Planner** — multi-step planning with deep thinking (Kimi K2.5)
+For Messy Virgo trading-team agents, use:
 
-Cost-optimization defaults are also pre-applied:
+- `../messyvirgo-openclaw-agents`
 
-- `temperature: 0.2` on all models for prompt cache efficiency
-- 50K token context cap to encourage session resets
-- Context pruning (30m TTL, keeps last 3 assistant turns)
-- Safeguard compaction (32K token headroom reserved)
-- 30m heartbeat using the cheapest available model
+Typical flow:
 
-See `docs/STRATEGY.md` for details on customizing agents and models.
-See `docs/OPTIMIZATION-GUIDE.md` for what's applied and why.
+```bash
+# 1) bring up wrapper
+./scripts/setup.sh
+./scripts/up.sh
+
+# 2) install pack into this instance
+cd ../messyvirgo-openclaw-agents
+./scripts/install.sh --target wrapper --profile mv-t1
+```
+
+Use OpenClaw CLI directly for channel/account setup:
+
+```bash
+cd ../messyvirgo-openclaw-client
+./scripts/cli.sh channels --help
+./scripts/cli.sh agents --help
+```
 
 ## Security model (short)
 

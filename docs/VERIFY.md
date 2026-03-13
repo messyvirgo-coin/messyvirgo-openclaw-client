@@ -23,10 +23,16 @@ On **macOS**, this repo uses `docker-compose.macos.yml` which binds to `0.0.0.0`
 
 Your `.env` should define:
 
-- `OPENCLAW_WORKSPACES_DIR=...`
-- `OPENCLAW_WORKSPACE_DIR=...`
+- `OPENCLAW_WORKSPACES_DIR=...` (root folder for all agent workspaces)
+- `OPENCLAW_WORKSPACE_DIR=...` (single workspace folder used as the default mount)
+- provider keys for enabled model backends (`OPENROUTER_API_KEY` and/or `BANKR_API_KEY`)
 
-`OPENCLAW_WORKSPACE_DIR` should normally be `<OPENCLAW_WORKSPACES_DIR>/main`.
+`OPENCLAW_WORKSPACE_DIR` should normally be a subdirectory inside `OPENCLAW_WORKSPACES_DIR`, usually `<OPENCLAW_WORKSPACES_DIR>/main`.
+
+Example:
+
+- `OPENCLAW_WORKSPACES_DIR=$HOME/OpenClawWorkspaces`
+- `OPENCLAW_WORKSPACE_DIR=$HOME/OpenClawWorkspaces/main`
 
 Check host-side directories:
 
@@ -37,9 +43,9 @@ ls -la "$OPENCLAW_WORKSPACES_DIR"
 You should see at least:
 
 - `main/`
-- `coder/`
-- `researcher/`
-- `planner/`
+- `mv-coder/`
+- `mv-researcher/`
+- `mv-planner/`
 
 Sanity check inside the container:
 
@@ -84,9 +90,9 @@ Test each agent explicitly:
 
 ```bash
 ./scripts/cli.sh agent --agent main --message "State your name in one sentence."
-./scripts/cli.sh agent --agent coder --message "State your name in one sentence."
-./scripts/cli.sh agent --agent researcher --message "State your name in one sentence."
-./scripts/cli.sh agent --agent planner --message "State your name in one sentence."
+./scripts/cli.sh agent --agent mv-coder --message "State your name in one sentence."
+./scripts/cli.sh agent --agent mv-researcher --message "State your name in one sentence."
+./scripts/cli.sh agent --agent mv-planner --message "State your name in one sentence."
 ```
 
 If an agent behaves like first-run onboarding ("Who am I?"), that workspace

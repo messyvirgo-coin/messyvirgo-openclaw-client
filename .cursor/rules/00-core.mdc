@@ -7,17 +7,17 @@ alwaysApply: true
 
 - Treat this repository as the deployment wrapper around OpenClaw, not the main OpenClaw source tree.
 - The OpenClaw source is cloned from `OPENCLAW_GIT_REPO` into `OPENCLAW_SRC_DIR`; in local dev it may exist as the sibling repo `../messyvirgo-openclaw`.
-- Keep the source fork clean and upstream-syncable; put Messy Virgo customizations in this repo unless a source-level change is truly required.
+- Keep the source fork clean and upstream-syncable; keep wrapper concerns in this repo and put Messy Virgo agent/skill customizations in `../messyvirgo-openclaw-agents` unless a source-level change is truly required.
 - Keep changes small and reviewable; avoid broad refactors without clear need.
 - Do not hardcode secrets, tokens, private URLs, or machine-specific paths.
 - If behavior changes, update docs or comments in the same PR when needed.
 
 ## Primary Customization Areas
 
-- Prefer editing `config/openclaw.json` for models, gateway settings, agents, and skills loading.
-- Prefer editing `config/workspaces/**` for agent instructions and workspace bootstrap files.
-- Prefer editing `skills/**` for custom OpenClaw skills mounted into the container.
+- Prefer editing `config/openclaw.json` for wrapper baseline gateway/model/tool defaults.
 - Prefer editing `docker-compose*.yml` and `scripts/*.sh` for deployment, hardening, and wrapper behavior.
+- Prefer editing `skills/**` only for local wrapper-specific skill mounts or examples.
+- Prefer editing `../messyvirgo-openclaw-agents` for managed agent profiles, pack skills, config fragments, and pack lifecycle scripts.
 
 ## Security And Upgrade Expectations
 
