@@ -73,6 +73,18 @@ print(secrets.token_hex(32))
 PY
 }
 
+is_managed_env_key() {
+  local candidate="$1"
+  shift
+  local key
+  for key in "$@"; do
+    if [[ "$key" == "$candidate" ]]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
 ensure_docker_running
 
 info "Preparing .env"
@@ -133,6 +145,36 @@ if [[ -z "${OPENCLAW_GATEWAY_TOKEN:-}" ]]; then
   OPENCLAW_GATEWAY_TOKEN="$(random_hex_64)"
 fi
 
+managed_env_keys=(
+  BANKR_API_KEY
+  OPENROUTER_API_KEY
+  BRAVE_API_KEY
+  OPENCLAW_CONFIG_DIR
+  OPENCLAW_WORKSPACES_DIR
+  OPENCLAW_WORKSPACE_DIR
+  OPENCLAW_GATEWAY_PORT
+  OPENCLAW_BRIDGE_PORT
+  OPENCLAW_GATEWAY_BIND
+  OPENCLAW_IMAGE
+  OPENCLAW_GATEWAY_TOKEN
+  OPENCLAW_DOCKER_APT_PACKAGES
+  OPENCLAW_SRC_DIR
+  OPENCLAW_GIT_REPO
+  OPENCLAW_NPM_VERSION
+)
+
+preserved_env_lines=()
+if [[ -f "$ENV_FILE" ]]; then
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    if [[ "$line" =~ ^([A-Za-z_][A-Za-z0-9_]*)= ]]; then
+      env_key="${BASH_REMATCH[1]}"
+      if ! is_managed_env_key "$env_key" "${managed_env_keys[@]}"; then
+        preserved_env_lines+=("$line")
+      fi
+    fi
+  done <"$ENV_FILE"
+fi
+
 # Write .env (simple overwrite, deterministic keys)
 cat >"$ENV_FILE" <<EOF
 BANKR_API_KEY=${BANKR_API_KEY:-}
@@ -151,6 +193,13 @@ OPENCLAW_SRC_DIR=$OPENCLAW_SRC_DIR
 OPENCLAW_GIT_REPO=$OPENCLAW_GIT_REPO
 OPENCLAW_NPM_VERSION=$OPENCLAW_NPM_VERSION
 EOF
+
+if [[ "${#preserved_env_lines[@]}" -gt 0 ]]; then
+  {
+    printf "\n# Preserved custom keys from previous .env\n"
+    printf "%s\n" "${preserved_env_lines[@]}"
+  } >>"$ENV_FILE"
+fi
 
 info "Cloning/updating OpenClaw source"
 if [[ -d "$OPENCLAW_SRC_DIR/.git" ]]; then
