@@ -50,6 +50,11 @@ If you plan to install the Messy Virgo Agents & Skills Pack, add these values no
 - `MESSY_VIRGO_MCP_URL` with value `https://api.messyvirgo.com/mcp`
 - `MESSY_VIRGO_API_KEY` with your API key
 
+If your MCP server runs locally on the same Linux host:
+
+- with `./scripts/up.sh`, usually use `http://172.17.0.1:8000/mcp`
+- with `./scripts/up-linux-hostnet.sh`, use `http://localhost:8000/mcp`
+
 Other values you can optionally edit in `.env` before running setup:
 
 - **`OPENCLAW_GIT_REPO`**: source repo to clone/pull (default: Messy Virgo fork; optional: upstream OpenClaw repo)
@@ -166,6 +171,11 @@ If you want to install Messy Virgo agents, make sure you added these values to t
 MESSY_VIRGO_MCP_URL=https://api.messyvirgo.com/mcp
 MESSY_VIRGO_API_KEY=<your_messy_virgo_api_key>
 ```
+
+If the MCP server runs locally on the same Linux host, use this shortcut:
+
+- `./scripts/up.sh` -> usually `MESSY_VIRGO_MCP_URL=http://172.17.0.1:8000/mcp`
+- `./scripts/up-linux-hostnet.sh` -> `MESSY_VIRGO_MCP_URL=http://localhost:8000/mcp`
 
 Do not commit real keys or bot tokens.
 
