@@ -63,7 +63,6 @@ ensure_docker_running
 load_env
 
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
-ENV_FILE="$ROOT_DIR/.env"
 
 CONFIG_DIR="${OPENCLAW_CONFIG_DIR:-$HOME/.openclaw-secure}"
 WORKSPACE_DIR="${OPENCLAW_WORKSPACE_DIR:-$HOME/OpenClawWorkspace}"
