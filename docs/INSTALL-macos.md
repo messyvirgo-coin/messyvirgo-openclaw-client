@@ -52,7 +52,7 @@ If you plan to install the Messy Virgo Agents and Skills Pack, add these values 
 
 Other values you can optionally edit in `.env` before running setup:
 
-- **`OPENCLAW_GIT_REPO`**: source repo to clone/pull (default: Messy Virgo fork; optional: upstream OpenClaw repo)
+- **`OPENCLAW_GIT_REPO`**: source repo to clone/pull (default: upstream [`openclaw/openclaw`](https://github.com/openclaw/openclaw); override for a fork or mirror)
 - **`OPENCLAW_SRC_DIR`**: local source checkout used to build the Docker image
 - **`OPENCLAW_IMAGE`**: image name to build locally
 - **`OPENCLAW_CONFIG_DIR`** and **`OPENCLAW_WORKSPACES_DIR`**: host state/workspace paths

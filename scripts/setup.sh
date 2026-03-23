@@ -113,7 +113,7 @@ else
   DEFAULT_WORKSPACES_DIR="$HOME/OpenClawWorkspaces"
 fi
 DEFAULT_SRC_DIR="${OPENCLAW_SRC_DIR:-$DEFAULT_CONFIG_DIR/openclaw-src}"
-DEFAULT_GIT_REPO="${OPENCLAW_GIT_REPO:-https://github.com/messyvirgo-coin/messyvirgo-openclaw}"
+DEFAULT_GIT_REPO="${OPENCLAW_GIT_REPO:-https://github.com/openclaw/openclaw}"
 DEFAULT_IMAGE="${OPENCLAW_IMAGE:-openclaw-secure:local}"
 DEFAULT_NPM_VERSION="${OPENCLAW_NPM_VERSION:-11.11.1}"
 
