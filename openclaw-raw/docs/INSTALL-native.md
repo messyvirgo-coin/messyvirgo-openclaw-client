@@ -22,7 +22,7 @@ Edit `.env` and set:
 
 - `BANKR_API_KEY`, `OPENROUTER_API_KEY`, `BRAVE_API_KEY` (for model providers you use)
 - `OPENCLAW_WORKSPACES_DIR` (default: `$HOME/OpenClawWorkspaces`)
-- `OPENCLAW_SKILLS_DIR` (path to this repo's `skills/` folder, e.g. `$HOME/Git/messyvirgo-openclaw-client/skills`)
+- `OPENCLAW_SKILLS_DIR` (optional; use relative `skills` for portability, or leave empty to default to `<repo>/skills`)
 - `OPENCLAW_CONFIG_DIR` (default: `$HOME/.openclaw`)
 - `OPENCLAW_GATEWAY_TOKEN` (leave empty to auto-generate on first setup)
 - `OPENCLAW_GATEWAY_PORT` (default: 18789)

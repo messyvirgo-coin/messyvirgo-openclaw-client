@@ -30,10 +30,7 @@ if [[ -z "${OPENCLAW_WORKSPACES_DIR:-}" ]]; then
   OPENCLAW_WORKSPACES_DIR="${HOME:-}/OpenClawWorkspaces"
   info "Using default OPENCLAW_WORKSPACES_DIR=$OPENCLAW_WORKSPACES_DIR (add to .env to override)"
 fi
-if [[ -z "${OPENCLAW_SKILLS_DIR:-}" ]]; then
-  OPENCLAW_SKILLS_DIR="$REPO_ROOT/skills"
-  info "Using default OPENCLAW_SKILLS_DIR=$OPENCLAW_SKILLS_DIR (add to .env to override)"
-fi
+OPENCLAW_SKILLS_DIR="$(resolve_openclaw_skills_dir "${OPENCLAW_SKILLS_DIR:-}")"
 if [[ -z "${OPENCLAW_CONFIG_DIR:-}" ]]; then
   OPENCLAW_CONFIG_DIR="${HOME:-}/.openclaw"
   info "Using default OPENCLAW_CONFIG_DIR=$OPENCLAW_CONFIG_DIR (add to .env to override)"

@@ -25,6 +25,18 @@ load_env() {
   fi
 }
 
+# Resolve OPENCLAW_SKILLS_DIR: empty → repo skills; relative → from repo root; absolute → as-is
+resolve_openclaw_skills_dir() {
+  local val="${1:-}"
+  if [[ -z "$val" ]]; then
+    echo "$REPO_ROOT/skills"
+  elif [[ "$val" != /* ]]; then
+    echo "$REPO_ROOT/$val"
+  else
+    echo "$val"
+  fi
+}
+
 workspace_dir_for_agent() {
   local workspace_root="$1"
   local agent_id="$2"
