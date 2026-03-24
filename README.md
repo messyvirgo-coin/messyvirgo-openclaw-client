@@ -44,12 +44,17 @@ This code is provided **as-is** and maintained **best-effort**. PRs/issues are w
 
 ## Upgrade (secure-client)
 
+Why not use "Update now" in the UI?
+
+- This wrapper runs OpenClaw from a Docker image, so in-app self-update is typically skipped with `reason: "not-git-install"` (runtime path is usually `/app`).
+- In container/immutable deployments, the correct update path is: pull the latest OpenClaw source (via `./secure-client/scripts/upgrade.sh`, which updates your clone from `OPENCLAW_GIT_REPO`) → rebuild image → restart container.
+
+If you want to apply updated wrapper config templates (including security defaults) to an existing deployment, run:
+
 ```bash
 ./secure-client/scripts/upgrade.sh
 ./secure-client/scripts/upgrade.sh --sync-config   # apply updated config templates
 ```
-
-Why not use "Update now" in the UI? The wrapper runs OpenClaw from a Docker image; the correct update path is: sync fork → rebuild image → restart container via `./secure-client/scripts/upgrade.sh`.
 
 More: [secure-client/docs/VERIFY.md](secure-client/docs/VERIFY.md) · [docs/PLUGINS.md](docs/PLUGINS.md)
 
