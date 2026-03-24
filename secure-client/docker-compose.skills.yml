@@ -1,0 +1,8 @@
+# skills/ lives at repo root; compose files are in secure-client/
+services:
+  openclaw-gateway:
+    volumes:
+      - ../skills:/home/node/custom-skills:ro
+  openclaw-cli:
+    volumes:
+      - ../skills:/home/node/custom-skills:ro

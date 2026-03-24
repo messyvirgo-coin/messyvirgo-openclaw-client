@@ -1,0 +1,321 @@
+{
+  "discovery": {
+    "mdns": {
+      "mode": "minimal"
+    }
+  },
+  "logging": {
+    "redactSensitive": "tools"
+  },
+  "tools": {
+    "web": {
+      "search": {
+        "provider": "brave",
+        "apiKey": "${BRAVE_API_KEY}",
+        "maxResults": 5,
+        "timeoutSeconds": 30
+      },
+      "fetch": {
+        "enabled": true
+      }
+    }
+  },
+  "session": {
+    "dmScope": "per-channel-peer"
+  },
+  "models": {
+    "mode": "merge",
+    "providers": {
+      "bankr": {
+        "baseUrl": "https://llm.bankr.bot/v1",
+        "apiKey": "${BANKR_API_KEY}",
+        "api": "openai-completions",
+        "models": [
+          { "id": "qwen3-coder",      "name": "Qwen3 Coder" },
+          { "id": "gemini-2.5-flash", "name": "Gemini 2.5 Flash" },
+          { "id": "kimi-k2.5",        "name": "Kimi K2.5" },
+          { "id": "gpt-5-nano",       "name": "GPT-5 Nano" }
+        ]
+      },
+      "openrouter": {
+        "baseUrl": "https://openrouter.ai/api/v1",
+        "apiKey": "${OPENROUTER_API_KEY}",
+        "api": "openai-completions",
+        "models": [
+          {
+            "id": "minimax/minimax-m2.5",
+            "name": "MiniMax M2.5",
+            "contextWindow": 205000,
+            "maxTokens": 8192
+          },
+          {
+            "id": "google/gemini-2.5-flash-lite",
+            "name": "Gemini Flash-Lite",
+            "contextWindow": 1000000,
+            "maxTokens": 8192
+          },
+          {
+            "id": "google/gemini-2.5-flash",
+            "name": "Gemini 2.5 Flash",
+            "contextWindow": 1000000,
+            "maxTokens": 8192
+          },
+          {
+            "id": "anthropic/claude-haiku-4-5",
+            "name": "Claude Haiku 4.5",
+            "contextWindow": 200000,
+            "maxTokens": 8192
+          },
+          {
+            "id": "anthropic/claude-sonnet-4-6",
+            "name": "Claude Sonnet 4.6",
+            "contextWindow": 1000000,
+            "maxTokens": 8192
+          },
+          {
+            "id": "anthropic/claude-opus-4-6",
+            "name": "Claude Opus 4.6",
+            "contextWindow": 1000000,
+            "maxTokens": 8192
+          },
+          {
+            "id": "deepseek/deepseek-v3.2",
+            "name": "DeepSeek V3.2",
+            "contextWindow": 164000,
+            "maxTokens": 8192
+          },
+          {
+            "id": "moonshotai/kimi-k2.5",
+            "name": "Kimi K2.5",
+            "contextWindow": 262000,
+            "maxTokens": 8192
+          },
+          {
+            "id": "z-ai/glm-5",
+            "name": "GLM-5",
+            "contextWindow": 205000,
+            "maxTokens": 8192
+          },
+          {
+            "id": "openai/gpt-5-mini",
+            "name": "GPT-5 Mini",
+            "contextWindow": 128000,
+            "maxTokens": 8192
+          },
+          {
+            "id": "x-ai/grok-4.1-fast",
+            "name": "Grok 4.1 Fast",
+            "contextWindow": 256000,
+            "maxTokens": 8192
+          }
+        ]
+      }
+    }
+  },
+  "agents": {
+    "defaults": {
+      "thinkingDefault": "low",
+      "contextTokens": 50000,
+      "contextPruning": {
+        "mode": "cache-ttl",
+        "ttl": "1h"
+      },
+      "compaction": {
+        "mode": "safeguard",
+        "reserveTokensFloor": 32000,
+        "memoryFlush": {
+          "enabled": true,
+          "softThresholdTokens": 4000
+        }
+      },
+      "heartbeat": {
+        "every": "55m",
+        "model": "openrouter/google/gemini-2.5-flash-lite",
+        "target": "last"
+      },
+      "subagents": {
+        "maxConcurrent": 8
+      },
+      "workspace": "${OPENCLAW_WORKSPACES_DIR}/main",
+      "model": {
+        "primary": "openrouter/x-ai/grok-4.1-fast"
+      },
+      "models": {
+        "bankr/qwen3-coder": {
+          "alias": "bk-qwen-coder",
+          "params": { "temperature": 0.2 }
+        },
+        "bankr/gemini-2.5-flash": {
+          "alias": "bk-gemini-flash",
+          "params": { "temperature": 0.2 }
+        },
+        "bankr/kimi-k2.5": {
+          "alias": "bk-kimi",
+          "params": { "temperature": 0.2 }
+        },
+        "bankr/gpt-5-nano": {
+          "alias": "bk-gpt-nano",
+          "params": { "temperature": 0.2 }
+        },
+        "openrouter/x-ai/grok-4.1-fast": {
+          "alias": "or-grok",
+          "params": { "temperature": 0.2 }
+        },
+        "openrouter/minimax/minimax-m2.5": {
+          "alias": "or-minimax",
+          "params": { "temperature": 0.2 }
+        },
+        "openrouter/google/gemini-2.5-flash-lite": {
+          "alias": "or-flashlite",
+          "params": { "temperature": 0.2 }
+        },
+        "openrouter/google/gemini-2.5-flash": {
+          "alias": "or-flash",
+          "params": { "temperature": 0.2 }
+        },
+        "openrouter/deepseek/deepseek-v3.2": {
+          "alias": "or-deepseek",
+          "params": { "temperature": 0.2 }
+        },
+        "openrouter/moonshotai/kimi-k2.5": {
+          "alias": "or-kimi",
+          "params": { "temperature": 0.2 }
+        },
+        "openrouter/z-ai/glm-5": {
+          "alias": "or-glm",
+          "params": { "temperature": 0.2 }
+        },
+        "openrouter/anthropic/claude-haiku-4-5": {
+          "alias": "or-haiku",
+          "params": { "temperature": 0.2 }
+        },
+        "openrouter/anthropic/claude-sonnet-4-6": {
+          "alias": "or-sonnet",
+          "params": { "temperature": 0.2 }
+        },
+        "openrouter/anthropic/claude-opus-4-6": {
+          "alias": "or-opus",
+          "params": { "temperature": 0.2 }
+        },
+        "openrouter/openai/gpt-5-mini": {
+          "alias": "or-gpt",
+          "params": { "temperature": 0.2 }
+        }
+      },
+      "sandbox": {
+        "mode": "off",
+        "scope": "session",
+        "workspaceAccess": "rw",
+        "workspaceRoot": "~/.openclaw/sandboxes",
+        "prune": {
+          "idleHours": 24,
+          "maxAgeDays": 7
+        }
+      }
+    },
+    "list": [
+      {
+        "id": "main",
+        "default": true,
+        "name": "Messy Virgo",
+        "identity": { "name": "Messy Virgo" },
+        "workspace": "${OPENCLAW_WORKSPACES_DIR}/main",
+        "model": "openrouter/x-ai/grok-4.1-fast",
+        "subagents": {
+          "allowAgents": ["mv-coder", "mv-researcher", "mv-planner"]
+        }
+      },
+      {
+        "id": "mv-coder",
+        "name": "Messy Michael (Coder)",
+        "identity": { "name": "Messy Michael (Coder)" },
+        "workspace": "${OPENCLAW_WORKSPACES_DIR}/mv-coder",
+        "model": "openrouter/minimax/minimax-m2.5",
+        "subagents": {
+          "thinking": "medium"
+        }
+      },
+      {
+        "id": "mv-researcher",
+        "name": "Messy Anna (Researcher)",
+        "identity": { "name": "Messy Anna (Researcher)" },
+        "workspace": "${OPENCLAW_WORKSPACES_DIR}/mv-researcher",
+        "model": "openrouter/x-ai/grok-4.1-fast",
+        "subagents": {
+          "thinking": "high"
+        }
+      },
+      {
+        "id": "mv-planner",
+        "name": "Messy Franco (Planner)",
+        "identity": { "name": "Messy Franco (Planner)" },
+        "workspace": "${OPENCLAW_WORKSPACES_DIR}/mv-planner",
+        "model": "openrouter/moonshotai/kimi-k2.5",
+        "subagents": {
+          "thinking": "high"
+        }
+      }
+    ]
+  },
+  "gateway": {
+    "mode": "local",
+    "bind": "lan",
+    "auth": {
+      "mode": "token",
+      "token": "${OPENCLAW_GATEWAY_TOKEN}",
+      "rateLimit": {
+        "maxAttempts": 10,
+        "windowMs": 60000,
+        "lockoutMs": 300000
+      }
+    },
+    "controlUi": {
+      "dangerouslyAllowHostHeaderOriginFallback": false,
+      "allowedOrigins": [
+        "http://127.0.0.1:${OPENCLAW_GATEWAY_PORT}",
+        "http://localhost:${OPENCLAW_GATEWAY_PORT}"
+      ]
+    },
+    "tailscale": {
+      "mode": "off",
+      "resetOnExit": false
+    }
+  },
+  "commands": {
+    "native": "auto",
+    "nativeSkills": "auto",
+    "restart": true,
+    "ownerDisplay": "raw"
+  },
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "dmPolicy": "pairing",
+      "groupPolicy": "open",
+      "streaming": "partial"
+    }
+  },
+  "hooks": {
+    "internal": {
+      "enabled": true,
+      "entries": {
+        "session-memory": {
+          "enabled": true
+        }
+      }
+    }
+  },
+  "skills": {
+    "load": {
+      "extraDirs": ["${OPENCLAW_SKILLS_DIR}"],
+      "watch": true
+    }
+  },
+  "plugins": {
+    "entries": {
+      "telegram": {
+        "enabled": true
+      }
+    }
+  }
+}
