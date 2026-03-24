@@ -14,8 +14,8 @@ alwaysApply: true
 
 ## Primary Customization Areas
 
-- Prefer editing `config/openclaw.json` for wrapper baseline gateway/model/tool defaults.
-- Prefer editing `docker-compose*.yml` and `scripts/*.sh` for deployment, hardening, and wrapper behavior.
+- Prefer editing `config/openclaw.json` (Docker) and `config/openclaw.native.json` (native) for wrapper baseline gateway/model/tool defaults.
+- Prefer editing `openclaw-secure/docker-compose*.yml` and `openclaw-secure/scripts/*.sh` for Docker deployment; `openclaw-raw/scripts/*.sh` for native.
 - Prefer editing `skills/**` only for local wrapper-specific skill mounts or examples.
 - Prefer editing `../messyvirgo-openclaw-agents` for managed agent profiles, pack skills, config fragments, and pack lifecycle scripts.
 

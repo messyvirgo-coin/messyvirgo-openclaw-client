@@ -2,7 +2,7 @@
 
 This guide always starts with the secure OpenClaw client in this repo, then optionally shows how to install Messy Virgo agents and connect Telegram:
 
-- installing the secure client wrapper
+- installing the OpenClaw-secure wrapper
 - opening the dashboard
 - approving the first browser/device pairing
 - running basic smoke checks
@@ -52,8 +52,8 @@ If you plan to install the Messy Virgo Agents & Skills Pack, add these values no
 
 If your MCP server runs locally on the same Linux host:
 
-- with `./scripts/up.sh`, usually use `http://172.17.0.1:8000/mcp`
-- with `./scripts/up-linux-hostnet.sh`, use `http://localhost:8000/mcp`
+- with `./openclaw-secure/scripts/up.sh`, usually use `http://172.17.0.1:8000/mcp`
+- with `./openclaw-secure/scripts/up-linux-hostnet.sh`, use `http://localhost:8000/mcp`
 
 Other values you can optionally edit in `.env` before running setup:
 
@@ -67,25 +67,25 @@ Other values you can optionally edit in `.env` before running setup:
 From the repo folder:
 
 ```bash
-./scripts/setup.sh
+./openclaw-secure/scripts/setup.sh
 ```
 
 `setup.sh` reads config from `.env` and uses defaults from `.env.example` when values are missing.
 
-If you prefer prompts, run `./scripts/setup.sh --interactive`.
+If you prefer prompts, run `./openclaw-secure/scripts/setup.sh --interactive`.
 
 Important:
 
 - choose a dedicated workspace root, not your whole home directory
 - `setup.sh` already builds the image, writes `.env`, deploys config/workspace templates, and starts the gateway
-- because `setup.sh` starts the gateway, you can go directly to step 3 without running `./scripts/up.sh`
+- because `setup.sh` starts the gateway, you can go directly to step 3 without running `./openclaw-secure/scripts/up.sh`
 
 ## 3) Open the dashboard
 
 Print the tokenized dashboard URL:
 
 ```bash
-./scripts/dashboard.sh
+./openclaw-secure/scripts/dashboard.sh
 ```
 
 Open the full URL that includes `#token=...`.
@@ -100,16 +100,16 @@ Notes:
 On a fresh install, the browser may show `pairing required`. If that happens, approve the pending device from the host terminal:
 
 ```bash
-./scripts/cli.sh devices list
-./scripts/cli.sh devices approve <requestId>
+./openclaw-secure/scripts/cli.sh devices list
+./openclaw-secure/scripts/cli.sh devices approve <requestId>
 ```
 
 How to get `<requestId>`:
 
-1. Run `./scripts/cli.sh devices list`
+1. Run `./openclaw-secure/scripts/cli.sh devices list`
 2. Find the pending pairing entry for your browser/device
 3. Copy its `requestId` value
-4. Run `./scripts/cli.sh devices approve <requestId>` with that exact value
+4. Run `./openclaw-secure/scripts/cli.sh devices approve <requestId>` with that exact value
 
 If there are multiple pending entries, approve the newest one first (or approve each pending request once).
 
@@ -124,44 +124,44 @@ You can run / execute the OpenClaw CLI in the docker container with either of th
 Option A: one command at a time from the host:
 
 ```bash
-./scripts/cli.sh status
-./scripts/cli.sh channels list
+./openclaw-secure/scripts/cli.sh status
+./openclaw-secure/scripts/cli.sh channels list
 ```
 
 Option B: open an interactive shell, then use the `openclaw` helper inside it:
 
 ```bash
-./scripts/cli-shell.sh
+./openclaw-secure/scripts/cli-shell.sh
 openclaw status
 openclaw channels list
 ```
 
-Use `./scripts/cli.sh ...` when you want a single command from the host terminal. Use `./scripts/cli-shell.sh` when you want an interactive CLI session and shorter `openclaw ...` commands.
+Use `./openclaw-secure/scripts/cli.sh ...` when you want a single command from the host terminal. Use `./openclaw-secure/scripts/cli-shell.sh` when you want an interactive CLI session and shorter `openclaw ...` commands.
 
 ## 6) Run quick smoke checks
 
 From the repo folder:
 
 ```bash
-./scripts/cli.sh health --json
-./scripts/cli.sh status
-./scripts/security-audit.sh
+./openclaw-secure/scripts/cli.sh health --json
+./openclaw-secure/scripts/cli.sh status
+./openclaw-secure/scripts/security-audit.sh
 ```
 
 Optional identity check for the built-in wrapper agents:
 
 ```bash
-./scripts/cli.sh agent --agent main --message "State your name in one sentence."
-./scripts/cli.sh agent --agent mv-coder --message "State your name in one sentence."
-./scripts/cli.sh agent --agent mv-researcher --message "State your name in one sentence."
-./scripts/cli.sh agent --agent mv-planner --message "State your name in one sentence."
+./openclaw-secure/scripts/cli.sh agent --agent main --message "State your name in one sentence."
+./openclaw-secure/scripts/cli.sh agent --agent mv-coder --message "State your name in one sentence."
+./openclaw-secure/scripts/cli.sh agent --agent mv-researcher --message "State your name in one sentence."
+./openclaw-secure/scripts/cli.sh agent --agent mv-planner --message "State your name in one sentence."
 ```
 
 If an agent behaves like first-run onboarding, the workspace may still contain a `BOOTSTRAP.md`. Restart after cleanup or rerun setup with the appropriate cleanup option.
 
 ## 7) Optional: install Messy Virgo agents and register Telegram
 
-Skip this section if you only want the secure client wrapper and built-in agents.
+Skip this section if you only want the OpenClaw-secure wrapper and built-in agents.
 
 ### 7.1 Add Messy Virgo credentials
 
@@ -174,8 +174,8 @@ MESSY_VIRGO_API_KEY=<your_messy_virgo_api_key>
 
 If the MCP server runs locally on the same Linux host, use this shortcut:
 
-- `./scripts/up.sh` -> usually `MESSY_VIRGO_MCP_URL=http://172.17.0.1:8000/mcp`
-- `./scripts/up-linux-hostnet.sh` -> `MESSY_VIRGO_MCP_URL=http://localhost:8000/mcp`
+- `./openclaw-secure/scripts/up.sh` -> usually `MESSY_VIRGO_MCP_URL=http://172.17.0.1:8000/mcp`
+- `./openclaw-secure/scripts/up-linux-hostnet.sh` -> `MESSY_VIRGO_MCP_URL=http://localhost:8000/mcp`
 
 Do not commit real keys or bot tokens.
 
@@ -215,8 +215,8 @@ set +a
 Return to your local `messyvirgo-openclaw-client` checkout after the pack install and restart the gateway to be on the safe side:
 
 ```bash
-./scripts/down.sh
-./scripts/up.sh
+./openclaw-secure/scripts/down.sh
+./openclaw-secure/scripts/up.sh
 ```
 
 MCP runtime note:
@@ -228,35 +228,37 @@ MCP runtime note:
 Quick MCP verification (optional, recommended):
 
 ```bash
-./scripts/cli.sh agent --local --agent mv-t1-mngr --message "Run mcporter call messy-virgo-funds.list_accessible_funds and return only the JSON output."
+./openclaw-secure/scripts/cli.sh agent --local --agent mv-t1-mngr --message "Run mcporter call messy-virgo-funds.list_accessible_funds and return only the JSON output."
 ```
 
 ### 7.3 Register a Telegram channel back in this repo
+
+If you don't have a bot token yet, see [docs/TELEGRAM.md](../../docs/TELEGRAM.md) for how to create one via @BotFather.
 
 To register a telegram channel for an agent, you can use either command style below.
 
 Host wrapper style:
 
 ```bash
-./scripts/cli.sh channels add --channel telegram --account <account> --name "<agent-name>" --token "<telegram_bot_token>"
-./scripts/cli.sh agents bind --agent <agent-name> --bind telegram:<account>
+./openclaw-secure/scripts/cli.sh channels add --channel telegram --account <account> --name "<agent-name>" --token "<telegram_bot_token>"
+./openclaw-secure/scripts/cli.sh agents bind --agent <agent-name> --bind telegram:<account>
 ```
 
 Interactive shell style:
 
 ```bash
-./scripts/cli-shell.sh
+./openclaw-secure/scripts/cli-shell.sh
 openclaw channels add --channel telegram --account <account> --name "<agent-name>" --token "<telegram_bot_token>"
 openclaw agents bind --agent <agent-name> --bind telegram:<account>
 ```
 
-In the following we skip providing both styles. Simply exchange `./scripts/cli.sh` with `openclaw` in the interactive shell.
+In the following we skip providing both styles. Simply exchange `./openclaw-secure/scripts/cli.sh` with `openclaw` in the interactive shell.
 
 Full example to register the 'Messy Virgo Team 1' Manager-Agent:
 
 ```bash
-./scripts/cli.sh channels add --channel telegram --account mv-t1 --name "mv-t1-mngr" --token "<telegram_bot_token>"
-./scripts/cli.sh agents bind --agent mv-t1-mngr --bind telegram:mv-t1
+./openclaw-secure/scripts/cli.sh channels add --channel telegram --account mv-t1 --name "mv-t1-mngr" --token "<telegram_bot_token>"
+./openclaw-secure/scripts/cli.sh agents bind --agent mv-t1-mngr --bind telegram:mv-t1
 ```
 
 ### 7.4 Choose Telegram group policy
@@ -265,17 +267,17 @@ Open access:
 
 ```bash
 # default
-./scripts/cli.sh config set channels.telegram.groupPolicy '"open"'
+./openclaw-secure/scripts/cli.sh config set channels.telegram.groupPolicy '"open"'
 
 # per account
-./scripts/cli.sh config set channels.telegram.accounts.<account>.groupPolicy '"open"'
+./openclaw-secure/scripts/cli.sh config set channels.telegram.accounts.<account>.groupPolicy '"open"'
 ```
 
 Restricted access to specific Telegram users:
 
 ```bash
 # per account
-./scripts/cli.sh config set channels.telegram.accounts.<account>.groupAllowFrom '["tg:<telegram_user_id>"]'
+./openclaw-secure/scripts/cli.sh config set channels.telegram.accounts.<account>.groupAllowFrom '["tg:<telegram_user_id>"]'
 ```
 
 Replace `<telegram_user_id>` with the Telegram user ID you want to allow. This guide does not yet cover how to look up that ID.
@@ -283,22 +285,22 @@ Replace `<telegram_user_id>` with the Telegram user ID you want to allow. This g
 Full example for the 'Messy Virgo Team 1' Manager-Agent:
 
 ```bash
-./scripts/cli.sh config set channels.telegram.groupPolicy '"open"'
-./scripts/cli.sh config set channels.telegram.accounts.mv-t1.groupPolicy '"open"'
+./openclaw-secure/scripts/cli.sh config set channels.telegram.groupPolicy '"open"'
+./openclaw-secure/scripts/cli.sh config set channels.telegram.accounts.mv-t1.groupPolicy '"open"'
 ```
 
 Mandatory restart after channel changes
 
 ```bash
-./scripts/down.sh
-./scripts/up.sh
+./openclaw-secure/scripts/down.sh
+./openclaw-secure/scripts/up.sh
 ```
 
 ### 7.5 Verify the channel and bindings
 
 ```bash
-./scripts/cli.sh channels list
-./scripts/cli.sh agents list --bindings
+./openclaw-secure/scripts/cli.sh channels list
+./openclaw-secure/scripts/cli.sh agents list --bindings
 ```
 
 ### 7.6 Approve Telegram pairing codes
@@ -306,7 +308,7 @@ Mandatory restart after channel changes
 Your telegram bot should have asked you to pair and provided you with a code. If not, say politely 'Hi'.
 
 ```bash
-./scripts/cli.sh pairing approve telegram <pairing_code>
+./openclaw-secure/scripts/cli.sh pairing approve telegram <pairing_code>
 ```
 
 Done. Have a chat!
@@ -316,19 +318,19 @@ Done. Have a chat!
 Start:
 
 ```bash
-./scripts/up.sh
+./openclaw-secure/scripts/up.sh
 ```
 
 Logs:
 
 ```bash
-./scripts/logs.sh
+./openclaw-secure/scripts/logs.sh
 ```
 
 Stop:
 
 ```bash
-./scripts/down.sh
+./openclaw-secure/scripts/down.sh
 ```
 
 ## 9) Upgrade later
@@ -336,7 +338,7 @@ Stop:
 To pull the latest source, rebuild the image, and restart:
 
 ```bash
-./scripts/upgrade.sh
+./openclaw-secure/scripts/upgrade.sh
 ```
 
 Your config and data are preserved.
@@ -348,7 +350,7 @@ Your config and data are preserved.
 Option A (quick fix):
 
 ```bash
-sudo ./scripts/setup.sh
+sudo ./openclaw-secure/scripts/setup.sh
 ```
 
 Option B (recommended): add your user to the `docker` group, then log out and back in once:
@@ -359,14 +361,14 @@ sudo usermod -aG docker "$USER"
 
 ### Dashboard opens but pairing keeps looping
 
-1. Make sure you opened the full tokenized URL from `./scripts/dashboard.sh`
-2. Approve the pending device with `./scripts/cli.sh devices list` and `./scripts/cli.sh devices approve <requestId>`
+1. Make sure you opened the full tokenized URL from `./openclaw-secure/scripts/dashboard.sh`
+2. Approve the pending device with `./openclaw-secure/scripts/cli.sh devices list` and `./openclaw-secure/scripts/cli.sh devices approve <requestId>`
 3. If needed, restart and reopen:
 
 ```bash
-./scripts/down.sh
-./scripts/up.sh
-./scripts/dashboard.sh
+./openclaw-secure/scripts/down.sh
+./openclaw-secure/scripts/up.sh
+./openclaw-secure/scripts/dashboard.sh
 ```
 
 ### “gateway token mismatch”
@@ -374,9 +376,9 @@ sudo usermod -aG docker "$USER"
 Restart the gateway and reopen the tokenized URL:
 
 ```bash
-./scripts/down.sh
-./scripts/up.sh
-./scripts/dashboard.sh
+./openclaw-secure/scripts/down.sh
+./openclaw-secure/scripts/up.sh
+./openclaw-secure/scripts/dashboard.sh
 ```
 
 If the dashboard has stored an old token, paste the current token from `.env` into Control UI settings.
@@ -391,7 +393,7 @@ You can change these values in `.env`:
 After changing them:
 
 ```bash
-./scripts/down.sh
-./scripts/up.sh
-./scripts/dashboard.sh
+./openclaw-secure/scripts/down.sh
+./openclaw-secure/scripts/up.sh
+./openclaw-secure/scripts/dashboard.sh
 ```

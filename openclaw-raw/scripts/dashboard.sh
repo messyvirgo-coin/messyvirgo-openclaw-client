@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Print tokenized dashboard URL for native OpenClaw gateway.
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/_common.sh"
 
-ensure_docker_running
 load_env
 
-ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
-ENV_FILE="$ROOT_DIR/.env"
+ENV_FILE="$REPO_ROOT/.env"
 
 # Read token directly from .env so it's never empty (trim CR/spaces).
 TOKEN=""
@@ -17,7 +17,7 @@ if [[ -f "$ENV_FILE" ]]; then
   TOKEN="$(grep -E '^OPENCLAW_GATEWAY_TOKEN=' "$ENV_FILE" | cut -d= -f2- | tr -d '\r\n \t\"' || true)"
 fi
 if [[ -z "${TOKEN}" ]]; then
-  die "OPENCLAW_GATEWAY_TOKEN is not set in .env. Run ./scripts/setup.sh or add the token to .env."
+  die "OPENCLAW_GATEWAY_TOKEN is not set in .env. Run ./openclaw-raw/scripts/setup.sh or add the token to .env."
 fi
 
 PORT="${OPENCLAW_GATEWAY_PORT:-18789}"
@@ -26,7 +26,7 @@ URL="http://127.0.0.1:${PORT}/#token=${TOKEN}"
 echo "$URL"
 echo ""
 info "If you see 'gateway token mismatch':"
-info "  1. Restart the gateway so it uses the token from .env: ./scripts/down.sh && ./scripts/up.sh"
+info "  1. Restart the gateway so it uses the token from .env: stop gateway (Ctrl+C), then ./openclaw-raw/scripts/gateway.sh"
 info "  2. In the dashboard, open Control UI → Settings and paste this token (replace any existing value):"
 echo "     ${TOKEN}"
 echo ""

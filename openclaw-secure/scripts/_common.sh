@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# OpenClaw-secure scripts live in openclaw-secure/scripts/; repo root is parent of openclaw-secure
+OPENCLAW_SECURE_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+REPO_ROOT="$(cd "$OPENCLAW_SECURE_ROOT/.." && pwd)"
 
 die() {
   echo "ERROR: $*" >&2
@@ -18,29 +20,27 @@ require_cmd() {
 
 compose_base() {
   docker compose \
-    -f "$ROOT_DIR/docker-compose.yml" \
-    -f "$ROOT_DIR/docker-compose.secure.yml" \
-    -f "$ROOT_DIR/docker-compose.ports.localhost.yml" \
-    -f "$ROOT_DIR/docker-compose.skills.yml" \
+    -f "$OPENCLAW_SECURE_ROOT/docker-compose.yml" \
+    -f "$OPENCLAW_SECURE_ROOT/docker-compose.secure.yml" \
+    -f "$OPENCLAW_SECURE_ROOT/docker-compose.ports.localhost.yml" \
+    -f "$OPENCLAW_SECURE_ROOT/docker-compose.skills.yml" \
     "$@"
 }
 
 compose_linux_hostnet() {
   docker compose \
-    -f "$ROOT_DIR/docker-compose.yml" \
-    -f "$ROOT_DIR/docker-compose.secure.yml" \
-    -f "$ROOT_DIR/docker-compose.linux-hostnet.yml" \
-    -f "$ROOT_DIR/docker-compose.skills.yml" \
+    -f "$OPENCLAW_SECURE_ROOT/docker-compose.yml" \
+    -f "$OPENCLAW_SECURE_ROOT/docker-compose.secure.yml" \
+    -f "$OPENCLAW_SECURE_ROOT/docker-compose.linux-hostnet.yml" \
+    -f "$OPENCLAW_SECURE_ROOT/docker-compose.skills.yml" \
     "$@"
 }
 
 compose_project_name() {
-  # Default Compose project name is the directory name.
-  basename "$ROOT_DIR"
+  basename "$OPENCLAW_SECURE_ROOT"
 }
 
 is_gateway_hostnet_running() {
-  # True if gateway container exists and runs with network_mode=host.
   local proj cid
   proj="$(compose_project_name)"
   cid="$(docker ps -a \
@@ -54,10 +54,7 @@ is_gateway_hostnet_running() {
 }
 
 compose() {
-  # Auto-select the right compose stack.
-  # Linux: use host networking (avoids Docker bridge NAT issues with device pairing).
-  # macOS: use bridge networking with localhost port mapping (Docker Desktop requirement).
-  if ! is_macos && [[ -f "$ROOT_DIR/docker-compose.linux-hostnet.yml" ]]; then
+  if ! is_macos && [[ -f "$OPENCLAW_SECURE_ROOT/docker-compose.linux-hostnet.yml" ]]; then
     compose_linux_hostnet "$@"
   else
     compose_base "$@"
@@ -65,9 +62,9 @@ compose() {
 }
 
 load_env() {
-  if [[ -f "$ROOT_DIR/.env" ]]; then
+  if [[ -f "$REPO_ROOT/.env" ]]; then
     # shellcheck disable=SC1091
-    set -a && source "$ROOT_DIR/.env" && set +a
+    set -a && source "$REPO_ROOT/.env" && set +a
   fi
 }
 
@@ -80,11 +77,9 @@ is_macos() {
 }
 
 # Docker Desktop on Mac often uses daemon API 1.44; Homebrew docker CLI may be 1.43.
-# Force API 1.44 when unset on macOS so "docker info" and compose work.
 if is_macos && [[ -z "${DOCKER_API_VERSION:-}" ]]; then
   export DOCKER_API_VERSION=1.44
 fi
-# On macOS, ensure Docker Desktop's bin is in PATH so docker-credential-desktop is found (for build/pull).
 if is_macos && [[ -d /Applications/Docker.app/Contents/Resources/bin ]]; then
   export PATH="/Applications/Docker.app/Contents/Resources/bin:$PATH"
 fi
@@ -152,7 +147,7 @@ sync_directory_contents() {
     fi
 
     if cmp -s "$src" "$dest" 2>/dev/null; then
-      info "$label item already up to date at $dest"
+      info "$label item already up to date at $target_dir"
       continue
     fi
 
@@ -249,9 +244,6 @@ deploy_workspace_templates() {
       fi
     fi
 
-    # Optional per-agent avatar assets.
-    # Source: assets/avatars/<agent-id>/...
-    # Target: <workspace>/<agent-id>/avatars/...
     sync_directory_contents \
       "$repo_root/assets/avatars/$agent_id" \
       "$target_dir/avatars" \

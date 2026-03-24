@@ -2,7 +2,7 @@
 .env.*
 !.env.example
 
-# Local clones/build artifacts (created by scripts/setup.sh)
+# Local clones/build artifacts (created by openclaw-secure/scripts/setup.sh)
 .openclaw-src/
 
 # Ignore user skills (keep README.md tracked)

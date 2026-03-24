@@ -9,8 +9,7 @@ source "$SCRIPT_DIR/_common.sh"
 
 require_cmd git
 
-ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
-ENV_FILE="$ROOT_DIR/.env"
+ENV_FILE="$REPO_ROOT/.env"
 SYNC_WORKSPACES=0
 DRY_RUN=0
 CLEANUP_BOOTSTRAP=0
@@ -32,7 +31,7 @@ while [[ $# -gt 0 ]]; do
       ;;
     -h|--help)
       cat <<'EOF'
-Usage: ./scripts/setup.sh [options]
+Usage: ./openclaw-secure/scripts/setup.sh [options]
 
 Options:
   --sync-workspaces    Overwrite changed workspace templates (creates .bak timestamped backups)
@@ -89,8 +88,8 @@ ensure_docker_running
 
 info "Preparing .env"
 if [[ ! -f "$ENV_FILE" ]]; then
-  if [[ -f "$ROOT_DIR/.env.example" ]]; then
-    cp "$ROOT_DIR/.env.example" "$ENV_FILE"
+  if [[ -f "$REPO_ROOT/.env.example" ]]; then
+    cp "$REPO_ROOT/.env.example" "$ENV_FILE"
   else
     die "Missing .env.example (repo incomplete)."
   fi
@@ -227,13 +226,14 @@ docker build \
   --build-arg "BASE_IMAGE=$OPENCLAW_IMAGE" \
   --build-arg "OPENCLAW_NPM_VERSION=$OPENCLAW_NPM_VERSION" \
   -t "$OPENCLAW_IMAGE" \
-  -f "$ROOT_DIR/docker/npm-overlay.Dockerfile" \
-  "$ROOT_DIR"
+  -f "$OPENCLAW_SECURE_ROOT/docker/npm-overlay.Dockerfile" \
+  "$REPO_ROOT"
 
 info "Deploying config templates"
 mkdir -p "$OPENCLAW_CONFIG_DIR"
-for f in "$ROOT_DIR"/config/openclaw*.json; do
-  [[ -f "$f" ]] || continue
+# Deploy Docker-oriented config only (openclaw.json has /home/node/ paths for containers).
+f="$REPO_ROOT/config/openclaw.json"
+if [[ -f "$f" ]]; then
   dest="$OPENCLAW_CONFIG_DIR/$(basename "$f")"
   if [[ ! -f "$dest" ]]; then
     cp "$f" "$dest"
@@ -241,11 +241,11 @@ for f in "$ROOT_DIR"/config/openclaw*.json; do
   else
     info "$(basename "$f") already exists at $dest (leaving untouched)"
   fi
-done
-info "Note: existing config templates in $OPENCLAW_CONFIG_DIR are preserved; merge template changes into your deployed openclaw.json manually."
+fi
+info "Note: existing config in $OPENCLAW_CONFIG_DIR is preserved; merge template changes manually. Native mode uses config/openclaw.native.json."
 
 deploy_workspace_templates \
-  "$ROOT_DIR" \
+  "$REPO_ROOT" \
   "$OPENCLAW_WORKSPACES_DIR" \
   "$SYNC_WORKSPACES" \
   "$DRY_RUN" \

@@ -13,7 +13,7 @@ cd /path/to/messyvirgo-openclaw-client
 ## 2) Stop running containers
 
 ```bash
-./scripts/down.sh
+./openclaw-secure/scripts/down.sh
 ```
 
 ## 3) Choose uninstall level
@@ -29,7 +29,7 @@ Removes:
 - local wrapper image tag
 
 ```bash
-./scripts/reset.sh --delete-config --delete-src --delete-workspace --remove-image --yes
+./openclaw-secure/scripts/reset.sh --delete-config --delete-src --delete-workspace --remove-image --yes
 ```
 
 ### B) Keep your workspace data, remove runtime only
@@ -37,13 +37,13 @@ Removes:
 Removes containers/config/source/image, but keeps the workspace folder:
 
 ```bash
-./scripts/reset.sh --delete-config --delete-src --remove-image --yes
+./openclaw-secure/scripts/reset.sh --delete-config --delete-src --remove-image --yes
 ```
 
 ### C) Stop/remove containers + wrapper volumes only (least destructive)
 
 ```bash
-./scripts/reset.sh
+./openclaw-secure/scripts/reset.sh
 ```
 
 ## 4) Optional: remove all unused Docker resources system-wide
@@ -51,7 +51,7 @@ Removes containers/config/source/image, but keeps the workspace folder:
 Only run this if you explicitly want cleanup beyond this project:
 
 ```bash
-./scripts/reset.sh --system-prune --yes
+./openclaw-secure/scripts/reset.sh --system-prune --yes
 ```
 
 This affects your whole Docker host, not just OpenClaw.

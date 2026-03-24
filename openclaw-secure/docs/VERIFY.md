@@ -6,7 +6,7 @@
 - You should need the tokenized URL from:
 
 ```bash
-./scripts/dashboard.sh
+./openclaw-secure/scripts/dashboard.sh
 ```
 
 You can also check the port binding:
@@ -50,13 +50,13 @@ You should see at least:
 Sanity check inside the container:
 
 ```bash
-./scripts/cli.sh status
+./openclaw-secure/scripts/cli.sh status
 ```
 
 Linux host-network workaround:
 
 ```bash
-./scripts/cli.sh status
+./openclaw-secure/scripts/cli.sh status
 ```
 
 And verify your Compose volumes in `docker-compose.yml` include:
@@ -67,7 +67,7 @@ And verify your Compose volumes in `docker-compose.yml` include:
 ## 3) Run OpenClaw’s security audit
 
 ```bash
-./scripts/security-audit.sh
+./openclaw-secure/scripts/security-audit.sh
 ```
 
 Fix anything the audit flags before you enable external channels.
@@ -82,17 +82,17 @@ So the secure default here is:
 
 - `agents.defaults.sandbox.mode: "off"`
 
-If this repo includes a secure config template (`config/openclaw.secure.json`), the setup script will copy it to `openclaw.json` on first setup (if missing).
+The setup script copies `config/openclaw.json` (Docker) to the config dir on first setup (if missing). Native mode uses `config/openclaw.native.json`.
 
 ## 5) Run simple per-agent identity checks
 
 Test each agent explicitly:
 
 ```bash
-./scripts/cli.sh agent --agent main --message "State your name in one sentence."
-./scripts/cli.sh agent --agent mv-coder --message "State your name in one sentence."
-./scripts/cli.sh agent --agent mv-researcher --message "State your name in one sentence."
-./scripts/cli.sh agent --agent mv-planner --message "State your name in one sentence."
+./openclaw-secure/scripts/cli.sh agent --agent main --message "State your name in one sentence."
+./openclaw-secure/scripts/cli.sh agent --agent mv-coder --message "State your name in one sentence."
+./openclaw-secure/scripts/cli.sh agent --agent mv-researcher --message "State your name in one sentence."
+./openclaw-secure/scripts/cli.sh agent --agent mv-planner --message "State your name in one sentence."
 ```
 
 If an agent behaves like first-run onboarding ("Who am I?"), that workspace
@@ -100,5 +100,5 @@ still has a `BOOTSTRAP.md`. Remove it (or run setup/upgrade with
 `--cleanup-bootstrap`) and restart the gateway.
 
 ```bash
-./scripts/down.sh && ./scripts/up.sh
+./openclaw-secure/scripts/down.sh && ./openclaw-secure/scripts/up.sh
 ```

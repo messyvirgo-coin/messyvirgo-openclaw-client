@@ -9,7 +9,7 @@ ensure_docker_running
 load_env
 
 if is_macos; then
-  die "Host networking mode is Linux-only. Use ./scripts/cli.sh on macOS."
+  die "Host networking mode is Linux-only. Use ./openclaw-secure/scripts/cli.sh on macOS."
 fi
 
 if [[ $# -lt 1 ]]; then
@@ -19,7 +19,8 @@ if [[ $# -lt 1 ]]; then
 fi
 
 docker compose \
-  -f "$ROOT_DIR/docker-compose.yml" \
-  -f "$ROOT_DIR/docker-compose.secure.yml" \
-  -f "$ROOT_DIR/docker-compose.linux-hostnet.yml" \
+  -f "$OPENCLAW_SECURE_ROOT/docker-compose.yml" \
+  -f "$OPENCLAW_SECURE_ROOT/docker-compose.secure.yml" \
+  -f "$OPENCLAW_SECURE_ROOT/docker-compose.linux-hostnet.yml" \
+  -f "$OPENCLAW_SECURE_ROOT/docker-compose.skills.yml" \
   run --rm openclaw-cli "$@"
