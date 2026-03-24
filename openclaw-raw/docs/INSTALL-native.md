@@ -47,9 +47,17 @@ Or with explicit port and bind:
 ./openclaw-raw/scripts/gateway.sh --port 18789 --bind lan
 ```
 
-Dashboard: `http://127.0.0.1:18789/#token=<your-OPENCLAW_GATEWAY_TOKEN>`
+## 4) Open the dashboard
 
-## 4) Run CLI commands
+The dashboard requires the gateway token in the URL. Run:
+
+```bash
+./openclaw-raw/scripts/dashboard.sh
+```
+
+This prints the tokenized URL (e.g. `http://127.0.0.1:18789/#token=...`). Open that URL in your browser. Without the token, you will see an unauthorized or empty start page.
+
+## 5) Run CLI commands
 
 ```bash
 ./openclaw-raw/scripts/cli.sh status
@@ -106,3 +114,18 @@ cd ../messyvirgo-openclaw-agents
 ```
 
 (Confirm the pack supports `--target native`; otherwise adapt the install steps for native config paths.)
+
+## Upgrading
+
+To upgrade OpenClaw and optionally sync config or workspace templates:
+
+```bash
+./openclaw-raw/scripts/upgrade.sh
+```
+
+Options:
+
+- `--sync-workspaces` – Overwrite changed workspace templates (creates timestamped backups)
+- `--sync-config` – Overwrite `openclaw.json` from `config/openclaw.native.json` (creates backup)
+- `--cleanup-bootstrap` – Remove `BOOTSTRAP.md` from deployed workspaces
+- `--dry-run` – Show what would change without applying

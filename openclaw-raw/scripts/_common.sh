@@ -18,6 +18,14 @@ require_cmd() {
   command -v "$1" >/dev/null 2>&1 || die "Missing dependency: $1"
 }
 
+os_name() {
+  uname -s | tr '[:upper:]' '[:lower:]'
+}
+
+is_macos() {
+  [[ "$(os_name)" == "darwin" ]]
+}
+
 load_env() {
   if [[ -f "$REPO_ROOT/.env" ]]; then
     # shellcheck disable=SC1091
@@ -48,6 +56,7 @@ deploy_workspace_templates() {
   local workspace_root="$2"
   local sync_workspaces="${3:-0}"
   local dry_run="${4:-0}"
+  local cleanup_bootstrap="${5:-0}"
   local ts
   ts="$(date +%Y%m%d-%H%M%S)"
 
@@ -98,5 +107,19 @@ deploy_workspace_templates() {
         info "$file_name already exists at $target_dir (leaving untouched)"
       fi
     done
+
+    if [[ "$cleanup_bootstrap" == "1" ]]; then
+      local bootstrap_path="$target_dir/BOOTSTRAP.md"
+      if [[ -f "$bootstrap_path" ]]; then
+        local bootstrap_backup="$bootstrap_path.bak.$ts"
+        if [[ "$dry_run" == "1" ]]; then
+          info "[dry-run] would backup and remove $bootstrap_path"
+        else
+          cp "$bootstrap_path" "$bootstrap_backup"
+          rm -f "$bootstrap_path"
+          info "Removed $bootstrap_path (backup: $bootstrap_backup)"
+        fi
+      fi
+    fi
   done
 }
