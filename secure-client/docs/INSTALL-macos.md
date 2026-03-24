@@ -236,6 +236,8 @@ Quick MCP verification (optional, recommended):
 
 ### 8.3 Register a Telegram channel back in this repo
 
+If you don't have a bot token yet, see [docs/TELEGRAM.md](../../docs/TELEGRAM.md) for how to create one via @BotFather.
+
 To register a telegram channel for an agent, you can use either command style below.
 
 Host wrapper style:

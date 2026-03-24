@@ -115,6 +115,19 @@ cd ../messyvirgo-openclaw-agents
 
 (Confirm the pack supports `--target native`; otherwise adapt the install steps for native config paths.)
 
+## Optional: Telegram
+
+To connect an agent to Telegram, create a bot via @BotFather, then register the channel with OpenClaw. See [docs/TELEGRAM.md](../../docs/TELEGRAM.md) for the full flow.
+
+**Native commands** (replace placeholders with your values):
+
+```bash
+./openclaw-raw/scripts/cli.sh channels add --channel telegram --account <account> --name "<agent-name>" --token "<telegram_bot_token>"
+./openclaw-raw/scripts/cli.sh agents bind --agent <agent-name> --bind telegram:<account>
+```
+
+After channel changes, restart the gateway (Ctrl+C, then `./openclaw-raw/scripts/gateway.sh`).
+
 ## Upgrading
 
 To upgrade OpenClaw and optionally sync config or workspace templates:
