@@ -31,7 +31,7 @@ while [[ $# -gt 0 ]]; do
       ;;
     -h|--help)
       cat <<'EOF'
-Usage: ./secure-client/scripts/setup.sh [options]
+Usage: ./openclaw-secure/scripts/setup.sh [options]
 
 Options:
   --sync-workspaces    Overwrite changed workspace templates (creates .bak timestamped backups)
@@ -226,14 +226,14 @@ docker build \
   --build-arg "BASE_IMAGE=$OPENCLAW_IMAGE" \
   --build-arg "OPENCLAW_NPM_VERSION=$OPENCLAW_NPM_VERSION" \
   -t "$OPENCLAW_IMAGE" \
-  -f "$SECURE_CLIENT_ROOT/docker/npm-overlay.Dockerfile" \
+  -f "$OPENCLAW_SECURE_ROOT/docker/npm-overlay.Dockerfile" \
   "$REPO_ROOT"
 
 info "Deploying config templates"
 mkdir -p "$OPENCLAW_CONFIG_DIR"
 # Deploy Docker-oriented config only (openclaw.json has /home/node/ paths for containers).
-for f in "$REPO_ROOT"/config/openclaw.json; do
-  [[ -f "$f" ]] || continue
+f="$REPO_ROOT/config/openclaw.json"
+if [[ -f "$f" ]]; then
   dest="$OPENCLAW_CONFIG_DIR/$(basename "$f")"
   if [[ ! -f "$dest" ]]; then
     cp "$f" "$dest"
@@ -241,7 +241,7 @@ for f in "$REPO_ROOT"/config/openclaw.json; do
   else
     info "$(basename "$f") already exists at $dest (leaving untouched)"
   fi
-done
+fi
 info "Note: existing config in $OPENCLAW_CONFIG_DIR is preserved; merge template changes manually. Native mode uses config/openclaw.native.json."
 
 deploy_workspace_templates \

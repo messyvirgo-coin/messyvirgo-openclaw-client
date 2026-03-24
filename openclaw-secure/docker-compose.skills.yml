@@ -1,4 +1,4 @@
-# skills/ lives at repo root; compose files are in secure-client/
+# skills/ lives at repo root; compose files are in openclaw-secure/
 services:
   openclaw-gateway:
     volumes:

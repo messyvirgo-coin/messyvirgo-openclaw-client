@@ -1,6 +1,6 @@
 ---
 description: Preserve container hardening and explicit mounts in compose files
-globs: secure-client/docker-compose*.yml
+globs: openclaw-secure/docker-compose*.yml
 alwaysApply: false
 ---
 

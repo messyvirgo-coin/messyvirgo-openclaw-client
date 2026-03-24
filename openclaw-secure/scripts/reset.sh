@@ -8,10 +8,10 @@ set -euo pipefail
 # and interactive confirmation (unless --yes is provided).
 #
 # Usage:
-#   ./secure-client/scripts/reset.sh
-#   ./secure-client/scripts/reset.sh --delete-config --delete-src
-#   ./secure-client/scripts/reset.sh --delete-config --delete-src --delete-workspace
-#   ./secure-client/scripts/reset.sh --system-prune
+#   ./openclaw-secure/scripts/reset.sh
+#   ./openclaw-secure/scripts/reset.sh --delete-config --delete-src
+#   ./openclaw-secure/scripts/reset.sh --delete-config --delete-src --delete-workspace
+#   ./openclaw-secure/scripts/reset.sh --system-prune
 #
 # Flags:
 #   --delete-config     Delete OPENCLAW_CONFIG_DIR (OpenClaw config/state) after stopping containers
@@ -76,7 +76,7 @@ info "Image tag:      $IMAGE_TAG"
 echo ""
 info "Stopping/removing this project's containers + volumes"
 compose_base down -v --remove-orphans 2>/dev/null || true
-if ! is_macos && [[ -f "$SECURE_CLIENT_ROOT/docker-compose.linux-hostnet.yml" ]]; then
+if ! is_macos && [[ -f "$OPENCLAW_SECURE_ROOT/docker-compose.linux-hostnet.yml" ]]; then
   compose_linux_hostnet down -v --remove-orphans 2>/dev/null || true
 fi
 
@@ -139,6 +139,6 @@ fi
 
 echo ""
 info "Reset complete."
-info "Next: ./secure-client/scripts/setup.sh"
-info "Then:  ./secure-client/scripts/up.sh && ./secure-client/scripts/dashboard.sh"
+info "Next: ./openclaw-secure/scripts/setup.sh"
+info "Then:  ./openclaw-secure/scripts/up.sh && ./openclaw-secure/scripts/dashboard.sh"
 

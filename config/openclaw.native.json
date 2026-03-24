@@ -307,7 +307,6 @@
   },
   "skills": {
     "load": {
-      "extraDirs": ["${OPENCLAW_SKILLS_DIR}"],
       "watch": true
     }
   },

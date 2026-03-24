@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Secure-client scripts live in secure-client/scripts/; repo root is parent of secure-client
-SECURE_CLIENT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-REPO_ROOT="$(cd "$SECURE_CLIENT_ROOT/.." && pwd)"
+# OpenClaw-secure scripts live in openclaw-secure/scripts/; repo root is parent of openclaw-secure
+OPENCLAW_SECURE_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+REPO_ROOT="$(cd "$OPENCLAW_SECURE_ROOT/.." && pwd)"
 
 die() {
   echo "ERROR: $*" >&2
@@ -20,24 +20,24 @@ require_cmd() {
 
 compose_base() {
   docker compose \
-    -f "$SECURE_CLIENT_ROOT/docker-compose.yml" \
-    -f "$SECURE_CLIENT_ROOT/docker-compose.secure.yml" \
-    -f "$SECURE_CLIENT_ROOT/docker-compose.ports.localhost.yml" \
-    -f "$SECURE_CLIENT_ROOT/docker-compose.skills.yml" \
+    -f "$OPENCLAW_SECURE_ROOT/docker-compose.yml" \
+    -f "$OPENCLAW_SECURE_ROOT/docker-compose.secure.yml" \
+    -f "$OPENCLAW_SECURE_ROOT/docker-compose.ports.localhost.yml" \
+    -f "$OPENCLAW_SECURE_ROOT/docker-compose.skills.yml" \
     "$@"
 }
 
 compose_linux_hostnet() {
   docker compose \
-    -f "$SECURE_CLIENT_ROOT/docker-compose.yml" \
-    -f "$SECURE_CLIENT_ROOT/docker-compose.secure.yml" \
-    -f "$SECURE_CLIENT_ROOT/docker-compose.linux-hostnet.yml" \
-    -f "$SECURE_CLIENT_ROOT/docker-compose.skills.yml" \
+    -f "$OPENCLAW_SECURE_ROOT/docker-compose.yml" \
+    -f "$OPENCLAW_SECURE_ROOT/docker-compose.secure.yml" \
+    -f "$OPENCLAW_SECURE_ROOT/docker-compose.linux-hostnet.yml" \
+    -f "$OPENCLAW_SECURE_ROOT/docker-compose.skills.yml" \
     "$@"
 }
 
 compose_project_name() {
-  basename "$SECURE_CLIENT_ROOT"
+  basename "$OPENCLAW_SECURE_ROOT"
 }
 
 is_gateway_hostnet_running() {
@@ -54,7 +54,7 @@ is_gateway_hostnet_running() {
 }
 
 compose() {
-  if ! is_macos && [[ -f "$SECURE_CLIENT_ROOT/docker-compose.linux-hostnet.yml" ]]; then
+  if ! is_macos && [[ -f "$OPENCLAW_SECURE_ROOT/docker-compose.linux-hostnet.yml" ]]; then
     compose_linux_hostnet "$@"
   else
     compose_base "$@"

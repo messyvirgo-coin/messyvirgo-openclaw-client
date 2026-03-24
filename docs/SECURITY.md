@@ -43,7 +43,7 @@ For that reason, this wrapper defaults to **sandboxing = off** and relies on:
 - Run the audit regularly:
 
 ```bash
-./secure-client/scripts/security-audit.sh
+./openclaw-secure/scripts/security-audit.sh
 ```
 
 ### Even safer (harder boundary)

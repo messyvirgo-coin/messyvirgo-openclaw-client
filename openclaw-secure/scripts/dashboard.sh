@@ -16,7 +16,7 @@ if [[ -f "$ENV_FILE" ]]; then
   TOKEN="$(grep -E '^OPENCLAW_GATEWAY_TOKEN=' "$ENV_FILE" | cut -d= -f2- | tr -d '\r\n \t\"' || true)"
 fi
 if [[ -z "${TOKEN}" ]]; then
-  die "OPENCLAW_GATEWAY_TOKEN is not set in .env. Run ./secure-client/scripts/setup.sh or add the token to .env."
+  die "OPENCLAW_GATEWAY_TOKEN is not set in .env. Run ./openclaw-secure/scripts/setup.sh or add the token to .env."
 fi
 
 PORT="${OPENCLAW_GATEWAY_PORT:-18789}"
@@ -25,7 +25,7 @@ URL="http://127.0.0.1:${PORT}/#token=${TOKEN}"
 echo "$URL"
 echo ""
 info "If you see 'gateway token mismatch':"
-info "  1. Restart the gateway so it uses the token from .env: ./secure-client/scripts/down.sh && ./secure-client/scripts/up.sh"
+info "  1. Restart the gateway so it uses the token from .env: ./openclaw-secure/scripts/down.sh && ./openclaw-secure/scripts/up.sh"
 info "  2. In the dashboard, open Control UI → Settings and paste this token (replace any existing value):"
 echo "     ${TOKEN}"
 echo ""

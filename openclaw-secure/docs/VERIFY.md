@@ -6,7 +6,7 @@
 - You should need the tokenized URL from:
 
 ```bash
-./secure-client/scripts/dashboard.sh
+./openclaw-secure/scripts/dashboard.sh
 ```
 
 You can also check the port binding:
@@ -50,13 +50,13 @@ You should see at least:
 Sanity check inside the container:
 
 ```bash
-./secure-client/scripts/cli.sh status
+./openclaw-secure/scripts/cli.sh status
 ```
 
 Linux host-network workaround:
 
 ```bash
-./secure-client/scripts/cli.sh status
+./openclaw-secure/scripts/cli.sh status
 ```
 
 And verify your Compose volumes in `docker-compose.yml` include:
@@ -67,7 +67,7 @@ And verify your Compose volumes in `docker-compose.yml` include:
 ## 3) Run OpenClaw’s security audit
 
 ```bash
-./secure-client/scripts/security-audit.sh
+./openclaw-secure/scripts/security-audit.sh
 ```
 
 Fix anything the audit flags before you enable external channels.
@@ -89,10 +89,10 @@ The setup script copies `config/openclaw.json` (Docker) to the config dir on fir
 Test each agent explicitly:
 
 ```bash
-./secure-client/scripts/cli.sh agent --agent main --message "State your name in one sentence."
-./secure-client/scripts/cli.sh agent --agent mv-coder --message "State your name in one sentence."
-./secure-client/scripts/cli.sh agent --agent mv-researcher --message "State your name in one sentence."
-./secure-client/scripts/cli.sh agent --agent mv-planner --message "State your name in one sentence."
+./openclaw-secure/scripts/cli.sh agent --agent main --message "State your name in one sentence."
+./openclaw-secure/scripts/cli.sh agent --agent mv-coder --message "State your name in one sentence."
+./openclaw-secure/scripts/cli.sh agent --agent mv-researcher --message "State your name in one sentence."
+./openclaw-secure/scripts/cli.sh agent --agent mv-planner --message "State your name in one sentence."
 ```
 
 If an agent behaves like first-run onboarding ("Who am I?"), that workspace
@@ -100,5 +100,5 @@ still has a `BOOTSTRAP.md`. Remove it (or run setup/upgrade with
 `--cleanup-bootstrap`) and restart the gateway.
 
 ```bash
-./secure-client/scripts/down.sh && ./secure-client/scripts/up.sh
+./openclaw-secure/scripts/down.sh && ./openclaw-secure/scripts/up.sh
 ```

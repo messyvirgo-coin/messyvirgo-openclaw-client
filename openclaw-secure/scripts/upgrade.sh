@@ -26,7 +26,7 @@ while [[ $# -gt 0 ]]; do
       ;;
     -h|--help)
       cat <<'EOF'
-Usage: ./secure-client/scripts/upgrade.sh [options]
+Usage: ./openclaw-secure/scripts/upgrade.sh [options]
 
 Options:
   --sync-workspaces    Overwrite changed workspace templates (creates .bak timestamped backups)
@@ -47,7 +47,7 @@ done
 ensure_docker_running
 
 if [[ -z "${OPENCLAW_SRC_DIR:-}" ]]; then
-  die "OPENCLAW_SRC_DIR is not set. Run ./secure-client/scripts/setup.sh first."
+  die "OPENCLAW_SRC_DIR is not set. Run ./openclaw-secure/scripts/setup.sh first."
 fi
 if [[ -z "${OPENCLAW_GIT_REPO:-}" ]]; then
   OPENCLAW_GIT_REPO="https://github.com/openclaw/openclaw"
@@ -76,7 +76,7 @@ if [[ "$OPENCLAW_WORKSPACES_DIR" == "$HOME" || "$OPENCLAW_WORKSPACES_DIR" == "/"
 fi
 
 if [[ ! -d "$OPENCLAW_SRC_DIR/.git" ]]; then
-  die "No git repo at $OPENCLAW_SRC_DIR. Run ./secure-client/scripts/setup.sh first."
+  die "No git repo at $OPENCLAW_SRC_DIR. Run ./openclaw-secure/scripts/setup.sh first."
 fi
 
 info "Pulling latest from configured repo"
@@ -100,15 +100,15 @@ docker build \
   --build-arg "BASE_IMAGE=$OPENCLAW_IMAGE" \
   --build-arg "OPENCLAW_NPM_VERSION=$OPENCLAW_NPM_VERSION" \
   -t "$OPENCLAW_IMAGE" \
-  -f "$SECURE_CLIENT_ROOT/docker/npm-overlay.Dockerfile" \
+  -f "$OPENCLAW_SECURE_ROOT/docker/npm-overlay.Dockerfile" \
   "$REPO_ROOT"
 
 info "Ensuring config templates exist"
 mkdir -p "$OPENCLAW_CONFIG_DIR"
 chmod 700 "$OPENCLAW_CONFIG_DIR"
 ts="$(date +%Y%m%d-%H%M%S)"
-for f in "$REPO_ROOT"/config/openclaw.json; do
-  [[ -f "$f" ]] || continue
+f="$REPO_ROOT/config/openclaw.json"
+if [[ -f "$f" ]]; then
   dest="$OPENCLAW_CONFIG_DIR/$(basename "$f")"
   if [[ ! -f "$dest" ]]; then
     cp "$f" "$dest"
@@ -123,7 +123,7 @@ for f in "$REPO_ROOT"/config/openclaw.json; do
   else
     info "$(basename "$f") already exists at $dest (leaving untouched)"
   fi
-done
+fi
 
 deploy_workspace_templates \
   "$REPO_ROOT" \

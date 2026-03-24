@@ -2,7 +2,7 @@
 
 This guide sets up OpenClaw to run directly on the host (no containers), using this repo's configuration, models, agents, and skills.
 
-Use the **secure-client** (Docker) path if you prefer container isolation. Use **openclaw-raw** when you want lower latency, easier debugging, or run where Docker is not available.
+Use the **openclaw-secure** (Docker) path if you prefer container isolation. Use **openclaw-raw** when you want lower latency, easier debugging, or run where Docker is not available.
 
 ## Prerequisites
 
@@ -72,7 +72,6 @@ set -a && source .env && set +a
 export OPENCLAW_CONFIG_PATH=$OPENCLAW_CONFIG_DIR/openclaw.json
 export OPENCLAW_STATE_DIR=$OPENCLAW_CONFIG_DIR
 export OPENCLAW_WORKSPACES_DIR
-export OPENCLAW_SKILLS_DIR
 openclaw status
 ```
 
@@ -83,7 +82,7 @@ openclaw status
 | Docker | `config/openclaw.json`   | `$OPENCLAW_CONFIG_DIR/openclaw.json` |
 | Native | `config/openclaw.native.json` | `$OPENCLAW_CONFIG_DIR/openclaw.json` |
 
-The native template uses `${OPENCLAW_WORKSPACES_DIR}` and `${OPENCLAW_SKILLS_DIR}`; these must be exported when running the gateway or CLI.
+The native template uses `${OPENCLAW_WORKSPACES_DIR}` and other vars. `OPENCLAW_SKILLS_DIR` is optional; when set, setup/upgrade inject it into the config so OpenClaw does not require it at runtime. Export `OPENCLAW_WORKSPACES_DIR` when running the gateway or CLI directly (our scripts do this automatically).
 
 ## Running as a service
 
@@ -94,7 +93,7 @@ openclaw gateway install
 systemctl --user enable --now openclaw-gateway
 ```
 
-Ensure the service unit inherits `OPENCLAW_CONFIG_PATH`, `OPENCLAW_WORKSPACES_DIR`, `OPENCLAW_SKILLS_DIR`, and your API keys (e.g. via `EnvironmentFile=`).
+Ensure the service unit inherits `OPENCLAW_CONFIG_PATH`, `OPENCLAW_WORKSPACES_DIR`, and your API keys (e.g. via `EnvironmentFile=`). `OPENCLAW_SKILLS_DIR` is optional; when set at setup time it is injected into the config.
 
 **macOS (launchd):**
 
@@ -142,3 +141,5 @@ Options:
 - `--sync-config` – Overwrite `openclaw.json` from `config/openclaw.native.json` (creates backup)
 - `--cleanup-bootstrap` – Remove `BOOTSTRAP.md` from deployed workspaces
 - `--dry-run` – Show what would change without applying
+
+**Troubleshooting:** If you see `missing env var "OPENCLAW_SKILLS_DIR"` when running `openclaw` directly, the config still references the old template. Run `./openclaw-raw/scripts/upgrade.sh --sync-config` to update it (creates a backup). Skills from `OPENCLAW_SKILLS_DIR` are optional.

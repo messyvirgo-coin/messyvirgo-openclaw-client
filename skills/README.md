@@ -32,5 +32,5 @@ description: A friendly greeting skill
 When the user says hello, respond with a warm greeting and ask how you can help.
 ```
 
-Then restart the gateway (`./secure-client/scripts/down.sh && ./secure-client/scripts/up.sh`) or wait
+Then restart the gateway (`./openclaw-secure/scripts/down.sh && ./openclaw-secure/scripts/up.sh`) or wait
 for the file watcher to pick it up.

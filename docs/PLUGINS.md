@@ -3,9 +3,9 @@
 This wrapper runs OpenClaw in Docker. Use the CLI via:
 
 ```bash
-./secure-client/scripts/cli.sh <command> <args>
+./openclaw-secure/scripts/cli.sh <command> <args>
 # or interactive:
-./secure-client/scripts/cli-shell.sh
+./openclaw-secure/scripts/cli-shell.sh
 ```
 
 ## Example: Opik (LLM observability)
@@ -15,13 +15,13 @@ This wrapper runs OpenClaw in Docker. Use the CLI via:
 ### 1. Install
 
 ```bash
-./secure-client/scripts/cli.sh plugins install @opik/opik-openclaw
+./openclaw-secure/scripts/cli.sh plugins install @opik/opik-openclaw
 ```
 
 ### 2. Configure
 
 ```bash
-./secure-client/scripts/cli.sh opik configure
+./openclaw-secure/scripts/cli.sh opik configure
 ```
 
 Validates Opik URL/API key and writes plugin config.
@@ -29,10 +29,10 @@ Validates Opik URL/API key and writes plugin config.
 ### 3. Restart gateway
 
 ```bash
-./secure-client/scripts/down.sh && ./secure-client/scripts/up.sh
+./openclaw-secure/scripts/down.sh && ./openclaw-secure/scripts/up.sh
 ```
 
-Check status: `./secure-client/scripts/cli.sh opik status`
+Check status: `./openclaw-secure/scripts/cli.sh opik status`
 
 ### 4. Allow plugin
 
