@@ -71,9 +71,14 @@ if [[ -z "${OPENCLAW_GATEWAY_TOKEN:-}" ]]; then
   else
     OPENCLAW_GATEWAY_TOKEN="$(python3 -c 'import secrets; print(secrets.token_hex(32))')"
   fi
-  # Append to .env
+  # Replace any existing OPENCLAW_GATEWAY_TOKEN line(s) to avoid duplicate keys
+  # (.env.example already has OPENCLAW_GATEWAY_TOKEN=; appending would create a duplicate)
+  if grep -q '^OPENCLAW_GATEWAY_TOKEN=' "$ENV_FILE" 2>/dev/null; then
+    grep -v '^OPENCLAW_GATEWAY_TOKEN=' "$ENV_FILE" > "${ENV_FILE}.tmp"
+    mv "${ENV_FILE}.tmp" "$ENV_FILE"
+  fi
   echo "OPENCLAW_GATEWAY_TOKEN=$OPENCLAW_GATEWAY_TOKEN" >>"$ENV_FILE"
-  info "Generated OPENCLAW_GATEWAY_TOKEN and appended to .env"
+  info "Generated OPENCLAW_GATEWAY_TOKEN and wrote to .env"
 fi
 
 info "Done."
