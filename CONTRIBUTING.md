@@ -2,7 +2,7 @@
 
 Thanks for your interest in contributing to Messy Virgo.
 
-This repository is a **small helper/wrapper** that runs [OpenClaw](https://github.com/openclaw/openclaw) locally in Docker (Linux/macOS) to provide a sandbox-style environment.
+This repository is a **wrapper** for [OpenClaw](https://github.com/openclaw/openclaw) with two deployment modes: **secure-client** (Docker) and **openclaw-raw** (native).
 
 Contributions are welcome (including Windows support), but please note:
 
@@ -19,7 +19,7 @@ Contributions are welcome (including Windows support), but please note:
 
 ## What kinds of contributions we welcome
 
-- Fixes for installation/UX issues in `docs/` or `scripts/`
+- Fixes for installation/UX issues in `docs/`, `secure-client/`, or `openclaw-raw/`
 - Bug fixes (especially around Docker networking differences across Linux/macOS)
 - Improvements to hardening (without breaking usability)
 - New platform support (e.g. Windows scripts), with clear documentation

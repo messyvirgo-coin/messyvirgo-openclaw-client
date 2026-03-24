@@ -17,7 +17,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y shellcheck
       - name: ShellCheck scripts
-        run: shellcheck scripts/*.sh
+        run: |
+          shellcheck secure-client/scripts/*.sh openclaw-raw/scripts/*.sh
 
   bash_syntax:
     name: Bash syntax
@@ -26,7 +27,7 @@ jobs:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
       - name: bash -n scripts
         run: |
-          for f in scripts/*.sh; do
+          for f in secure-client/scripts/*.sh openclaw-raw/scripts/*.sh; do
             bash -n "$f"
           done
 

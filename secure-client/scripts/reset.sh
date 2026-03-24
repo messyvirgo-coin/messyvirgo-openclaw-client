@@ -8,10 +8,10 @@ set -euo pipefail
 # and interactive confirmation (unless --yes is provided).
 #
 # Usage:
-#   ./scripts/reset.sh
-#   ./scripts/reset.sh --delete-config --delete-src
-#   ./scripts/reset.sh --delete-config --delete-src --delete-workspace
-#   ./scripts/reset.sh --system-prune
+#   ./secure-client/scripts/reset.sh
+#   ./secure-client/scripts/reset.sh --delete-config --delete-src
+#   ./secure-client/scripts/reset.sh --delete-config --delete-src --delete-workspace
+#   ./secure-client/scripts/reset.sh --system-prune
 #
 # Flags:
 #   --delete-config     Delete OPENCLAW_CONFIG_DIR (OpenClaw config/state) after stopping containers
@@ -63,7 +63,7 @@ ensure_docker_running
 load_env
 
 CONFIG_DIR="${OPENCLAW_CONFIG_DIR:-$HOME/.openclaw-secure}"
-WORKSPACE_DIR="${OPENCLAW_WORKSPACE_DIR:-$HOME/OpenClawWorkspace}"
+WORKSPACE_DIR="${OPENCLAW_WORKSPACE_DIR:-$HOME/OpenClawWorkspaces/main}"
 SRC_DIR="${OPENCLAW_SRC_DIR:-$CONFIG_DIR/openclaw-src}"
 IMAGE_TAG="${OPENCLAW_IMAGE:-openclaw-secure:local}"
 
@@ -139,6 +139,6 @@ fi
 
 echo ""
 info "Reset complete."
-info "Next: ./scripts/setup.sh"
-info "Then:  ./scripts/up.sh && ./scripts/dashboard.sh"
+info "Next: ./secure-client/scripts/setup.sh"
+info "Then:  ./secure-client/scripts/up.sh && ./secure-client/scripts/dashboard.sh"
 

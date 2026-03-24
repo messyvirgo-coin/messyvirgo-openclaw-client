@@ -16,10 +16,10 @@
 Example:
 
 ```bash
-./scripts/setup.sh
-./scripts/up.sh
-./scripts/cli.sh status
-./scripts/dashboard.sh
+./secure-client/scripts/setup.sh
+./secure-client/scripts/up.sh
+./secure-client/scripts/cli.sh status
+./secure-client/scripts/dashboard.sh
 ```
 
 ## Checklist

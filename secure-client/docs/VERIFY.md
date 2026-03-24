@@ -82,7 +82,7 @@ So the secure default here is:
 
 - `agents.defaults.sandbox.mode: "off"`
 
-If this repo includes a secure config template (`config/openclaw.secure.json`), the setup script will copy it to `openclaw.json` on first setup (if missing).
+The setup script copies `config/openclaw.json` (Docker) to the config dir on first setup (if missing). Native mode uses `config/openclaw.native.json`.
 
 ## 5) Run simple per-agent identity checks
 

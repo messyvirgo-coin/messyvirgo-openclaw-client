@@ -26,7 +26,7 @@ while [[ $# -gt 0 ]]; do
       ;;
     -h|--help)
       cat <<'EOF'
-Usage: ./scripts/upgrade.sh [options]
+Usage: ./secure-client/scripts/upgrade.sh [options]
 
 Options:
   --sync-workspaces    Overwrite changed workspace templates (creates .bak timestamped backups)
@@ -47,7 +47,7 @@ done
 ensure_docker_running
 
 if [[ -z "${OPENCLAW_SRC_DIR:-}" ]]; then
-  die "OPENCLAW_SRC_DIR is not set. Run scripts/setup.sh first."
+  die "OPENCLAW_SRC_DIR is not set. Run ./secure-client/scripts/setup.sh first."
 fi
 if [[ -z "${OPENCLAW_GIT_REPO:-}" ]]; then
   OPENCLAW_GIT_REPO="https://github.com/openclaw/openclaw"
@@ -76,7 +76,7 @@ if [[ "$OPENCLAW_WORKSPACES_DIR" == "$HOME" || "$OPENCLAW_WORKSPACES_DIR" == "/"
 fi
 
 if [[ ! -d "$OPENCLAW_SRC_DIR/.git" ]]; then
-  die "No git repo at $OPENCLAW_SRC_DIR. Run scripts/setup.sh first."
+  die "No git repo at $OPENCLAW_SRC_DIR. Run ./secure-client/scripts/setup.sh first."
 fi
 
 info "Pulling latest from configured repo"

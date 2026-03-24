@@ -27,11 +27,11 @@ if [[ $CODE -ne 0 ]]; then
     echo "" >&2
     OPENCLAW_GATEWAY_BIND=loopback compose_linux_hostnet up -d openclaw-gateway
     info "Dashboard (localhost-only): http://127.0.0.1:${OPENCLAW_GATEWAY_PORT:-18789}/"
-    info "Gateway auth token is required; run ./scripts/dashboard.sh for the tokenized URL."
+    info "Gateway auth token is required; run ./secure-client/scripts/dashboard.sh for the tokenized URL."
     exit 0
   fi
   exit "$CODE"
 fi
 
 info "Dashboard (localhost-only): http://127.0.0.1:${OPENCLAW_GATEWAY_PORT:-18789}/"
-info "Gateway auth token is required; run ./scripts/dashboard.sh for the tokenized URL."
+info "Gateway auth token is required; run ./secure-client/scripts/dashboard.sh for the tokenized URL."

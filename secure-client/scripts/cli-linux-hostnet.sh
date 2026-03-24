@@ -9,7 +9,7 @@ ensure_docker_running
 load_env
 
 if is_macos; then
-  die "Host networking mode is Linux-only. Use ./scripts/cli.sh on macOS."
+  die "Host networking mode is Linux-only. Use ./secure-client/scripts/cli.sh on macOS."
 fi
 
 if [[ $# -lt 1 ]]; then

@@ -31,7 +31,7 @@ while [[ $# -gt 0 ]]; do
       ;;
     -h|--help)
       cat <<'EOF'
-Usage: ./scripts/setup.sh [options]
+Usage: ./secure-client/scripts/setup.sh [options]
 
 Options:
   --sync-workspaces    Overwrite changed workspace templates (creates .bak timestamped backups)

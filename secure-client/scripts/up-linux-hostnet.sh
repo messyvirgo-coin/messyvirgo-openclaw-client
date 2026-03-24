@@ -9,7 +9,7 @@ ensure_docker_running
 load_env
 
 if is_macos; then
-  die "Host networking mode is Linux-only. Use ./scripts/up.sh on macOS."
+  die "Host networking mode is Linux-only. Use ./secure-client/scripts/up.sh on macOS."
 fi
 
 info "Starting OpenClaw gateway (Linux host networking workaround)"
