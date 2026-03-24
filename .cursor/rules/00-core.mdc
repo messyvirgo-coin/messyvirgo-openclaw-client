@@ -6,8 +6,8 @@ alwaysApply: true
 # Wrapper Repo Rules
 
 - Treat this repository as the deployment wrapper around OpenClaw, not the main OpenClaw source tree.
-- The OpenClaw source is cloned from `OPENCLAW_GIT_REPO` into `OPENCLAW_SRC_DIR`; in local dev it may exist as the sibling repo `../messyvirgo-openclaw`.
-- Keep the source fork clean and upstream-syncable; keep wrapper concerns in this repo and put Messy Virgo agent/skill customizations in `../messyvirgo-openclaw-agents` unless a source-level change is truly required.
+- The OpenClaw source is cloned from `OPENCLAW_GIT_REPO` (default upstream) into `OPENCLAW_SRC_DIR`; in local dev the checkout often lives as a sibling directory (e.g. `../messyvirgo-openclaw` or `../openclaw`).
+- Track upstream OpenClaw for source changes; keep wrapper concerns in this repo and put Messy Virgo agent/skill customizations in `../messyvirgo-openclaw-agents` unless a source-level change is truly required.
 - Keep changes small and reviewable; avoid broad refactors without clear need.
 - Do not hardcode secrets, tokens, private URLs, or machine-specific paths.
 - If behavior changes, update docs or comments in the same PR when needed.

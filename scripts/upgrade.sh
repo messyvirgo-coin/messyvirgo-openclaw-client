@@ -51,7 +51,7 @@ if [[ -z "${OPENCLAW_SRC_DIR:-}" ]]; then
   die "OPENCLAW_SRC_DIR is not set. Run scripts/setup.sh first."
 fi
 if [[ -z "${OPENCLAW_GIT_REPO:-}" ]]; then
-  OPENCLAW_GIT_REPO="https://github.com/messyvirgo-coin/messyvirgo-openclaw"
+  OPENCLAW_GIT_REPO="https://github.com/openclaw/openclaw"
 fi
 if [[ -z "${OPENCLAW_NPM_VERSION:-}" ]]; then
   OPENCLAW_NPM_VERSION="11.11.1"
