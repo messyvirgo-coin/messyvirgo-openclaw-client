@@ -54,29 +54,23 @@ Example for the Messy Virgo Team 1 Manager-Agent:
 
 ## 4) Group policy
 
-**Open access (anyone in the group can use the bot):**
+The safe baseline for group chats is `allowlist`. Telegram group restrictions are based on numeric Telegram user IDs, not usernames.
+
+If you do not yet know the trusted users' IDs, keep the group restricted and have them pair in DM first.
 
 ```bash
 # Docker
-./openclaw-secure/scripts/cli.sh config set channels.telegram.groupPolicy '"open"'
-./openclaw-secure/scripts/cli.sh config set channels.telegram.accounts.<account>.groupPolicy '"open"'
-
-# Native
-./openclaw-raw/scripts/cli.sh config set channels.telegram.groupPolicy '"open"'
-./openclaw-raw/scripts/cli.sh config set channels.telegram.accounts.<account>.groupPolicy '"open"'
-```
-
-**Restricted (only specific Telegram user IDs):**
-
-```bash
-# Docker
+./openclaw-secure/scripts/cli.sh config set channels.telegram.groupPolicy '"allowlist"'
+./openclaw-secure/scripts/cli.sh config set channels.telegram.accounts.<account>.groupPolicy '"allowlist"'
 ./openclaw-secure/scripts/cli.sh config set channels.telegram.accounts.<account>.groupAllowFrom '["tg:<telegram_user_id>"]'
 
 # Native
+./openclaw-raw/scripts/cli.sh config set channels.telegram.groupPolicy '"allowlist"'
+./openclaw-raw/scripts/cli.sh config set channels.telegram.accounts.<account>.groupPolicy '"allowlist"'
 ./openclaw-raw/scripts/cli.sh config set channels.telegram.accounts.<account>.groupAllowFrom '["tg:<telegram_user_id>"]'
 ```
 
-Replace `<telegram_user_id>` with the Telegram user ID you want to allow.
+Replace `<telegram_user_id>` with the numeric Telegram user ID you want to allow. If you intentionally want an open trusted group, set `groupPolicy` back to `"open"` for that account only.
 
 ## 5) Restart after channel changes
 
