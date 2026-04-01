@@ -373,14 +373,14 @@ Troubleshooting:
 ### Dashboard opens but pairing keeps looping
 
 1. Make sure you opened the full tokenized URL from `./openclaw-secure/scripts/dashboard.sh`
-1. On macOS, approve the pending device with:
+2. On macOS, approve the pending device with:
 
 ```bash
 bash -lc 'source ./openclaw-secure/scripts/_common.sh; compose exec -T openclaw-gateway node /app/openclaw.mjs devices list'
 bash -lc 'source ./openclaw-secure/scripts/_common.sh; compose exec -T openclaw-gateway node /app/openclaw.mjs devices approve <requestId>'
 ```
 
-1. If needed, restart and reopen:
+3. If needed, restart and reopen:
 
 ```bash
 ./openclaw-secure/scripts/down.sh
