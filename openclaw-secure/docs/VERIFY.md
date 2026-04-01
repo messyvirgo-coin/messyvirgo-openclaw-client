@@ -25,7 +25,7 @@ Your `.env` should define:
 
 - `OPENCLAW_WORKSPACES_DIR=...` (root folder for all agent workspaces)
 - `OPENCLAW_WORKSPACE_DIR=...` (single workspace folder used as the default mount)
-- provider keys for enabled model backends (`OPENROUTER_API_KEY` and/or `BANKR_API_KEY`)
+- provider keys for enabled model backends (`OPENROUTER_API_KEY`
 
 `OPENCLAW_WORKSPACE_DIR` should normally be a subdirectory inside `OPENCLAW_WORKSPACES_DIR`, usually `<OPENCLAW_WORKSPACES_DIR>/main`.
 

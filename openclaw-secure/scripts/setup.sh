@@ -145,7 +145,6 @@ if [[ -z "${OPENCLAW_GATEWAY_TOKEN:-}" ]]; then
 fi
 
 managed_env_keys=(
-  BANKR_API_KEY
   OPENROUTER_API_KEY
   BRAVE_API_KEY
   OPENCLAW_CONFIG_DIR
@@ -176,7 +175,6 @@ fi
 
 # Write .env (simple overwrite, deterministic keys)
 cat >"$ENV_FILE" <<EOF
-BANKR_API_KEY=${BANKR_API_KEY:-}
 OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
 BRAVE_API_KEY=${BRAVE_API_KEY:-}
 OPENCLAW_CONFIG_DIR=$OPENCLAW_CONFIG_DIR

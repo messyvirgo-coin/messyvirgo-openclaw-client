@@ -26,17 +26,6 @@
   "models": {
     "mode": "merge",
     "providers": {
-      "bankr": {
-        "baseUrl": "https://llm.bankr.bot/v1",
-        "apiKey": "${BANKR_API_KEY}",
-        "api": "openai-completions",
-        "models": [
-          { "id": "qwen3-coder",      "name": "Qwen3 Coder" },
-          { "id": "gemini-2.5-flash", "name": "Gemini 2.5 Flash" },
-          { "id": "kimi-k2.5",        "name": "Kimi K2.5" },
-          { "id": "gpt-5-nano",       "name": "GPT-5 Nano" }
-        ]
-      },
       "openrouter": {
         "baseUrl": "https://openrouter.ai/api/v1",
         "apiKey": "${OPENROUTER_API_KEY}",
@@ -51,12 +40,6 @@
           {
             "id": "google/gemini-2.5-flash-lite",
             "name": "Gemini Flash-Lite",
-            "contextWindow": 1000000,
-            "maxTokens": 8192
-          },
-          {
-            "id": "google/gemini-2.5-flash",
-            "name": "Gemini 2.5 Flash",
             "contextWindow": 1000000,
             "maxTokens": 8192
           },
@@ -141,22 +124,6 @@
         "primary": "openrouter/x-ai/grok-4.1-fast"
       },
       "models": {
-        "bankr/qwen3-coder": {
-          "alias": "bk-qwen-coder",
-          "params": { "temperature": 0.2 }
-        },
-        "bankr/gemini-2.5-flash": {
-          "alias": "bk-gemini-flash",
-          "params": { "temperature": 0.2 }
-        },
-        "bankr/kimi-k2.5": {
-          "alias": "bk-kimi",
-          "params": { "temperature": 0.2 }
-        },
-        "bankr/gpt-5-nano": {
-          "alias": "bk-gpt-nano",
-          "params": { "temperature": 0.2 }
-        },
         "openrouter/x-ai/grok-4.1-fast": {
           "alias": "or-grok",
           "params": { "temperature": 0.2 }

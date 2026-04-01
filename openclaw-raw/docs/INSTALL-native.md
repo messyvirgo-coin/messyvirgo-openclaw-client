@@ -20,7 +20,7 @@ cp .env.example .env
 
 Edit `.env` and set:
 
-- `BANKR_API_KEY`, `OPENROUTER_API_KEY`, `BRAVE_API_KEY` (for model providers you use)
+- `OPENROUTER_API_KEY`, `BRAVE_API_KEY` (for model providers you use)
 - `OPENCLAW_WORKSPACES_DIR` (default: `$HOME/OpenClawWorkspaces`)
 - `OPENCLAW_SKILLS_DIR` (optional; use relative `skills` for portability, or leave empty to default to `<repo>/skills`)
 - `OPENCLAW_CONFIG_DIR` (default: `$HOME/.openclaw`)

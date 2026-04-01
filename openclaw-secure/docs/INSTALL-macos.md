@@ -42,7 +42,6 @@ cp .env.example .env
 Open `.env` and set any values you already have:
 
 - `OPENROUTER_API_KEY` for OpenRouter model provider
-- `BANKR_API_KEY` if you also enable Bankr models
 - `BRAVE_API_KEY` for web search
 
 If you plan to install the Messy Virgo Agents and Skills Pack, add these values now:
