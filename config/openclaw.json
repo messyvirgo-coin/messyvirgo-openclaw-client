@@ -291,7 +291,7 @@
     "telegram": {
       "enabled": true,
       "dmPolicy": "pairing",
-      "groupPolicy": "open",
+      "groupPolicy": "allowlist",
       "streaming": "partial"
     }
   },
