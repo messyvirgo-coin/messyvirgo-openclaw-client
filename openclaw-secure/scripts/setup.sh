@@ -205,7 +205,7 @@ if [[ -d "$OPENCLAW_SRC_DIR/.git" ]]; then
   git -C "$OPENCLAW_SRC_DIR" remote set-url origin "$OPENCLAW_GIT_REPO"
   git -C "$OPENCLAW_SRC_DIR" fetch --tags --prune
   git -C "$OPENCLAW_SRC_DIR" checkout main
-  git -C "$OPENCLAW_SRC_DIR" pull --ff-only
+  git -C "$OPENCLAW_SRC_DIR" reset --hard origin/main
 else
   rm -rf "$OPENCLAW_SRC_DIR"
   git clone "$OPENCLAW_GIT_REPO" "$OPENCLAW_SRC_DIR"

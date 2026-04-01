@@ -79,11 +79,11 @@ if [[ ! -d "$OPENCLAW_SRC_DIR/.git" ]]; then
   die "No git repo at $OPENCLAW_SRC_DIR. Run ./openclaw-secure/scripts/setup.sh first."
 fi
 
-info "Pulling latest from configured repo"
+info "Syncing OpenClaw source to origin/main (discards local edits under OPENCLAW_SRC_DIR)"
 git -C "$OPENCLAW_SRC_DIR" remote set-url origin "$OPENCLAW_GIT_REPO"
 git -C "$OPENCLAW_SRC_DIR" fetch --tags --prune
 git -C "$OPENCLAW_SRC_DIR" checkout main
-git -C "$OPENCLAW_SRC_DIR" pull --ff-only
+git -C "$OPENCLAW_SRC_DIR" reset --hard origin/main
 
 info "Applying wrapper source patches"
 "$SCRIPT_DIR/patch-openclaw-source.sh" "$OPENCLAW_SRC_DIR"
