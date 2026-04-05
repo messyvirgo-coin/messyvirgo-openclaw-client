@@ -9,14 +9,15 @@ This repo wraps [OpenClaw](https://github.com/openclaw/openclaw) with shared con
 
 Both use the same `config/` and `skills/` from the repo root.
 
-This code is provided **as-is** and maintained **best-effort**. PRs/issues are welcome, but this repo is not a support channel (see [SUPPORT.md](./SUPPORT.md)).
+Environment file: **`.env`** at the repo root. Templates: **[`.env.secure.example`](./.env.secure.example)** (Docker), **[`.env.raw.example`](./.env.raw.example)** (native).
+
+Provided as-is, best-effort maintenance. See [SUPPORT.md](./SUPPORT.md).
 
 ## Quickstart
 
 ### OpenClaw-secure (Docker, Linux + macOS)
 
-- **macOS**: [openclaw-secure/docs/INSTALL-macos.md](openclaw-secure/docs/INSTALL-macos.md)
-- **Linux**: [openclaw-secure/docs/INSTALL-linux.md](openclaw-secure/docs/INSTALL-linux.md)
+- **Install**: [openclaw-secure/docs/INSTALL-docker.md](openclaw-secure/docs/INSTALL-docker.md)
 
 ```bash
 ./openclaw-secure/scripts/setup.sh
@@ -42,43 +43,39 @@ This code is provided **as-is** and maintained **best-effort**. PRs/issues are w
 ./openclaw-secure/scripts/cli-shell.sh
 ```
 
+Uninstall: [openclaw-secure/docs/UNINSTALL.md](openclaw-secure/docs/UNINSTALL.md).
+
 ## Upgrade (openclaw-secure)
 
-Why not use "Update now" in the UI?
+Upstream [stable](https://github.com/openclaw/openclaw) is published as **`v*`** tags. **`setup.sh`** and **`upgrade.sh`** fetch **`OPENCLAW_GIT_REPO`**, check out the latest **`v*`** tag when **`OPENCLAW_GIT_REF`** is unset, and rebuild the image. In-container Control UI self-update is usually unavailable (`not-git-install`); use **`upgrade.sh`** instead.
 
-- This wrapper runs OpenClaw from a Docker image, so in-app self-update is typically skipped with `reason: "not-git-install"` (runtime path is usually `/app`).
-- In container/immutable deployments, the correct update path is: pull the latest OpenClaw source (via `./openclaw-secure/scripts/upgrade.sh`, which updates your clone from `OPENCLAW_GIT_REPO`) → rebuild image → restart container.
-
-If you want to apply updated wrapper config templates (including security defaults) to an existing deployment, run:
+Set **`OPENCLAW_GIT_REF=main`** in `.env` to track the moving default branch instead of the latest tag.
 
 ```bash
 ./openclaw-secure/scripts/upgrade.sh
-./openclaw-secure/scripts/upgrade.sh --sync-config   # apply updated config templates
+./openclaw-secure/scripts/upgrade.sh --sync-config
 ```
 
-More: [openclaw-secure/docs/VERIFY.md](openclaw-secure/docs/VERIFY.md) · [docs/PLUGINS.md](docs/PLUGINS.md)
+Reference: [openclaw-secure/docs/VERIFY.md](openclaw-secure/docs/VERIFY.md) · [docs/MEMORY.md](docs/MEMORY.md) · [docs/PLUGINS.md](docs/PLUGINS.md) · [docs/TELEGRAM.md](docs/TELEGRAM.md)
 
 ## Agent packs
 
 Pack-specific agents live in a separate repo: `../messyvirgo-openclaw-agents`.
 
 ```bash
-# 1) Bring up wrapper
 ./openclaw-secure/scripts/setup.sh
 ./openclaw-secure/scripts/up.sh
-
-# 2) Install pack
 cd ../messyvirgo-openclaw-agents
 ./scripts/install.sh --target wrapper --profile mv-t1
 ```
 
-CLI for channel setup: `./openclaw-secure/scripts/cli.sh channels --help`
+Channels: `./openclaw-secure/scripts/cli.sh channels --help`
 
 ## Security (openclaw-secure)
 
-- Linux: dashboard ports bound to `127.0.0.1`
-- macOS: Docker Desktop quirk uses `0.0.0.0`; gateway is token-authenticated
-- Single explicit workspace mount; tool sandboxing off (see [docs/SECURITY.md](docs/SECURITY.md))
+- Default compose publishes the dashboard on **`127.0.0.1`**; Linux may use **host networking** instead (see [docs/SECURITY.md](docs/SECURITY.md))
+- Gateway is **token-authenticated**; explicit config + workspace mounts only
+- Tool sandboxing **off** in Docker by default (no Docker socket in the gateway); see [docs/SECURITY.md](docs/SECURITY.md)
 
 ## License
 

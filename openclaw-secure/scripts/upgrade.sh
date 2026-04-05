@@ -28,6 +28,9 @@ while [[ $# -gt 0 ]]; do
       cat <<'EOF'
 Usage: ./openclaw-secure/scripts/upgrade.sh [options]
 
+Environment (from .env):
+  OPENCLAW_GIT_REF   Git ref to check out after fetch (default: latest v* release tag).
+
 Options:
   --sync-workspaces    Overwrite changed workspace templates (creates .bak timestamped backups)
   --sync-config        Overwrite changed config templates (creates .bak timestamped backups)
@@ -79,26 +82,22 @@ if [[ ! -d "$OPENCLAW_SRC_DIR/.git" ]]; then
   die "No git repo at $OPENCLAW_SRC_DIR. Run ./openclaw-secure/scripts/setup.sh first."
 fi
 
-info "Fetching OpenClaw release tags"
-git -C "$OPENCLAW_SRC_DIR" remote set-url origin "$OPENCLAW_GIT_REPO"
-git -C "$OPENCLAW_SRC_DIR" fetch --tags --prune origin
-
-LATEST_RELEASE_TAG="$(
-  git -C "$OPENCLAW_SRC_DIR" tag -l 'v*' --sort=-v:refname | head -n 1
-)"
-if [[ -z "$LATEST_RELEASE_TAG" ]]; then
-  die "No release tags found in $OPENCLAW_SRC_DIR"
-fi
-
-info "Checking out latest release tag ($LATEST_RELEASE_TAG)"
-git -C "$OPENCLAW_SRC_DIR" checkout --force "$LATEST_RELEASE_TAG"
+openclaw_sync_and_checkout_openclaw_source "$OPENCLAW_SRC_DIR" "$OPENCLAW_GIT_REPO"
 
 info "Applying wrapper source patches"
 "$SCRIPT_DIR/patch-openclaw-source.sh" "$OPENCLAW_SRC_DIR"
 
+refresh_openclaw_pnpm_lockfile "$OPENCLAW_SRC_DIR"
+
 info "Rebuilding Docker image ($OPENCLAW_IMAGE)"
+OPENCLAW_DOCKER_BUILD_EXTRA_ARGS=()
+if [[ -n "${OPENCLAW_NODE_BOOKWORM_IMAGE:-}" ]]; then
+  OPENCLAW_DOCKER_BUILD_EXTRA_ARGS+=(--build-arg "OPENCLAW_NODE_BOOKWORM_IMAGE=$OPENCLAW_NODE_BOOKWORM_IMAGE")
+  info "OpenClaw Dockerfile base: OPENCLAW_NODE_BOOKWORM_IMAGE=$OPENCLAW_NODE_BOOKWORM_IMAGE"
+fi
 docker build \
   --build-arg "OPENCLAW_DOCKER_APT_PACKAGES=${OPENCLAW_DOCKER_APT_PACKAGES:-jq}" \
+  "${OPENCLAW_DOCKER_BUILD_EXTRA_ARGS[@]}" \
   -t "$OPENCLAW_IMAGE" \
   -f "$OPENCLAW_SRC_DIR/Dockerfile" \
   "$OPENCLAW_SRC_DIR"

@@ -27,7 +27,25 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/_common.sh"
 
 usage() {
-  sed -n '1,120p' "$0" | sed -n '1,120p' | sed 's/^# \{0,1\}//'
+  awk '
+    NR == 1 { next }
+    in_doc {
+      if (/^#/) {
+        sub(/^# ?/, "")
+        print
+        next
+      }
+      if (/^$/) next
+      exit
+    }
+    /^#/ && !/^#!/ {
+      in_doc = 1
+      sub(/^# ?/, "")
+      print
+      next
+    }
+    { next }
+  ' "$0"
 }
 
 YES=0
@@ -139,6 +157,4 @@ fi
 
 echo ""
 info "Reset complete."
-info "Next: ./openclaw-secure/scripts/setup.sh"
-info "Then:  ./openclaw-secure/scripts/up.sh && ./openclaw-secure/scripts/dashboard.sh"
 

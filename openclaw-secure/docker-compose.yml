@@ -8,6 +8,11 @@ services:
       OPENCLAW_GATEWAY_PORT: ${OPENCLAW_GATEWAY_PORT:-18789}
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
       BRAVE_API_KEY: ${BRAVE_API_KEY:-}
+      TAVILY_API_KEY: ${TAVILY_API_KEY:-}
+      # Upstream image sets OPENCLAW_BUNDLED_PLUGINS_DIR=/app/extensions (source). That forces
+      # jiti to compile bundled extension TypeScript on every gateway boot and can blow the stack.
+      # Prefer compiled outputs under dist/ (see upstream CHANGELOG: gateway loads dist/extensions).
+      OPENCLAW_BUNDLED_PLUGINS_DIR: /app/dist/extensions
     volumes:
       - ${OPENCLAW_CONFIG_DIR:-${HOME}/.openclaw-secure}:/home/node/.openclaw
       - ${OPENCLAW_WORKSPACES_DIR:-${HOME}/OpenClawWorkspaces}:/home/node/workspaces
@@ -36,7 +41,9 @@ services:
       OPENCLAW_GATEWAY_PORT: ${OPENCLAW_GATEWAY_PORT:-18789}
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
       BRAVE_API_KEY: ${BRAVE_API_KEY:-}
+      TAVILY_API_KEY: ${TAVILY_API_KEY:-}
       BROWSER: echo
+      OPENCLAW_BUNDLED_PLUGINS_DIR: /app/dist/extensions
     volumes:
       - ${OPENCLAW_CONFIG_DIR:-${HOME}/.openclaw-secure}:/home/node/.openclaw
       - ${OPENCLAW_WORKSPACES_DIR:-${HOME}/OpenClawWorkspaces}:/home/node/workspaces

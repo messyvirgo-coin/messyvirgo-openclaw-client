@@ -23,14 +23,7 @@ fi
 PORT="${OPENCLAW_GATEWAY_PORT:-18789}"
 URL="http://127.0.0.1:${PORT}/#token=${TOKEN}"
 
-echo "$URL"
-echo ""
-info "If you see 'gateway token mismatch':"
-info "  1. Restart the gateway so it uses the token from .env: stop gateway (Ctrl+C), then ./openclaw-raw/scripts/gateway.sh"
-info "  2. In the dashboard, open Control UI → Settings and paste this token (replace any existing value):"
-echo "     ${TOKEN}"
-echo ""
-info "Then open the URL above in your browser (or answer y to open it now)."
+printf '%s\n' "$URL"
 
 if is_macos; then
   if command -v open >/dev/null 2>&1; then

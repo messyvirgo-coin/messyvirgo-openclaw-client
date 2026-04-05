@@ -6,16 +6,13 @@
   },
 
   "logging": {
-    "redactSensitive": "all"
+    "redactSensitive": "tools"
   },
 
   "tools": {
     "web": {
       "search": {
         "provider": "tavily",
-        "tavily": {
-          "apiKey": "${TAVILY_API_KEY}"
-        },
         "maxResults": 5,
         "timeoutSeconds": 30
       },
@@ -30,32 +27,7 @@
   },
 
   "memory": {
-    "backend": "qmd",
-    "citations": "auto",
-    "qmd": {
-      "includeDefaultMemory": true,
-      "searchMode": "search",
-      "update": {
-        "interval": "5m",
-        "debounceMs": 15000,
-        "onBoot": true,
-        "waitForBootSync": false
-      },
-      "limits": {
-        "maxResults": 6,
-        "maxSnippetChars": 700,
-        "timeoutMs": 4000
-      },
-      "scope": {
-        "default": "deny",
-        "rules": [
-          {
-            "action": "allow",
-            "match": { "chatType": "direct" }
-          }
-        ]
-      }
-    }
+    "citations": "auto"
   },
 
   "models": {
@@ -128,9 +100,25 @@
 
       "memorySearch": {
         "enabled": true,
-        "provider": "local",
-        "local": {
-          "modelPath": "hf:ggml-org/embeddinggemma-300m-qat-q8_0-GGUF/embeddinggemma-300m-qat-Q8_0.gguf"
+        "provider": "openai",
+        "model": "openai/text-embedding-3-small",
+        "fallback": "none",
+        "remote": {
+          "baseUrl": "https://openrouter.ai/api/v1",
+          "apiKey": "${OPENROUTER_API_KEY}"
+        },
+        "store": {
+          "path": "~/.openclaw/memory/{agentId}.sqlite"
+        },
+        "experimental": {
+          "sessionMemory": true
+        },
+        "sources": ["memory", "sessions"],
+        "sync": {
+          "sessions": {
+            "deltaBytes": 100000,
+            "deltaMessages": 50
+          }
         },
         "query": {
           "hybrid": {
@@ -148,7 +136,8 @@
           }
         },
         "cache": {
-          "enabled": true
+          "enabled": true,
+          "maxEntries": 50000
         }
       },
 
@@ -233,10 +222,6 @@
         "scope": "session",
         "workspaceAccess": "none",
         "workspaceRoot": "~/.openclaw/sandboxes",
-        "network": {
-          "outbound": "allow",
-          "localhost": "allow"
-        },
         "prune": {
           "idleHours": 12,
           "maxAgeDays": 3
@@ -363,8 +348,24 @@
 
   "plugins": {
     "entries": {
+      "memory-core": {
+        "enabled": true,
+        "config": {
+          "dreaming": {
+            "enabled": true
+          }
+        }
+      },
       "telegram": {
         "enabled": true
+      },
+      "tavily": {
+        "enabled": true,
+        "config": {
+          "webSearch": {
+            "apiKey": "${TAVILY_API_KEY}"
+          }
+        }
       }
     }
   }

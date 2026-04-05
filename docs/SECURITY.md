@@ -2,17 +2,11 @@
 
 ### What this Docker setup protects well
 
-- **On Linux (secure compose)**: dashboard ports are bound to `127.0.0.1`.
-  - Not reachable from other devices on your network (unless you forward it yourself).
-- **On macOS (Docker Desktop)**: this repo uses `docker-compose.macos.yml` which binds ports to `0.0.0.0` due to a Docker Desktop loopback port-binding quirk.
-  - The gateway is still **token-authenticated**, but network exposure is broader than a strict `127.0.0.1` bind.
-- **Filesystem access is limited**: OpenClaw gets **exactly one** host directory as a mount (the workspace), which you choose deliberately.
-  - No access to your entire `$HOME`, fewer accidental secrets.
-- **Tool sandboxing**: shell/read/write/edit runs (per session) in Docker sandboxes with:
-  - `readOnlyRoot: true`
-  - `capDrop: ALL`
-  - **no network by default** (`network: none`)
-  - CPU/RAM/PIDs limits
+- **Published ports**: the default stack merges **`docker-compose.ports.localhost.yml`**, which maps the gateway (and bridge) to **`127.0.0.1`** on the host. On **Linux**, some setups use **`docker-compose.linux-hostnet.yml`** (`network_mode: host`) instead—see [openclaw-secure/docs/INSTALL-docker.md](../openclaw-secure/docs/INSTALL-docker.md) §5.
+- **On macOS (Docker Desktop)**: reachability and how `docker ps` labels ports can differ from Linux; the gateway remains **token-authenticated**.
+- **Filesystem access is explicit**: the compose file mounts **config** (`OPENCLAW_CONFIG_DIR` → `~/.openclaw` in-container), **all agent workspaces** (`OPENCLAW_WORKSPACES_DIR`), and the **default workspace** (`OPENCLAW_WORKSPACE_DIR`). You choose those paths in `.env`; they are not your entire `$HOME` unless you set them that way.
+- **Gateway container hardening** (see `docker-compose.secure.yml`): read-only rootfs, dropped capabilities, `no-new-privileges`, tmpfs for temp dirs, resource limits.
+- **Tool sandboxing in this wrapper**: `agents.defaults.sandbox.mode` is **`off`** in Docker so the gateway does not need the host Docker socket. Nested OpenClaw sandboxes are a separate feature when sandbox mode is enabled elsewhere—see § below.
 
 ### What this does NOT perfectly solve
 
@@ -20,7 +14,7 @@
 - If you set the workspace to your real project folder, OpenClaw can of course read/write **everything in that folder**.
 - If you enable channels (Telegram/WhatsApp/etc.), input comes from outside → **prompt-injection risk** stays real.
 
-### Note about OpenClaw \"tool sandboxing\" in this Docker setup
+### Note about OpenClaw "tool sandboxing" in this Docker setup
 
 OpenClaw's built-in tool sandboxing uses Docker to spawn sandbox containers **from the Gateway host**.
 When the Gateway itself runs inside Docker (this repo), giving it access to Docker (e.g. mounting `/var/run/docker.sock`)
@@ -29,8 +23,8 @@ would effectively grant it high-privilege control over your host.
 For that reason, this wrapper defaults to **sandboxing = off** and relies on:
 
 - container isolation + hardening (read-only rootfs, dropped caps, no-new-privileges)
-- a single, explicit RW workspace mount
-- localhost-only dashboard exposure where possible (Linux secure compose), and token-authenticated exposure on macOS as noted above
+- explicit config + workspace mounts (you choose paths in `.env`; avoid pointing the default workspace at a broad home tree)
+- localhost-oriented port publishing where the compose overlay uses `127.0.0.1`, plus token auth on all platforms
 
 **Why `sandbox.docker` is omitted from `config/openclaw.json`:** With `agents.defaults.sandbox.mode: "off"`, the nested `sandbox.docker` block is inactive. This wrapper intentionally avoids Docker sandbox spawning from inside the gateway container (it would require Docker socket access and weaken host security). Keeping the block caused confusion and warnings in some versions. If you enable `sandbox.mode` in the future, add a `sandbox.docker` block (image, workdir, caps, network, etc.) — see OpenClaw upstream config for the schema.
 

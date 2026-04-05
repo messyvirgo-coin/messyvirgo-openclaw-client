@@ -15,9 +15,11 @@ You can also check the port binding:
 docker ps --format "table {{.Names}}\t{{.Ports}}"
 ```
 
-On **Linux** (secure compose), you should see `127.0.0.1:18789->18789/tcp` (not `0.0.0.0:...`).
+With the default **`docker-compose.ports.localhost.yml`** overlay, published ports target **`127.0.0.1`**. In `docker ps`, Linux often shows `127.0.0.1:18789->18789/tcp`.
 
-On **macOS**, this repo uses `docker-compose.macos.yml` which binds to `0.0.0.0` due to a Docker Desktop loopback port-binding quirk. The gateway is still token-authenticated, but treat this as broader network exposure than a strict loopback bind.
+On **Linux**, if **`docker-compose.linux-hostnet.yml`** is used, the gateway uses **`network_mode: host`**; `docker ps` may list **no** port mapping—use the tokenized URL on `http://127.0.0.1:<OPENCLAW_GATEWAY_PORT>/` anyway.
+
+On **macOS** (Docker Desktop), port display and reachability can differ from Linux; the gateway remains **token-authenticated**. See [INSTALL-docker.md](INSTALL-docker.md) §5.
 
 ## 2) Confirm per-agent workspaces are present and mapped
 
@@ -25,7 +27,7 @@ Your `.env` should define:
 
 - `OPENCLAW_WORKSPACES_DIR=...` (root folder for all agent workspaces)
 - `OPENCLAW_WORKSPACE_DIR=...` (single workspace folder used as the default mount)
-- provider keys for enabled model backends (`OPENROUTER_API_KEY`
+- provider keys for enabled model backends (`OPENROUTER_API_KEY` for chat and memory embeddings, `TAVILY_API_KEY` if using the Tavily plugin, etc.)
 
 `OPENCLAW_WORKSPACE_DIR` should normally be a subdirectory inside `OPENCLAW_WORKSPACES_DIR`, usually `<OPENCLAW_WORKSPACES_DIR>/main`.
 
@@ -47,22 +49,17 @@ You should see at least:
 - `mv-researcher/`
 - `mv-planner/`
 
-Sanity check inside the container:
+Sanity check (CLI container shares config + workspaces with the gateway):
 
 ```bash
 ./openclaw-secure/scripts/cli.sh status
 ```
 
-Linux host-network workaround:
-
-```bash
-./openclaw-secure/scripts/cli.sh status
-```
-
-And verify your Compose volumes in `docker-compose.yml` include:
+Verify `openclaw-secure/docker-compose.yml` mounts at least:
 
 - `${OPENCLAW_CONFIG_DIR}:/home/node/.openclaw`
-- `${OPENCLAW_WORKSPACE_DIR}:/home/node/.openclaw/workspace`
+- `${OPENCLAW_WORKSPACES_DIR}:/home/node/workspaces`
+- `${OPENCLAW_WORKSPACE_DIR}:/home/node/.openclaw/workspace` (default agent workspace)
 
 ## 3) Run OpenClaw’s security audit
 
@@ -102,3 +99,15 @@ still has a `BOOTSTRAP.md`. Remove it (or run setup/upgrade with
 ```bash
 ./openclaw-secure/scripts/down.sh && ./openclaw-secure/scripts/up.sh
 ```
+
+## 6) Verify semantic memory (optional)
+
+The wrapper uses OpenClaw’s **builtin** memory engine with **OpenRouter** for embeddings. Full architecture, env vars, and CLI commands are in **[../../docs/MEMORY.md](../../docs/MEMORY.md)**.
+
+Quick probe (ephemeral `openclaw-cli` service — same config/workspace mounts as the gateway):
+
+```bash
+./openclaw-secure/scripts/cli.sh memory status --deep
+```
+
+Alternative: `docker compose … exec openclaw-gateway sh -lc 'openclaw memory status --deep'` if your image exposes the `openclaw` CLI on PATH inside the gateway container.
