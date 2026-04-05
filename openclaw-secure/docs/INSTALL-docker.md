@@ -104,7 +104,7 @@ Open the full URL including `#token=...`. Without the token you may see `unautho
 **Port binding notes:**
 
 - The default stack merges **`docker-compose.ports.localhost.yml`**, which publishes the gateway on **`127.0.0.1`** (see `openclaw-secure/docker-compose*.yml`).
-- On **Linux**, if `docker-compose.linux-hostnet.yml` is used (`network_mode: host`), `docker ps` may show **no** published ports; use the tokenized URL on `http://127.0.0.1:<port>/` per your `.env`.
+- On **Linux**, if `docker-compose.linux-hostnet.yml` is used (`network_mode: host`), `docker ps` may show **no** published ports; use the tokenized URL on `http://127.0.0.1:<port>/` per your `.env`. Wrapper scripts set **`OPENCLAW_GATEWAY_BIND=loopback`** for that stack so the gateway stays localhost-only (your `.env` value is not used there).
 - On **macOS**, Docker Desktop sometimes makes port behavior feel broader than strict loopback; the gateway remains **token-authenticated**.
 
 ---

@@ -13,15 +13,8 @@ if is_macos; then
 fi
 
 info "Starting OpenClaw gateway (Linux host networking workaround)"
-info "For safety, forcing OPENCLAW_GATEWAY_BIND=loopback (localhost-only)."
+info "compose_linux_hostnet() forces OPENCLAW_GATEWAY_BIND=loopback (localhost-only)."
 
-# shellcheck disable=SC2068
-OPENCLAW_GATEWAY_BIND=loopback \
-docker compose \
-  -f "$OPENCLAW_SECURE_ROOT/docker-compose.yml" \
-  -f "$OPENCLAW_SECURE_ROOT/docker-compose.secure.yml" \
-  -f "$OPENCLAW_SECURE_ROOT/docker-compose.linux-hostnet.yml" \
-  -f "$OPENCLAW_SECURE_ROOT/docker-compose.skills.yml" \
-  up -d openclaw-gateway
+compose up -d openclaw-gateway
 
 info "Dashboard (localhost-only): http://127.0.0.1:${OPENCLAW_GATEWAY_PORT:-18789}/"

@@ -28,7 +28,9 @@ compose_base() {
 }
 
 compose_linux_hostnet() {
-  docker compose \
+  # Host networking uses the host netns; published-port maps do not apply. Force a
+  # loopback bind so the gateway stays localhost-only despite OPENCLAW_GATEWAY_BIND=lan in .env.
+  OPENCLAW_GATEWAY_BIND=loopback docker compose \
     -f "$OPENCLAW_SECURE_ROOT/docker-compose.yml" \
     -f "$OPENCLAW_SECURE_ROOT/docker-compose.secure.yml" \
     -f "$OPENCLAW_SECURE_ROOT/docker-compose.linux-hostnet.yml" \
