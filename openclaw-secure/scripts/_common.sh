@@ -107,22 +107,45 @@ ensure_docker_running() {
   fi
 }
 
-# OpenClaw's Dockerfile runs `CI=true pnpm prune --prod`; under CI, pnpm treats the lockfile as frozen.
-# If upstream changes package.json before pnpm-lock.yaml catches up, the image build fails with
-# ERR_PNPM_OUTDATED_LOCKFILE. Running `pnpm install` on the host refreshes the lockfile before docker build.
+# Host `pnpm install` refreshes the lockfile before `docker build` (avoids ERR_PNPM_OUTDATED_LOCKFILE under CI prune).
 refresh_openclaw_pnpm_lockfile() {
   local src="${1:?}"
   if ! command -v pnpm >/dev/null 2>&1; then
-    info "pnpm not on PATH; if the image build fails with ERR_PNPM_OUTDATED_LOCKFILE, run: (cd \"$src\" && corepack enable && pnpm install), then re-run."
+    info "pnpm not on PATH; on ERR_PNPM_OUTDATED_LOCKFILE run (cd \"$src\" && corepack enable && pnpm install)"
     return 0
   fi
-  info "Syncing pnpm lockfile in OpenClaw source (avoids stale-lockfile failures during image build)"
+  info "Refreshing pnpm lockfile in OpenClaw source"
   (
     cd "$src" || exit 1
     export COREPACK_ENABLE_DOWNLOAD_PROMPT=0
     corepack enable >/dev/null 2>&1 || true
     pnpm install
   ) || die "pnpm install failed in $src (could not refresh lockfile)"
+}
+
+# Fetch origin; check out OPENCLAW_GIT_REF if set, else newest v* tag (aligned with upgrade.sh).
+openclaw_sync_and_checkout_openclaw_source() {
+  local src="${1:?}"
+  local repo="${2:?}"
+  info "Fetching OpenClaw ($repo)"
+  git -C "$src" remote set-url origin "$repo"
+  git -C "$src" fetch --tags --prune origin
+  if [[ -n "${OPENCLAW_GIT_REF:-}" ]]; then
+    info "Checking out $OPENCLAW_GIT_REF"
+    git -C "$src" -c advice.detachedHead=false checkout --force "$OPENCLAW_GIT_REF"
+    if git -C "$src" rev-parse "origin/${OPENCLAW_GIT_REF}" >/dev/null 2>&1; then
+      git -C "$src" reset --hard "origin/${OPENCLAW_GIT_REF}"
+    fi
+  else
+    local tag
+    tag="$(git -C "$src" tag -l 'v*' --sort=-v:refname | head -n 1)"
+    if [[ -z "$tag" ]]; then
+      die "No v* release tags in $src. Set OPENCLAW_GIT_REF in .env (e.g. main)."
+    fi
+    info "Checking out $tag"
+    git -C "$src" -c advice.detachedHead=false checkout --force "$tag"
+  fi
+  info "OpenClaw $(git -C "$src" log -1 --oneline)"
 }
 
 workspace_dir_for_agent() {

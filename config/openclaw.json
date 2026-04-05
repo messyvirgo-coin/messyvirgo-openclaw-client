@@ -4,11 +4,9 @@
       "mode": "minimal"
     }
   },
-
   "logging": {
     "redactSensitive": "tools"
   },
-
   "tools": {
     "web": {
       "search": {
@@ -21,15 +19,12 @@
       }
     }
   },
-
   "session": {
     "dmScope": "per-channel-peer"
   },
-
   "memory": {
     "citations": "auto"
   },
-
   "models": {
     "mode": "merge",
     "providers": {
@@ -92,12 +87,10 @@
       }
     }
   },
-
   "agents": {
     "defaults": {
       "thinkingDefault": "low",
       "contextTokens": 200000,
-
       "memorySearch": {
         "enabled": true,
         "provider": "openai",
@@ -113,7 +106,10 @@
         "experimental": {
           "sessionMemory": true
         },
-        "sources": ["memory", "sessions"],
+        "sources": [
+          "memory",
+          "sessions"
+        ],
         "sync": {
           "sessions": {
             "deltaBytes": 100000,
@@ -140,7 +136,6 @@
           "maxEntries": 50000
         }
       },
-
       "contextPruning": {
         "mode": "cache-ttl",
         "ttl": "10m",
@@ -149,7 +144,6 @@
         "hardClearRatio": 0.88,
         "minPrunableToolChars": 1200
       },
-
       "compaction": {
         "mode": "default",
         "reserveTokensFloor": 40000,
@@ -163,7 +157,6 @@
           "prompt": "Write any lasting notes to memory/YYYY-MM-DD.md; reply with NO_REPLY if nothing to store."
         }
       },
-
       "heartbeat": {
         "every": "30m",
         "model": "openrouter/google/gemini-2.5-flash-lite",
@@ -171,52 +164,63 @@
         "lightContext": true,
         "isolatedSession": true
       },
-
       "subagents": {
         "maxConcurrent": 8
       },
-
       "workspace": "/home/node/workspaces/main",
-
       "model": {
         "primary": "openrouter/x-ai/grok-4.1-fast"
       },
-
       "models": {
         "openrouter/x-ai/grok-4.1-fast": {
           "alias": "or-grok",
-          "params": { "temperature": 0.2 }
+          "params": {
+            "temperature": 0.2
+          }
         },
         "openrouter/google/gemini-2.5-flash-lite": {
           "alias": "or-flashlite",
-          "params": { "temperature": 0.2 }
+          "params": {
+            "temperature": 0.2
+          }
         },
         "openrouter/anthropic/claude-haiku-4-5": {
           "alias": "or-haiku",
-          "params": { "temperature": 0.2 }
+          "params": {
+            "temperature": 0.2
+          }
         },
         "openrouter/anthropic/claude-sonnet-4-6": {
           "alias": "or-sonnet",
-          "params": { "temperature": 0.2 }
+          "params": {
+            "temperature": 0.2
+          }
         },
         "openrouter/anthropic/claude-opus-4-6": {
           "alias": "or-opus",
-          "params": { "temperature": 0.2 }
+          "params": {
+            "temperature": 0.2
+          }
         },
         "openrouter/openai/gpt-5.4-mini": {
           "alias": "or-gpt",
-          "params": { "temperature": 0.2 }
+          "params": {
+            "temperature": 0.2
+          }
         },
         "openrouter/minimax/minimax-m2.5": {
           "alias": "or-minimax",
-          "params": { "temperature": 0.2 }
+          "params": {
+            "temperature": 0.2
+          }
         },
         "openrouter/moonshotai/kimi-k2.5": {
           "alias": "or-kimi",
-          "params": { "temperature": 0.2 }
+          "params": {
+            "temperature": 0.2
+          }
         }
       },
-
       "sandbox": {
         "mode": "off",
         "scope": "session",
@@ -228,7 +232,6 @@
         }
       }
     },
-
     "list": [
       {
         "id": "main",
@@ -240,7 +243,11 @@
         "workspace": "/home/node/workspaces/main",
         "model": "openrouter/x-ai/grok-4.1-fast",
         "subagents": {
-          "allowAgents": ["mv-coder", "mv-researcher", "mv-planner"]
+          "allowAgents": [
+            "mv-coder",
+            "mv-researcher",
+            "mv-planner"
+          ]
         }
       },
       {
@@ -284,7 +291,6 @@
       }
     ]
   },
-
   "gateway": {
     "mode": "local",
     "bind": "lan",
@@ -309,14 +315,12 @@
       "resetOnExit": false
     }
   },
-
   "commands": {
     "native": "auto",
     "nativeSkills": "auto",
     "restart": true,
     "ownerDisplay": "raw"
   },
-
   "channels": {
     "telegram": {
       "enabled": true,
@@ -325,7 +329,6 @@
       "streaming": "partial"
     }
   },
-
   "hooks": {
     "internal": {
       "enabled": true,
@@ -336,7 +339,6 @@
       }
     }
   },
-
   "skills": {
     "load": {
       "extraDirs": [
@@ -345,14 +347,13 @@
       "watch": true
     }
   },
-
   "plugins": {
     "entries": {
       "memory-core": {
         "enabled": true,
         "config": {
           "dreaming": {
-            "mode": "rem"
+            "enabled": true
           }
         }
       },

@@ -55,3 +55,35 @@ if ver in broken or (isinstance(ver, str) and ver.startswith("^0.9.")):
     print(f"==> Patched {key} to ^0.18.0 in {path} (wrapper workaround for missing npm versions)")
 PY
 fi
+
+# Official Dreaming config lives under plugins.entries.memory-core.config.dreaming
+# (https://docs.openclaw.ai/concepts/dreaming). Some release tags ship memory-core
+# openclaw.plugin.json with configSchema.properties {} and additionalProperties: false,
+# which rejects that JSON. Allow a dreaming object so templates validate after build.
+MEMORY_CORE_PLUGIN="$TARGET_SRC_DIR/extensions/memory-core/openclaw.plugin.json"
+if [[ -f "$MEMORY_CORE_PLUGIN" ]]; then
+  python3 - "$MEMORY_CORE_PLUGIN" <<'PY'
+import json
+import pathlib
+import sys
+
+path = pathlib.Path(sys.argv[1])
+data = json.loads(path.read_text())
+cs = data.get("configSchema")
+if not isinstance(cs, dict):
+    raise SystemExit(0)
+props = cs.get("properties")
+if not isinstance(props, dict):
+    props = {}
+if "dreaming" in props:
+    print(f"==> memory-core configSchema already documents dreaming: {path}")
+    raise SystemExit(0)
+props["dreaming"] = {"type": "object", "additionalProperties": True}
+cs["type"] = "object"
+cs["additionalProperties"] = False
+cs["properties"] = props
+data["configSchema"] = cs
+path.write_text(json.dumps(data, indent=2) + "\n")
+print(f"==> Patched memory-core configSchema to allow config.dreaming: {path}")
+PY
+fi

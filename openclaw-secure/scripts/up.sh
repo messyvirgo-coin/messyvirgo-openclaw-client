@@ -13,10 +13,8 @@ if [[ -d "$CONFIG_DIR" ]]; then
   chmod 700 "$CONFIG_DIR"
 fi
 
-info "Starting OpenClaw gateway (secure compose overlay)"
-# Use compose() (not compose_base) so Linux matches setup.sh: docker-compose.linux-hostnet.yml
-# when present. up.sh previously used bridge + published ports on Linux whenever bind succeeded,
-# which diverged from setup and produced NetworkMode=openclaw-secure_default.
+info "Starting OpenClaw gateway"
+# compose() selects the Linux hostnet overlay when present (consistent with setup.sh).
 set +e
 OUT="$(compose up -d openclaw-gateway 2>&1)"
 CODE=$?
@@ -26,5 +24,5 @@ if [[ $CODE -ne 0 ]]; then
   exit "$CODE"
 fi
 
-info "Dashboard (localhost-only): http://127.0.0.1:${OPENCLAW_GATEWAY_PORT:-18789}/"
-info "Gateway auth token is required; run ./openclaw-secure/scripts/dashboard.sh for the tokenized URL."
+info "Dashboard: http://127.0.0.1:${OPENCLAW_GATEWAY_PORT:-18789}/"
+info "Authenticated URL: ./openclaw-secure/scripts/dashboard.sh"

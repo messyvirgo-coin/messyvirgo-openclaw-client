@@ -255,15 +255,13 @@ Restart after channel changes. Approve bot pairing:
 
 ## 11) Upgrade
 
-**Stable (recommended, same line as upstream “stable” / `openclaw@latest`):** from the [OpenClaw repo](https://github.com/openclaw/openclaw), tagged releases are `vYYYY.M.D`. This wrapper’s **`upgrade.sh`** fetches **`OPENCLAW_GIT_REPO`** and checks out the **newest `v*` tag**, rebuilds the image, and restarts the gateway. Do **not** set **`OPENCLAW_GIT_REF`** in `.env` unless you mean to opt into a specific branch or tag.
+[openclaw/openclaw](https://github.com/openclaw/openclaw) publishes **`v*`** tags. **`setup.sh`** / **`upgrade.sh`** fetch **`OPENCLAW_GIT_REPO`** and check out the latest tag unless **`OPENCLAW_GIT_REF`** is set (e.g. **`main`**).
 
 ```bash
 ./openclaw-secure/scripts/upgrade.sh
 ```
 
-**Native install (for comparison only):** upstream recommends global install + onboarding, e.g. `npm install -g openclaw@latest` and `openclaw onboard --install-daemon`, and channel switches via `openclaw update --channel stable|beta|dev`. Docker users here use **`upgrade.sh`** instead of `npm` for the gateway image.
-
-Config and workspaces are preserved unless you pass flags like `--sync-config`.
+Upstream also documents global `npm` installs and `openclaw update`; this Docker layout rebuilds the image via **`upgrade.sh`** instead. Config and workspaces are kept unless you pass flags such as **`--sync-config`**.
 
 ---
 

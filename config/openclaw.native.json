@@ -352,7 +352,7 @@
         "enabled": true,
         "config": {
           "dreaming": {
-            "mode": "rem"
+            "enabled": true
           }
         }
       },

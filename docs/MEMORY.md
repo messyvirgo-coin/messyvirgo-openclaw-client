@@ -1,39 +1,36 @@
-# Memory management (Messy Virgo wrapper)
+# Memory (wrapper defaults)
 
-How **semantic memory** is configured in this repository: workspace files, the builtin index, plugins, env vars, deployment, and verification.
-
-Official OpenClaw references:
+Semantic memory: workspace files, builtin SQLite index, `memory-core`, env vars, deployment. Upstream docs:
 
 - [Memory overview](https://docs.openclaw.ai/concepts/memory)
 - [Builtin memory engine](https://docs.openclaw.ai/concepts/memory-builtin)
 - [Memory search](https://docs.openclaw.ai/concepts/memory-search)
-- [Memory configuration reference](https://docs.openclaw.ai/reference/memory-config)
-- [Dreaming (experimental)](https://docs.openclaw.ai/concepts/dreaming)
+- [Memory configuration reference](https://docs.openclaw.ai/reference/memory-config) — full knob list for `memorySearch`, QMD, citations, etc.
+- [Dreaming (experimental) — config keys](https://docs.openclaw.ai/reference/memory-config#dreaming-experimental) — canonical location for `plugins.entries.memory-core.config.dreaming` (phases, schedules, `execution`, `storage`, …)
+- [Dreaming (experimental) — concepts & commands](https://docs.openclaw.ai/concepts/dreaming)
 - [`openclaw memory` CLI](https://docs.openclaw.ai/cli/memory)
 
 ---
 
-## 1. Design goals
+## 1. Defaults
 
-| Goal | Approach |
-|------|----------|
-| **No local embedding models** | Embeddings over HTTPS to **OpenRouter** (`openai/text-embedding-3-small` via OpenAI-compatible API). No GGUF or GPU for vectors. |
-| **Few moving parts** | **Builtin** engine only (per-agent SQLite + FTS5 + vectors). No QMD binary in the default stack. |
-| **Predictable cost** | Chat and embeddings share **`OPENROUTER_API_KEY`**. `memorySearch.fallback` is `none` (no silent failover to another embedding provider). |
-| **Durable vs scratch notes** | Daily logs under `memory/YYYY-MM-DD.md`, long-term curation in workspace **`MEMORY.md`**. Compaction prompts flush durable notes to disk. |
-| **Optional consolidation** | **Dreaming** (`memory-core`) can promote high-signal snippets into `MEMORY.md` on a schedule when enabled. |
+| Item | Setting |
+|------|---------|
+| Embeddings | OpenRouter, `openai/text-embedding-3-small`, `OPENROUTER_API_KEY` |
+| Engine | Builtin SQLite + FTS5 + vectors (no QMD in template) |
+| `memorySearch.fallback` | `none` |
+| Workspace | `MEMORY.md` + `memory/YYYY-MM-DD.md` |
+| Dreaming | `plugins.entries.memory-core.config.dreaming`; keys in [memory-config → Dreaming](https://docs.openclaw.ai/reference/memory-config#dreaming-experimental), behavior in [concepts/dreaming](https://docs.openclaw.ai/concepts/dreaming) |
 
 ---
 
 ## 2. Three layers
 
-### Layer A — Workspace files (source of truth for prose)
+### Layer A — Workspace files
 
-- **`MEMORY.md`** — Curated, long-lived context (loaded at session start per upstream behavior).
-- **`memory/YYYY-MM-DD.md`** — Daily notes; typical target for compaction “flush to disk.”
-- Optional: more markdown under `memory/` or paths in `memorySearch.extraPaths` (not set in the default template).
-
-Humans and agents edit these files; the index is derived from them.
+- **`MEMORY.md`**: loaded at session start (upstream behavior).
+- **`memory/YYYY-MM-DD.md`**: daily notes; compaction targets.
+- Optional: more under `memory/` or `memorySearch.extraPaths` (unset in template).
 
 ### Layer B — Builtin memory index (SQLite)
 
@@ -80,7 +77,7 @@ This wrapper’s templates use the **builtin** SQLite engine (no `memory.backend
 }
 ```
 
-- **`citations`**: Search snippets may include a `Source:` footer; `auto` is the default ([memory-config](https://docs.openclaw.ai/reference/memory-config)).
+- **`citations`**: Search snippets may include a `Source:` footer; `auto` is the default ([memory-config](https://docs.openclaw.ai/reference/memory-config), Citations / `memory.citations`).
 - **`backend` omitted** → builtin SQLite engine ([builtin engine](https://docs.openclaw.ai/concepts/memory-builtin)).
 
 ### 4.2 `agents.defaults.memorySearch`
@@ -98,55 +95,63 @@ Controls embeddings, store path, hybrid ranking, cache, and optional session ind
 | `cache` | Embedding cache for unchanged chunks. |
 | `experimental.sessionMemory` + `sources` | Session transcripts in search (experimental; see upstream). |
 
-Changing **provider**, **model**, or chunking can require a **full reindex**.
+Changing **provider**, **model**, or chunking can require a **full reindex** ([memory-config](https://docs.openclaw.ai/reference/memory-config)).
 
 ### 4.3 `plugins.entries["memory-core"]`
+
+Per [Memory configuration reference → Dreaming (experimental)](https://docs.openclaw.ai/reference/memory-config#dreaming-experimental), Dreaming is **not** under `agents.defaults.memorySearch`; it lives only under `plugins.entries.memory-core.config.dreaming`. The templates use the same minimal shape as the [Dreaming quick start](https://docs.openclaw.ai/concepts/dreaming) (master switch on; light / deep / REM use their documented defaults until you add `phases` or other keys from the reference):
 
 ```json
 "memory-core": {
   "enabled": true,
   "config": {
     "dreaming": {
-      "mode": "rem"
+      "enabled": true
     }
   }
 }
 ```
 
-Uses **`rem`** with **preset thresholds only** (no overrides): per the [modes table](https://docs.openclaw.ai/concepts/dreaming#dreaming-experimental), that is roughly **every 6 hours**, `minScore` **0.85**, `minRecallCount` **4**, `minUniqueQueries` **3**, `recencyHalfLifeDays` **14**. Add optional keys (`recencyHalfLifeDays`, `maxAgeDays`, `minScore`, `cron`, etc.) only when you want to diverge from that baseline — see [Dreaming](https://docs.openclaw.ai/concepts/dreaming).
+**Docker (`openclaw-secure`):** `setup.sh` / `upgrade.sh` run `patch-openclaw-source.sh` before the image build. That patch adds `dreaming` to bundled `memory-core`’s `configSchema` when upstream still ships an empty `properties` object with `additionalProperties: false` (which incorrectly rejects the official JSON). Rebuild the image after pulling wrapper changes so validation matches the docs.
 
-**Dreaming** (experimental): tracks recall from `memory_search` hits on daily notes and can promote into **`MEMORY.md`** on a schedule. Modes: `off`, `core`, `rem`, `deep` — see the [modes table](https://docs.openclaw.ai/concepts/dreaming#dreaming-experimental). With **`mode` not `off`**, the Control UI usually shows the **Dreams** tab. You can still use **`/dreaming`** commands in chat where supported.
+**Native (`openclaw-raw`):** If your globally installed `openclaw` is a stock npm build without that patch, you may still see `plugins.entries.memory-core.config: invalid config: must NOT have additional properties` until upstream updates the plugin schema or you run a gateway built from patched OpenClaw source. Chat commands from the same doc (`/dreaming on`, etc.) remain available when the feature is present.
 
-**Release vs docs:** OpenClaw **v2026.4.2** ships `memory-core` without Dreaming in the extension and an empty `configSchema`, so this block can fail validation (`must NOT have additional properties`) and the Dreams UI will not appear until you build from a newer revision (e.g. **`origin/main`**) or a release that includes Dreaming. **`setup.sh`** resets the source checkout to **`main`**; **`upgrade.sh`** currently pins the **latest `v*` tag**, which can move you back to a tag without Dreaming.
+Tune **`timezone`**, **`verboseLogging`**, **`storage`**, **`phases.light` / `deep` / `rem`**, **`execution`**, and **`execution.defaults`** using the tables in [memory-config → Dreaming (experimental)](https://docs.openclaw.ai/reference/memory-config#dreaming-experimental).
 
-The **`openclaw memory`** CLI is provided by **memory-core**; it appears only when the CLI and gateway versions match the [memory CLI](https://docs.openclaw.ai/cli/memory) docs. If `openclaw memory` is missing, use agent **`memory_search`** (below) or upgrade/rebuild the image.
+`openclaw memory` requires matching CLI and gateway builds; otherwise use the **`memory_search`** tool or rebuild the image.
 
 ### 4.4 Related settings
 
-- **`agents.defaults.compaction.memoryFlush`** — Nudges durable notes into `memory/YYYY-MM-DD.md` before compaction.
-- **`hooks.internal.entries["session-memory"]`** — Session/memory integration.
+- **`agents.defaults.compaction.memoryFlush`**
+- **`hooks.internal.entries["session-memory"]`**
 
----
+### 4.5 Validation vs [memory-config](https://docs.openclaw.ai/reference/memory-config)
+
+This wrapper’s `config/openclaw.json` and `config/openclaw.native.json` are aligned with the reference as follows (spot-check after edits):
+
+| Reference area | Template alignment |
+|----------------|-------------------|
+| Top-level `memory` | `citations: "auto"`; no `memory.backend` → **builtin** SQLite engine (not QMD). |
+| `agents.defaults.memorySearch` | `provider` / `model` / `fallback`; `remote.baseUrl` + `remote.apiKey` (OpenAI-compatible OpenRouter); `store.path` with `{agentId}`; `query.hybrid` (weights, MMR, temporal decay); `cache.enabled` + `maxEntries`; experimental session indexing (`experimental.sessionMemory`, `sources`, `sync.sessions`). |
+| Dreaming | `plugins.entries.memory-core.config.dreaming.enabled: true` only; optional fields (`phases`, `timezone`, `storage`, …) per [Dreaming (experimental)](https://docs.openclaw.ai/reference/memory-config#dreaming-experimental). |
+
+**Note:** The reference defaults `cache.enabled` to `false`; this template sets **`true`** to avoid re-embedding unchanged chunks ([Embedding cache](https://docs.openclaw.ai/reference/memory-config#embedding-cache)).
 
 ## 5. Environment variables
 
 | Variable | Purpose |
 |----------|---------|
 | `OPENROUTER_API_KEY` | Chat and embeddings (`memorySearch.remote.apiKey`). |
-| `TAVILY_API_KEY` | Tavily web search plugin (not memory vectors). |
-| `OPENCLAW_CONFIG_DIR` | Host dir → `~/.openclaw` in container; holds `openclaw.json` and **`memory/*.sqlite`**. |
-| `OPENCLAW_WORKSPACES_DIR` | Workspaces with `MEMORY.md` and `memory/`. |
-
-Ensure `.env` sets `OPENROUTER_API_KEY` for the secure stack.
-
----
+| `TAVILY_API_KEY` | Tavily plugin (not embeddings). |
+| `OPENCLAW_CONFIG_DIR` | Host config; `openclaw.json` and `memory/*.sqlite` in-container under `~/.openclaw`. |
+| `OPENCLAW_WORKSPACES_DIR` | Agent workspaces (`MEMORY.md`, `memory/`). |
 
 ## 6. Deploying config changes
 
-- **First Docker deploy:** `setup.sh` copies `config/openclaw.json` only if `openclaw.json` is **missing**. Otherwise merge or replace manually, then restart the gateway.
-- **Native:** `openclaw-raw/scripts/setup.sh`; template refresh via **`--sync-config`** in [INSTALL-native.md](../openclaw-raw/docs/INSTALL-native.md).
+- Docker: `setup.sh` copies `config/openclaw.json` only when `openclaw.json` is absent; otherwise merge manually and restart the gateway.
+- Native: `openclaw-raw/scripts/setup.sh`; `--sync-config` in [INSTALL-native.md](../openclaw-raw/docs/INSTALL-native.md).
 
-Greenfield: [INSTALL-docker.md](../openclaw-secure/docs/INSTALL-docker.md) or [INSTALL-native.md](../openclaw-raw/docs/INSTALL-native.md). No mandatory `memory index --force` on first install. After changing embedding **provider** or **model**, run a forced reindex once (§8).
+Install: [INSTALL-docker.md](../openclaw-secure/docs/INSTALL-docker.md), [INSTALL-native.md](../openclaw-raw/docs/INSTALL-native.md). Reindex after changing embedding provider or model (§8).
 
 ---
 
@@ -177,22 +182,15 @@ flowchart LR
   HYB -->|memory_search| AGENT[Agent]
 ```
 
-Dreaming (not shown) may write to **`MEMORY.md`** when enabled.
-
----
-
 ## 8. Verification
-
-With the gateway running and a CLI that exposes **`memory`**:
 
 ```bash
 ./openclaw-secure/scripts/cli.sh memory status --deep
-# Per agent (when supported):
 ./openclaw-secure/scripts/cli.sh memory status --deep --agent mv-coder
 ./openclaw-secure/scripts/cli.sh memory search "your phrase" --agent mv-researcher
 ```
 
-Direct `docker compose` (match your overlays; see `openclaw-secure/scripts/_common.sh`):
+`docker compose` (match local overlays; see `openclaw-secure/scripts/_common.sh`):
 
 ```bash
 cd openclaw-secure
@@ -207,32 +205,21 @@ docker compose -f docker-compose.yml -f docker-compose.secure.yml \
 | `memory status --agent <id>` | Same, scoped to one agent. |
 | `memory index --force` | Full rebuild after provider/model change. |
 | `memory search "phrase"` | End-to-end retrieval test. |
-| `memory search … --min-score 0` | Include weak hybrid matches (short tokens often need this). |
-| `memory search --agent <id> …` | Search one agent’s index. |
-| `memory promote --limit 10` | Preview Dreaming candidates (`--apply` writes `MEMORY.md`). |
+| `memory search … --min-score 0` | Weak hybrid matches (short queries). |
+| `memory search --agent <id> …` | Scoped search. |
+| `memory promote --limit 10` | Dreaming preview (`--apply` writes `MEMORY.md`). |
 
-**Always works (tool path):** put a unique sentence in an agent workspace under `memory/YYYY-MM-DD.md`, then in that agent’s session ask it to run **`memory_search`** for that phrase.
+## 9. Multi-agent isolation
 
----
+Per-agent index: `~/.openclaw/memory/{agentId}.sqlite` on the host under **`OPENCLAW_CONFIG_DIR/memory/`**. Hybrid scoring can filter very short queries; use longer phrases or `--min-score 0`.
 
-## 9. Multi-agent testing
-
-Each entry in `agents.list` gets its **own** workspace and **own** SQLite file:
-
-`~/.openclaw/memory/{agentId}.sqlite` → on the host, under **`OPENCLAW_CONFIG_DIR/memory/`** (e.g. `main.sqlite`, `mv-coder.sqlite`, `mv-researcher.sqlite`, `mv-planner.sqlite`).
-
-Hybrid search uses a **score floor**; tiny tokens (e.g. `plugh`) often score below the default cutoff even when indexed. Prefer **distinct multi-word lines** (or `memory search … --min-score 0` for debugging).
-
-### Example: two agents (`mv-coder` vs `mv-researcher`)
-
-From the **wrapper repo root** (loads `OPENCLAW_WORKSPACES_DIR` from `.env`):
+Example (repo root, `.env` loaded):
 
 ```bash
 set -a && source .env && set +a
 TODAY=$(date +%F)
 mkdir -p "$OPENCLAW_WORKSPACES_DIR/mv-coder/memory" "$OPENCLAW_WORKSPACES_DIR/mv-researcher/memory"
 
-# Long phrases so hybrid search returns hits without lowering min-score
 printf '%s\n' 'MV memory isolation (coder workspace only): QUAILMVCDR7p9k' \
   >>"$OPENCLAW_WORKSPACES_DIR/mv-coder/memory/${TODAY}.md"
 printf '%s\n' 'MV memory isolation (researcher workspace only): VELVETMVRSR4m2n' \
@@ -240,28 +227,13 @@ printf '%s\n' 'MV memory isolation (researcher workspace only): VELVETMVRSR4m2n'
 
 ./openclaw-secure/scripts/cli.sh memory index --force --agent mv-coder
 ./openclaw-secure/scripts/cli.sh memory index --force --agent mv-researcher
-
-# Should return a hit (memory/… chunk)
 ./openclaw-secure/scripts/cli.sh memory search QUAILMVCDR7p9k --agent mv-coder
 ./openclaw-secure/scripts/cli.sh memory search VELVETMVRSR4m2n --agent mv-researcher
-
-# Cross-agent: expect "No matches." — the other agent's note is not in this index
 ./openclaw-secure/scripts/cli.sh memory search VELVETMVRSR4m2n --agent mv-coder
 ./openclaw-secure/scripts/cli.sh memory search QUAILMVCDR7p9k --agent mv-researcher
 ```
 
-**Optional — LLM check** (uses your models / API keys):
-
-```bash
-./openclaw-secure/scripts/cli.sh agent --agent mv-coder --message \
-  "Use memory_search for QUAILMVCDR7p9k and VELVETMVRSR4m2n. Report which phrase appears in this agent's memory and which does not."
-./openclaw-secure/scripts/cli.sh agent --agent mv-researcher --message \
-  "Use memory_search for QUAILMVCDR7p9k and VELVETMVRSR4m2n. Report which phrase appears in this agent's memory and which does not."
-```
-
-**Expect:** each agent reports **its** phrase in memory and **not** the other’s. If **`memorySearch.sources`** includes **`sessions`**, old transcripts can mention both strings — prefer judging isolation from the **file-backed** hits above, or test on a fresh agent pair before long chats.
-
-**Optional:** `ls -la "$OPENCLAW_CONFIG_DIR/memory/"` — one `.sqlite` per agent id after indexing.
+Cross-agent searches should not return the other agent’s line. With `memorySearch.sources` including `sessions`, session text can blur isolation; use file-backed hits or fresh agents to validate.
 
 ---
 
@@ -269,13 +241,12 @@ printf '%s\n' 'MV memory isolation (researcher workspace only): VELVETMVRSR4m2n'
 
 | Symptom | Check |
 |---------|--------|
-| `unknown command 'memory'` | CLI/gateway skew or build without memory-core CLI wiring; use **`memory_search`** via `agent` (§8–§9) or rebuild the image from a current OpenClaw release. |
-| Wrong / missing provider in `memory status` | `OPENROUTER_API_KEY` in container; `remote.baseUrl` and `model`; outbound HTTPS. |
-| Empty search | Files under workspace `memory/`; `memory index --force --agent <id>`; `agentId` matches store path. Very short queries (e.g. one invented word) can score **below** the default hybrid cutoff — try a longer phrase, the full line, or `memory search … --min-score 0`. |
-| CLI / gateway errors | Matching OpenClaw versions; upgrade image or CLI. |
-| Unexpected `MEMORY.md` edits | Dreaming enabled via chat or `config.dreaming`; `/dreaming off` or remove config block. |
-| High embedding usage | Session memory + reindexing; tune or disable `experimental.sessionMemory` / `sync.sessions`. |
+| `unknown command 'memory'` | Version skew; use `memory_search` or rebuild image. |
+| Wrong provider in `memory status` | `OPENROUTER_API_KEY`, `remote.baseUrl`, `model`, HTTPS egress. |
+| Empty search | Workspace `memory/` files; `memory index --force --agent <id>`; longer query or `--min-score 0`. |
+| CLI / gateway errors | Align image and CLI versions. |
+| Unexpected `MEMORY.md` edits | Dreaming; `/dreaming off` or adjust config. |
+| `memory-core.config` / `additional properties` | Docker: rebuild after `upgrade.sh` (schema patch). Native: stock CLI may lack schema fix (§4.3). |
+| High embedding usage | `experimental.sessionMemory` / `sync.sessions`. |
 
----
-
-Keep this document aligned with `config/openclaw.json` and `config/openclaw.native.json` when changing memory settings.
+Keep in sync with `config/openclaw.json` and `config/openclaw.native.json`.

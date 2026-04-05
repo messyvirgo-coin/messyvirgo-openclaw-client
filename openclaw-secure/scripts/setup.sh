@@ -198,16 +198,15 @@ if [[ "${#preserved_env_lines[@]}" -gt 0 ]]; then
   } >>"$ENV_FILE"
 fi
 
+# shellcheck disable=SC1091
+set -a && source "$ENV_FILE" && set +a
+
 info "Cloning/updating OpenClaw source"
-if [[ -d "$OPENCLAW_SRC_DIR/.git" ]]; then
-  git -C "$OPENCLAW_SRC_DIR" remote set-url origin "$OPENCLAW_GIT_REPO"
-  git -C "$OPENCLAW_SRC_DIR" fetch --tags --prune
-  git -C "$OPENCLAW_SRC_DIR" checkout main
-  git -C "$OPENCLAW_SRC_DIR" reset --hard origin/main
-else
+if [[ ! -d "$OPENCLAW_SRC_DIR/.git" ]]; then
   rm -rf "$OPENCLAW_SRC_DIR"
   git clone "$OPENCLAW_GIT_REPO" "$OPENCLAW_SRC_DIR"
 fi
+openclaw_sync_and_checkout_openclaw_source "$OPENCLAW_SRC_DIR" "$OPENCLAW_GIT_REPO"
 
 info "Applying wrapper source patches"
 "$SCRIPT_DIR/patch-openclaw-source.sh" "$OPENCLAW_SRC_DIR"
@@ -248,7 +247,7 @@ if [[ -f "$f" ]]; then
     info "$(basename "$f") already exists at $dest (leaving untouched)"
   fi
 fi
-info "Note: existing config in $OPENCLAW_CONFIG_DIR is preserved; merge template changes manually. Native mode uses config/openclaw.native.json."
+info "Existing config in $OPENCLAW_CONFIG_DIR left unchanged; merge template updates manually if needed."
 
 deploy_workspace_templates \
   "$REPO_ROOT" \
@@ -323,10 +322,8 @@ if ! compose exec -T openclaw-gateway sh -lc 'command -v mcporter >/dev/null 2>&
   die "mcporter is missing in the runtime image. Re-run setup after pulling latest wrapper changes."
 fi
 
-info "Done."
-info "Workspaces root: $OPENCLAW_WORKSPACES_DIR"
-info "Default workspace: $OPENCLAW_WORKSPACE_DIR"
-info "Config/state:    $OPENCLAW_CONFIG_DIR"
-echo ""
-echo "  Dashboard: http://127.0.0.1:${OPENCLAW_GATEWAY_PORT:-18789}/#token=${OPENCLAW_GATEWAY_TOKEN}"
+info "Setup complete."
+printf 'Workspaces: %s\nDefault:      %s\nConfig:       %s\nDashboard:    http://127.0.0.1:%s/#token=%s\n' \
+  "$OPENCLAW_WORKSPACES_DIR" "$OPENCLAW_WORKSPACE_DIR" "$OPENCLAW_CONFIG_DIR" \
+  "${OPENCLAW_GATEWAY_PORT:-18789}" "$OPENCLAW_GATEWAY_TOKEN"
 echo ""

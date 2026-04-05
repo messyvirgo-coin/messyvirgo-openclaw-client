@@ -8,9 +8,7 @@ source "$SCRIPT_DIR/_common.sh"
 ensure_docker_running
 load_env
 
-info "Opening interactive shell in openclaw-cli container"
-info "This will create an 'openclaw' helper inside the shell."
-info "Type 'openclaw --help' to see available commands."
+info "openclaw-cli: interactive shell (run: openclaw --help)"
 
 # The service entrypoint is the OpenClaw CLI; override it to get a shell.
 # Also add a helper so `openclaw ...` works (the CLI is `node /app/openclaw.mjs`).
