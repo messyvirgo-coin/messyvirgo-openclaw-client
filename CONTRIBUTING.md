@@ -1,14 +1,12 @@
-# Contributing to messyvirgo-openclaw-client
+# Contributing to OpenClaw
 
-Thanks for your interest in contributing to Messy Virgo.
+Thanks for your interest in contributing to OpenClaw.
 
-This repository is a **wrapper** for [OpenClaw](https://github.com/openclaw/openclaw) with two deployment modes: **openclaw-secure** (Docker) and **openclaw-raw** (native).
-
-Contributions are welcome (including Windows support), but please note:
+Contributions are welcome, but please note:
 
 - This repo is public and open to PRs, **but not every PR will be merged**.
 - Maintainers keep final say on scope, design, and what gets shipped.
-- Support is **best-effort** only (see [SUPPORT.md](./SUPPORT.md)).
+- Support is **best-effort** only.
 
 ## Ground rules
 
@@ -19,23 +17,20 @@ Contributions are welcome (including Windows support), but please note:
 
 ## What kinds of contributions we welcome
 
-- Fixes for installation/UX issues in `docs/`, `openclaw-secure/`, or `openclaw-raw/`
-- Bug fixes (especially around Docker networking differences across Linux/macOS)
-- Improvements to hardening (without breaking usability)
-- New platform support (e.g. Windows scripts), with clear documentation
+- Fixes for installation and UX issues in `docs/`, `openclaw-secure/`, or `openclaw-raw/`
+- Bug fixes, especially around Docker networking differences across Linux and macOS
+- Improvements to hardening without breaking usability
+- New platform support, with clear documentation
 
-## Contribution boundaries (important)
+## Contribution boundaries
 
-- This repo provides a local wrapper. It is **not** the upstream OpenClaw project.
-  - Upstream issues/feature requests should generally go to OpenClaw.
 - The maintainers may decline changes that increase maintenance burden, reduce security, or expand scope.
 
 ## Pull request checklist
 
 - Explain intent: what problem does this solve?
-- Add/update docs if the user workflow changes.
-- Test on at least one platform (Linux or macOS) and describe what you ran.
-  - If you can’t test, say so explicitly.
+- Add or update docs if the user workflow changes.
+- Test on at least one platform and describe what you ran.
 - Double-check you did **not** commit `.env`, tokens, or local paths.
 
 ## Maintainers

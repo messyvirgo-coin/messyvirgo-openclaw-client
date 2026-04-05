@@ -1,13 +1,11 @@
 # Uninstall (Linux + macOS)
 
-This guide applies to both Linux and macOS. You do **not** need separate uninstall files.
-
-The wrapper reset script is cross-platform and already handles platform-specific compose behavior.
+This guide applies to both Linux and macOS.
 
 ## 1) Go to the wrapper repo
 
 ```bash
-cd /path/to/messyvirgo-openclaw-client
+cd /path/to/openclaw
 ```
 
 ## 2) Stop running containers

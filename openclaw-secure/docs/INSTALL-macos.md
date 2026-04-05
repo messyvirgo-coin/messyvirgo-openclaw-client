@@ -1,6 +1,6 @@
 # macOS install (beginner-friendly)
 
-This guide always starts with the secure OpenClaw client in this repo, then optionally shows how to install Messy Virgo agents and connect Telegram:
+This guide covers OpenClaw setup, then optionally shows how to install Messy Virgo agents and connect Telegram:
 
 - installing the OpenClaw-secure wrapper
 - opening the dashboard
@@ -24,11 +24,11 @@ docker info
 docker compose version
 ```
 
-If you still need to clone the repo:
+Clone the repo:
 
 ```bash
-git clone https://github.com/messyvirgo-coin/messyvirgo-openclaw-client.git
-cd messyvirgo-openclaw-client
+git clone https://github.com/openclaw/openclaw.git
+cd openclaw
 ```
 
 ## 1) Prepare `.env`
@@ -198,7 +198,7 @@ In your local checkout of the agent repo (set the real path to this client repo)
 
 ```bash
 set -a
-source /path/to/messyvirgo-openclaw-client/.env
+source /path/to/openclaw/.env
 set +a
 ./scripts/install.sh --target wrapper --profile <profile>
 ```
@@ -209,12 +209,12 @@ Example for `mv-t1` profile:
 
 ```bash
 set -a
-source ../messyvirgo-openclaw-client/.env
+source ../openclaw/.env
 set +a
 ./scripts/install.sh --target wrapper --profile mv-t1
 ```
 
-Return to your local `messyvirgo-openclaw-client` checkout after the pack install and restart the gateway to be on the safe side:
+Return to your local checkout after the pack install and restart the gateway:
 
 ```bash
 ./openclaw-secure/scripts/down.sh

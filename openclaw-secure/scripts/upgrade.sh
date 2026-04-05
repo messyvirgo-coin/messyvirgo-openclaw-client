@@ -79,11 +79,19 @@ if [[ ! -d "$OPENCLAW_SRC_DIR/.git" ]]; then
   die "No git repo at $OPENCLAW_SRC_DIR. Run ./openclaw-secure/scripts/setup.sh first."
 fi
 
-info "Syncing OpenClaw source to origin/main (discards local edits under OPENCLAW_SRC_DIR)"
+info "Fetching OpenClaw release tags"
 git -C "$OPENCLAW_SRC_DIR" remote set-url origin "$OPENCLAW_GIT_REPO"
-git -C "$OPENCLAW_SRC_DIR" fetch --tags --prune
-git -C "$OPENCLAW_SRC_DIR" checkout main
-git -C "$OPENCLAW_SRC_DIR" reset --hard origin/main
+git -C "$OPENCLAW_SRC_DIR" fetch --tags --prune origin
+
+LATEST_RELEASE_TAG="$(
+  git -C "$OPENCLAW_SRC_DIR" tag -l 'v*' --sort=-v:refname | head -n 1
+)"
+if [[ -z "$LATEST_RELEASE_TAG" ]]; then
+  die "No release tags found in $OPENCLAW_SRC_DIR"
+fi
+
+info "Checking out latest release tag ($LATEST_RELEASE_TAG)"
+git -C "$OPENCLAW_SRC_DIR" checkout --force "$LATEST_RELEASE_TAG"
 
 info "Applying wrapper source patches"
 "$SCRIPT_DIR/patch-openclaw-source.sh" "$OPENCLAW_SRC_DIR"

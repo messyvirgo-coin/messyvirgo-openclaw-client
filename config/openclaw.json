@@ -4,14 +4,18 @@
       "mode": "minimal"
     }
   },
+
   "logging": {
-    "redactSensitive": "tools"
+    "redactSensitive": "all"
   },
+
   "tools": {
     "web": {
       "search": {
-        "provider": "brave",
-        "apiKey": "${BRAVE_API_KEY}",
+        "provider": "tavily",
+        "tavily": {
+          "apiKey": "${TAVILY_API_KEY}"
+        },
         "maxResults": 5,
         "timeoutSeconds": 30
       },
@@ -20,9 +24,40 @@
       }
     }
   },
+
   "session": {
     "dmScope": "per-channel-peer"
   },
+
+  "memory": {
+    "backend": "qmd",
+    "citations": "auto",
+    "qmd": {
+      "includeDefaultMemory": true,
+      "searchMode": "search",
+      "update": {
+        "interval": "5m",
+        "debounceMs": 15000,
+        "onBoot": true,
+        "waitForBootSync": false
+      },
+      "limits": {
+        "maxResults": 6,
+        "maxSnippetChars": 700,
+        "timeoutMs": 4000
+      },
+      "scope": {
+        "default": "deny",
+        "rules": [
+          {
+            "action": "allow",
+            "match": { "chatType": "direct" }
+          }
+        ]
+      }
+    }
+  },
+
   "models": {
     "mode": "merge",
     "providers": {
@@ -31,12 +66,6 @@
         "apiKey": "${OPENROUTER_API_KEY}",
         "api": "openai-completions",
         "models": [
-          {
-            "id": "minimax/minimax-m2.5",
-            "name": "MiniMax M2.5",
-            "contextWindow": 205000,
-            "maxTokens": 8192
-          },
           {
             "id": "google/gemini-2.5-flash-lite",
             "name": "Gemini Flash-Lite",
@@ -62,26 +91,8 @@
             "maxTokens": 8192
           },
           {
-            "id": "deepseek/deepseek-v3.2",
-            "name": "DeepSeek V3.2",
-            "contextWindow": 164000,
-            "maxTokens": 8192
-          },
-          {
-            "id": "moonshotai/kimi-k2.5",
-            "name": "Kimi K2.5",
-            "contextWindow": 262000,
-            "maxTokens": 8192
-          },
-          {
-            "id": "z-ai/glm-5",
-            "name": "GLM-5",
-            "contextWindow": 205000,
-            "maxTokens": 8192
-          },
-          {
-            "id": "openai/gpt-5-mini",
-            "name": "GPT-5 Mini",
+            "id": "openai/gpt-5.4-mini",
+            "name": "GPT-5.4 Mini",
             "contextWindow": 128000,
             "maxTokens": 8192
           },
@@ -90,66 +101,105 @@
             "name": "Grok 4.1 Fast",
             "contextWindow": 256000,
             "maxTokens": 8192
+          },
+          {
+            "id": "minimax/minimax-m2.5",
+            "name": "MiniMax M2.5",
+            "reasoning": true,
+            "contextWindow": 196608,
+            "maxTokens": 8192
+          },
+          {
+            "id": "moonshotai/kimi-k2.5",
+            "name": "Kimi K2.5",
+            "reasoning": true,
+            "contextWindow": 262144,
+            "maxTokens": 8192
           }
         ]
       }
     }
   },
+
   "agents": {
     "defaults": {
       "thinkingDefault": "low",
-      "contextTokens": 50000,
+      "contextTokens": 200000,
+
+      "memorySearch": {
+        "enabled": true,
+        "provider": "local",
+        "local": {
+          "modelPath": "hf:ggml-org/embeddinggemma-300m-qat-q8_0-GGUF/embeddinggemma-300m-qat-Q8_0.gguf"
+        },
+        "query": {
+          "hybrid": {
+            "enabled": true,
+            "vectorWeight": 0.7,
+            "textWeight": 0.3,
+            "mmr": {
+              "enabled": true,
+              "lambda": 0.7
+            },
+            "temporalDecay": {
+              "enabled": true,
+              "halfLifeDays": 30
+            }
+          }
+        },
+        "cache": {
+          "enabled": true
+        }
+      },
+
       "contextPruning": {
         "mode": "cache-ttl",
-        "ttl": "1h"
+        "ttl": "10m",
+        "keepLastAssistants": 4,
+        "softTrimRatio": 0.65,
+        "hardClearRatio": 0.88,
+        "minPrunableToolChars": 1200
       },
+
       "compaction": {
-        "mode": "safeguard",
-        "reserveTokensFloor": 32000,
+        "mode": "default",
+        "reserveTokensFloor": 40000,
+        "keepRecentTokens": 20000,
+        "maxHistoryShare": 0.65,
+        "model": "openrouter/google/gemini-2.5-flash-lite",
         "memoryFlush": {
           "enabled": true,
-          "softThresholdTokens": 4000
-        }        
+          "softThresholdTokens": 4000,
+          "systemPrompt": "Session nearing compaction. Store durable memories now.",
+          "prompt": "Write any lasting notes to memory/YYYY-MM-DD.md; reply with NO_REPLY if nothing to store."
+        }
       },
+
       "heartbeat": {
-        "every": "55m",
+        "every": "30m",
         "model": "openrouter/google/gemini-2.5-flash-lite",
-        "target": "last"
+        "target": "last",
+        "lightContext": true,
+        "isolatedSession": true
       },
+
       "subagents": {
         "maxConcurrent": 8
       },
+
       "workspace": "/home/node/workspaces/main",
+
       "model": {
         "primary": "openrouter/x-ai/grok-4.1-fast"
       },
+
       "models": {
         "openrouter/x-ai/grok-4.1-fast": {
           "alias": "or-grok",
           "params": { "temperature": 0.2 }
         },
-        "openrouter/minimax/minimax-m2.5": {
-          "alias": "or-minimax",
-          "params": { "temperature": 0.2 }
-        },
         "openrouter/google/gemini-2.5-flash-lite": {
           "alias": "or-flashlite",
-          "params": { "temperature": 0.2 }
-        },
-        "openrouter/google/gemini-2.5-flash": {
-          "alias": "or-flash",
-          "params": { "temperature": 0.2 }
-        },
-        "openrouter/deepseek/deepseek-v3.2": {
-          "alias": "or-deepseek",
-          "params": { "temperature": 0.2 }
-        },
-        "openrouter/moonshotai/kimi-k2.5": {
-          "alias": "or-kimi",
-          "params": { "temperature": 0.2 }
-        },
-        "openrouter/z-ai/glm-5": {
-          "alias": "or-glm",
           "params": { "temperature": 0.2 }
         },
         "openrouter/anthropic/claude-haiku-4-5": {
@@ -164,28 +214,44 @@
           "alias": "or-opus",
           "params": { "temperature": 0.2 }
         },
-        "openrouter/openai/gpt-5-mini": {
+        "openrouter/openai/gpt-5.4-mini": {
           "alias": "or-gpt",
+          "params": { "temperature": 0.2 }
+        },
+        "openrouter/minimax/minimax-m2.5": {
+          "alias": "or-minimax",
+          "params": { "temperature": 0.2 }
+        },
+        "openrouter/moonshotai/kimi-k2.5": {
+          "alias": "or-kimi",
           "params": { "temperature": 0.2 }
         }
       },
+
       "sandbox": {
-        "mode": "off",
+        "mode": "all",
         "scope": "session",
-        "workspaceAccess": "rw",
+        "workspaceAccess": "none",
         "workspaceRoot": "~/.openclaw/sandboxes",
+        "network": {
+          "outbound": "allow",
+          "localhost": "allow"
+        },
         "prune": {
-          "idleHours": 24,
-          "maxAgeDays": 7
+          "idleHours": 12,
+          "maxAgeDays": 3
         }
       }
     },
+
     "list": [
       {
         "id": "main",
         "default": true,
         "name": "Messy Virgo",
-        "identity": { "name": "Messy Virgo" },
+        "identity": {
+          "name": "Messy Virgo"
+        },
         "workspace": "/home/node/workspaces/main",
         "model": "openrouter/x-ai/grok-4.1-fast",
         "subagents": {
@@ -195,9 +261,12 @@
       {
         "id": "mv-coder",
         "name": "Messy Michael (Coder)",
-        "identity": { "name": "Messy Michael (Coder)" },
+        "identity": {
+          "name": "Messy Michael (Coder)"
+        },
         "workspace": "/home/node/workspaces/mv-coder",
         "model": "openrouter/minimax/minimax-m2.5",
+        "thinkingDefault": "medium",
         "subagents": {
           "thinking": "medium"
         }
@@ -205,9 +274,12 @@
       {
         "id": "mv-researcher",
         "name": "Messy Anna (Researcher)",
-        "identity": { "name": "Messy Anna (Researcher)" },
+        "identity": {
+          "name": "Messy Anna (Researcher)"
+        },
         "workspace": "/home/node/workspaces/mv-researcher",
         "model": "openrouter/x-ai/grok-4.1-fast",
+        "thinkingDefault": "high",
         "subagents": {
           "thinking": "high"
         }
@@ -215,18 +287,22 @@
       {
         "id": "mv-planner",
         "name": "Messy Franco (Planner)",
-        "identity": { "name": "Messy Franco (Planner)" },
+        "identity": {
+          "name": "Messy Franco (Planner)"
+        },
         "workspace": "/home/node/workspaces/mv-planner",
         "model": "openrouter/moonshotai/kimi-k2.5",
+        "thinkingDefault": "high",
         "subagents": {
           "thinking": "high"
         }
       }
     ]
   },
+
   "gateway": {
     "mode": "local",
-    "bind": "lan",
+    "bind": "loopback",
     "auth": {
       "mode": "token",
       "token": "${OPENCLAW_GATEWAY_TOKEN}",
@@ -248,12 +324,14 @@
       "resetOnExit": false
     }
   },
+
   "commands": {
     "native": "auto",
     "nativeSkills": "auto",
     "restart": true,
     "ownerDisplay": "raw"
   },
+
   "channels": {
     "telegram": {
       "enabled": true,
@@ -262,6 +340,7 @@
       "streaming": "partial"
     }
   },
+
   "hooks": {
     "internal": {
       "enabled": true,
@@ -272,12 +351,16 @@
       }
     }
   },
+
   "skills": {
     "load": {
-      "extraDirs": ["/home/node/custom-skills"],
+      "extraDirs": [
+        "/home/node/custom-skills"
+      ],
       "watch": true
     }
   },
+
   "plugins": {
     "entries": {
       "telegram": {
