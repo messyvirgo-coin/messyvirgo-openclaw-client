@@ -6,16 +6,13 @@
   },
 
   "logging": {
-    "redactSensitive": "all"
+    "redactSensitive": "tools"
   },
 
   "tools": {
     "web": {
       "search": {
         "provider": "tavily",
-        "tavily": {
-          "apiKey": "${TAVILY_API_KEY}"
-        },
         "maxResults": 5,
         "timeoutSeconds": 30
       },
@@ -233,10 +230,6 @@
         "scope": "session",
         "workspaceAccess": "none",
         "workspaceRoot": "~/.openclaw/sandboxes",
-        "network": {
-          "outbound": "allow",
-          "localhost": "allow"
-        },
         "prune": {
           "idleHours": 12,
           "maxAgeDays": 3
@@ -365,6 +358,14 @@
     "entries": {
       "telegram": {
         "enabled": true
+      },
+      "tavily": {
+        "enabled": true,
+        "config": {
+          "webSearch": {
+            "apiKey": "${TAVILY_API_KEY}"
+          }
+        }
       }
     }
   }

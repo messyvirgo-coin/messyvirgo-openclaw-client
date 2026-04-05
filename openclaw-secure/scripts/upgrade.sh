@@ -97,8 +97,14 @@ info "Applying wrapper source patches"
 "$SCRIPT_DIR/patch-openclaw-source.sh" "$OPENCLAW_SRC_DIR"
 
 info "Rebuilding Docker image ($OPENCLAW_IMAGE)"
+OPENCLAW_DOCKER_BUILD_EXTRA_ARGS=()
+if [[ -n "${OPENCLAW_NODE_BOOKWORM_IMAGE:-}" ]]; then
+  OPENCLAW_DOCKER_BUILD_EXTRA_ARGS+=(--build-arg "OPENCLAW_NODE_BOOKWORM_IMAGE=$OPENCLAW_NODE_BOOKWORM_IMAGE")
+  info "OpenClaw Dockerfile base: OPENCLAW_NODE_BOOKWORM_IMAGE=$OPENCLAW_NODE_BOOKWORM_IMAGE"
+fi
 docker build \
   --build-arg "OPENCLAW_DOCKER_APT_PACKAGES=${OPENCLAW_DOCKER_APT_PACKAGES:-jq}" \
+  "${OPENCLAW_DOCKER_BUILD_EXTRA_ARGS[@]}" \
   -t "$OPENCLAW_IMAGE" \
   -f "$OPENCLAW_SRC_DIR/Dockerfile" \
   "$OPENCLAW_SRC_DIR"
