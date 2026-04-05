@@ -2,25 +2,28 @@
 
 This guide sets up OpenClaw to run directly on the host (no containers), using this repo's configuration, models, agents, and skills.
 
-Use the **openclaw-secure** (Docker) path if you prefer container isolation. Use **openclaw-raw** when you want lower latency, easier debugging, or run where Docker is not available.
+For **Docker**, use [../openclaw-secure/docs/INSTALL-docker.md](../openclaw-secure/docs/INSTALL-docker.md). Use **openclaw-raw** when you want lower latency, easier debugging, or Docker is unavailable.
 
 ## Prerequisites
 
-- Node.js 18+ and npm
+- **Node.js** and npm compatible with your installed `openclaw` CLI (check `openclaw --help` / [upstream OpenClaw](https://github.com/openclaw/openclaw) release notes if unsure)
 - OpenClaw installed globally: `npm install -g openclaw`
-- This repo cloned locally
+- This **wrapper** repo cloned locally
 
 ## 1) Prepare `.env`
 
-From the repo root:
+All wrapper scripts read **one file** at the repo root — **`.env`**.
 
 ```bash
-cp .env.example .env
+cp .env.raw.example .env
 ```
+
+(`openclaw-secure` / Docker uses [`.env.secure.example`](../../.env.secure.example) instead — same `.env` name, different template.)
 
 Edit `.env` and set:
 
-- `OPENROUTER_API_KEY`, `BRAVE_API_KEY` (for model providers you use)
+- `OPENROUTER_API_KEY` (chat models **and** semantic memory embeddings — same key), `BRAVE_API_KEY` (if used)
+- `TAVILY_API_KEY` if you use the Tavily plugin in `config/openclaw.native.json`
 - `OPENCLAW_WORKSPACES_DIR` (default: `$HOME/OpenClawWorkspaces`)
 - `OPENCLAW_SKILLS_DIR` (optional; use relative `skills` for portability, or leave empty to default to `<repo>/skills`)
 - `OPENCLAW_CONFIG_DIR` (default: `$HOME/.openclaw`)
@@ -33,7 +36,7 @@ Edit `.env` and set:
 ./openclaw-raw/scripts/setup.sh
 ```
 
-This creates the config directory, copies `config/openclaw.native.json` to `$OPENCLAW_CONFIG_DIR/openclaw.json`, deploys workspace templates, and generates a gateway token if missing.
+This creates the config directory, copies `config/openclaw.native.json` to `$OPENCLAW_CONFIG_DIR/openclaw.json`, deploys workspace templates, and generates a gateway token if missing. That template already includes the **builtin** memory stack (no separate memory bootstrap step).
 
 ## 3) Start the gateway
 
@@ -143,3 +146,15 @@ Options:
 - `--dry-run` – Show what would change without applying
 
 **Troubleshooting:** If you see `missing env var "OPENCLAW_SKILLS_DIR"` when running `openclaw` directly, the config still references the old template. Run `./openclaw-raw/scripts/upgrade.sh --sync-config` to update it (creates a backup). Skills from `OPENCLAW_SKILLS_DIR` are optional.
+
+## Semantic memory (native)
+
+There is **no additional install step** for memory beyond bootstrap (`setup.sh`) and a valid **`OPENROUTER_API_KEY`**. Native and Docker both use the **builtin** engine + **OpenRouter** embeddings defined in the repo templates.
+
+**Optional verification** (gateway running, from repo root):
+
+```bash
+./openclaw-raw/scripts/cli.sh memory status --deep
+```
+
+You do **not** need `memory index --force` on a fresh install unless you are debugging or you **changed** embedding provider/model and want a full rebuild (see **[../../docs/MEMORY.md](../../docs/MEMORY.md)** §6 and §8).

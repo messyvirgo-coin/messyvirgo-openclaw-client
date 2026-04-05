@@ -1,11 +1,11 @@
 # Uninstall (Linux + macOS)
 
-This guide applies to both Linux and macOS.
+This guide applies to both Linux and macOS. It removes **this wrapper’s** Docker stack and optional host data paths from `.env`—not upstream OpenClaw’s public repo.
 
 ## 1) Go to the wrapper repo
 
 ```bash
-cd /path/to/openclaw
+cd /path/to/this-wrapper-repo
 ```
 
 ## 2) Stop running containers

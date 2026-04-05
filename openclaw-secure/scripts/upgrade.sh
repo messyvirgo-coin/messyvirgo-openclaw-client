@@ -28,6 +28,11 @@ while [[ $# -gt 0 ]]; do
       cat <<'EOF'
 Usage: ./openclaw-secure/scripts/upgrade.sh [options]
 
+Environment (from .env):
+  OPENCLAW_GIT_REF   Optional. When set, check out this branch or tag after fetch instead of
+                     the latest v* release tag. Example: main (Dreaming / memory-core config
+                     schema may require a revision newer than the latest v* tag).
+
 Options:
   --sync-workspaces    Overwrite changed workspace templates (creates .bak timestamped backups)
   --sync-config        Overwrite changed config templates (creates .bak timestamped backups)
@@ -79,22 +84,31 @@ if [[ ! -d "$OPENCLAW_SRC_DIR/.git" ]]; then
   die "No git repo at $OPENCLAW_SRC_DIR. Run ./openclaw-secure/scripts/setup.sh first."
 fi
 
-info "Fetching OpenClaw release tags"
+info "Fetching OpenClaw from origin"
 git -C "$OPENCLAW_SRC_DIR" remote set-url origin "$OPENCLAW_GIT_REPO"
 git -C "$OPENCLAW_SRC_DIR" fetch --tags --prune origin
 
-LATEST_RELEASE_TAG="$(
-  git -C "$OPENCLAW_SRC_DIR" tag -l 'v*' --sort=-v:refname | head -n 1
-)"
-if [[ -z "$LATEST_RELEASE_TAG" ]]; then
-  die "No release tags found in $OPENCLAW_SRC_DIR"
+if [[ -n "${OPENCLAW_GIT_REF:-}" ]]; then
+  info "Checking out OPENCLAW_GIT_REF=$OPENCLAW_GIT_REF (see .env; overrides latest v* tag)"
+  git -C "$OPENCLAW_SRC_DIR" checkout --force "$OPENCLAW_GIT_REF"
+  if git -C "$OPENCLAW_SRC_DIR" rev-parse "origin/${OPENCLAW_GIT_REF}" >/dev/null 2>&1; then
+    git -C "$OPENCLAW_SRC_DIR" reset --hard "origin/${OPENCLAW_GIT_REF}"
+  fi
+else
+  LATEST_RELEASE_TAG="$(
+    git -C "$OPENCLAW_SRC_DIR" tag -l 'v*' --sort=-v:refname | head -n 1
+  )"
+  if [[ -z "$LATEST_RELEASE_TAG" ]]; then
+    die "No release tags found in $OPENCLAW_SRC_DIR"
+  fi
+  info "Checking out latest release tag ($LATEST_RELEASE_TAG)"
+  git -C "$OPENCLAW_SRC_DIR" checkout --force "$LATEST_RELEASE_TAG"
 fi
-
-info "Checking out latest release tag ($LATEST_RELEASE_TAG)"
-git -C "$OPENCLAW_SRC_DIR" checkout --force "$LATEST_RELEASE_TAG"
 
 info "Applying wrapper source patches"
 "$SCRIPT_DIR/patch-openclaw-source.sh" "$OPENCLAW_SRC_DIR"
+
+refresh_openclaw_pnpm_lockfile "$OPENCLAW_SRC_DIR"
 
 info "Rebuilding Docker image ($OPENCLAW_IMAGE)"
 OPENCLAW_DOCKER_BUILD_EXTRA_ARGS=()

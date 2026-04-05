@@ -107,6 +107,24 @@ ensure_docker_running() {
   fi
 }
 
+# OpenClaw's Dockerfile runs `CI=true pnpm prune --prod`; under CI, pnpm treats the lockfile as frozen.
+# If upstream changes package.json before pnpm-lock.yaml catches up, the image build fails with
+# ERR_PNPM_OUTDATED_LOCKFILE. Running `pnpm install` on the host refreshes the lockfile before docker build.
+refresh_openclaw_pnpm_lockfile() {
+  local src="${1:?}"
+  if ! command -v pnpm >/dev/null 2>&1; then
+    info "pnpm not on PATH; if the image build fails with ERR_PNPM_OUTDATED_LOCKFILE, run: (cd \"$src\" && corepack enable && pnpm install), then re-run."
+    return 0
+  fi
+  info "Syncing pnpm lockfile in OpenClaw source (avoids stale-lockfile failures during image build)"
+  (
+    cd "$src" || exit 1
+    export COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+    corepack enable >/dev/null 2>&1 || true
+    pnpm install
+  ) || die "pnpm install failed in $src (could not refresh lockfile)"
+}
+
 workspace_dir_for_agent() {
   local workspace_root="$1"
   local agent_id="$2"

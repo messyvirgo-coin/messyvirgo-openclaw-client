@@ -1,6 +1,7 @@
 .env
 .env.*
-!.env.example
+!.env.secure.example
+!.env.raw.example
 
 # Local clones/build artifacts (created by openclaw-secure/scripts/setup.sh)
 .openclaw-src/

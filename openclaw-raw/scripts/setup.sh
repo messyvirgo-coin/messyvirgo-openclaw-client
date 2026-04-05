@@ -15,11 +15,11 @@ CONFIG_SRC="$REPO_ROOT/config/openclaw.native.json"
 
 # Ensure .env exists
 if [[ ! -f "$ENV_FILE" ]]; then
-  if [[ -f "$REPO_ROOT/.env.example" ]]; then
-    cp "$REPO_ROOT/.env.example" "$ENV_FILE"
-    info "Created $ENV_FILE from .env.example"
+  if [[ -f "$REPO_ROOT/.env.raw.example" ]]; then
+    cp "$REPO_ROOT/.env.raw.example" "$ENV_FILE"
+    info "Created $ENV_FILE from .env.raw.example"
   else
-    die "Missing .env.example. Create .env with OPENCLAW_WORKSPACES_DIR, OPENCLAW_SKILLS_DIR, API keys, and OPENCLAW_GATEWAY_TOKEN."
+    die "Missing .env.raw.example. Create .env with OPENCLAW_WORKSPACES_DIR, OPENCLAW_SKILLS_DIR, API keys, and OPENCLAW_GATEWAY_TOKEN."
   fi
 fi
 
@@ -72,7 +72,7 @@ if [[ -z "${OPENCLAW_GATEWAY_TOKEN:-}" ]]; then
     OPENCLAW_GATEWAY_TOKEN="$(python3 -c 'import secrets; print(secrets.token_hex(32))')"
   fi
   # Replace any existing OPENCLAW_GATEWAY_TOKEN line(s) to avoid duplicate keys
-  # (.env.example already has OPENCLAW_GATEWAY_TOKEN=; appending would create a duplicate)
+  # (.env.raw.example already has OPENCLAW_GATEWAY_TOKEN=; appending would create a duplicate)
   if grep -q '^OPENCLAW_GATEWAY_TOKEN=' "$ENV_FILE" 2>/dev/null; then
     grep -v '^OPENCLAW_GATEWAY_TOKEN=' "$ENV_FILE" > "${ENV_FILE}.tmp"
     mv "${ENV_FILE}.tmp" "$ENV_FILE"

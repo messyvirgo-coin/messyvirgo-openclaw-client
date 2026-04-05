@@ -88,10 +88,10 @@ ensure_docker_running
 
 info "Preparing .env"
 if [[ ! -f "$ENV_FILE" ]]; then
-  if [[ -f "$REPO_ROOT/.env.example" ]]; then
-    cp "$REPO_ROOT/.env.example" "$ENV_FILE"
+  if [[ -f "$REPO_ROOT/.env.secure.example" ]]; then
+    cp "$REPO_ROOT/.env.secure.example" "$ENV_FILE"
   else
-    die "Missing .env.example (repo incomplete)."
+    die "Missing .env.secure.example (repo incomplete)."
   fi
 fi
 
@@ -212,6 +212,8 @@ fi
 info "Applying wrapper source patches"
 "$SCRIPT_DIR/patch-openclaw-source.sh" "$OPENCLAW_SRC_DIR"
 
+refresh_openclaw_pnpm_lockfile "$OPENCLAW_SRC_DIR"
+
 info "Building Docker image ($OPENCLAW_IMAGE)"
 OPENCLAW_DOCKER_BUILD_EXTRA_ARGS=()
 if [[ -n "${OPENCLAW_NODE_BOOKWORM_IMAGE:-}" ]]; then
@@ -299,11 +301,18 @@ required_rate = {
 if not isinstance(rate, dict) or rate != required_rate:
     auth["rateLimit"] = required_rate
     changed = True
+# Gateway container has no Docker CLI/socket; tool sandboxing cannot spawn nested containers.
+agents = cfg.setdefault("agents", {})
+defaults = agents.setdefault("defaults", {})
+sb = defaults.setdefault("sandbox", {})
+if sb.get("mode") != "off":
+    sb["mode"] = "off"
+    changed = True
 if changed:
     with open(path, "w") as f:
         json.dump(cfg, f, indent=2)
         f.write("\n")
-    print("==> Patched gateway config in " + path)
+    print("==> Patched gateway/sandbox config in " + path)
 PY
 fi
 

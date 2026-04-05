@@ -19,8 +19,8 @@ Do not commit real bot tokens. Add them to `.env` or paste only when prompted by
 ## 2) Prerequisites
 
 - Gateway running (Docker or native).
-- Agent pack installed (e.g. Messy Virgo from `messyvirgo-openclaw-agents`).
-- `.env` loaded with `MESSY_VIRGO_API_KEY` and `MESSY_VIRGO_MCP_URL` if your agents need them.
+- An agent profile in config to bind the channel to (wrapper defaults include several agents; Messy Virgo pack agents are optional).
+- If you use Messy Virgo MCP tools, set `MESSY_VIRGO_API_KEY` and `MESSY_VIRGO_MCP_URL` in `.env` (see the agent pack docs).
 
 ## 3) Register the channel
 

@@ -27,7 +27,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/_common.sh"
 
 usage() {
-  sed -n '1,120p' "$0" | sed -n '1,120p' | sed 's/^# \{0,1\}//'
+  sed -n '1,120p' "$0" | sed 's/^# \{0,1\}//'
 }
 
 YES=0
