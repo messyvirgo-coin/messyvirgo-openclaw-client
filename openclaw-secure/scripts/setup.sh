@@ -198,7 +198,7 @@ if [[ "${#preserved_env_lines[@]}" -gt 0 ]]; then
   } >>"$ENV_FILE"
 fi
 
-# shellcheck disable=SC1091
+# shellcheck disable=SC1090,SC1091
 set -a && source "$ENV_FILE" && set +a
 
 info "Cloning/updating OpenClaw source"
