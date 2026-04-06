@@ -1,0 +1,11 @@
+---
+description: description: Always consult OpenClaw documentation
+alwaysApply: true
+---
+
+# OpenClaw Documentation Check
+
+- Before changing or explaining any OpenClaw configuration, feature, schema, plugin, channel, gateway, or runtime behavior, consult the official documentation at <https://docs.openclaw.ai/>.
+- Treat the official docs as the source of truth for valid keys, supported options, defaults, and current behavior.
+- If local code, memory, or assumptions conflict with the docs, follow the docs and call out the discrepancy.
+- Use docs-backed terminology when naming config fields or describing behavior.
