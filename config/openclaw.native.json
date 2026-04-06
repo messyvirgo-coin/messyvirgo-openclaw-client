@@ -320,9 +320,10 @@
   "channels": {
     "telegram": {
       "enabled": true,
+      "defaultAccount": "main",
       "dmPolicy": "pairing",
       "groupPolicy": "allowlist",
-      "streaming": "partial"
+      "streaming": "off"
     }
   },
 

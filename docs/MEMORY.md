@@ -1,5 +1,7 @@
 # Memory (wrapper defaults)
 
+See [OPENCLAW.md](OPENCLAW.md) for how wrapper docs fit together.
+
 Semantic memory: workspace files, builtin SQLite index, `memory-core`, env vars, deployment. Upstream docs:
 
 - [Memory overview](https://docs.openclaw.ai/concepts/memory)

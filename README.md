@@ -56,7 +56,7 @@ Set **`OPENCLAW_GIT_REF=main`** in `.env` to track the moving default branch ins
 ./openclaw-secure/scripts/upgrade.sh --sync-config
 ```
 
-Reference: [openclaw-secure/docs/VERIFY.md](openclaw-secure/docs/VERIFY.md) · [docs/MEMORY.md](docs/MEMORY.md) · [docs/PLUGINS.md](docs/PLUGINS.md) · [docs/TELEGRAM.md](docs/TELEGRAM.md)
+OpenClaw overview (wrapper + links): [docs/OPENCLAW.md](docs/OPENCLAW.md). Verify: [openclaw-secure/docs/VERIFY.md](openclaw-secure/docs/VERIFY.md).
 
 ## Agent packs
 

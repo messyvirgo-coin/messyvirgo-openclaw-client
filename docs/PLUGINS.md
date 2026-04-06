@@ -1,5 +1,7 @@
 # Plugins (wrapper)
 
+See [OPENCLAW.md](OPENCLAW.md) for how wrapper docs fit together.
+
 Templates enable first-party plugins (`memory-core`, `telegram`, `tavily`, …). Additional packages install with the OpenClaw CLI and persist under **`OPENCLAW_CONFIG_DIR`**.
 
 - [`openclaw plugins`](https://docs.openclaw.ai/cli/plugins)

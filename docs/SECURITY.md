@@ -1,5 +1,7 @@
 ## Security / threat model (short & honest)
 
+See [OPENCLAW.md](OPENCLAW.md) for how wrapper docs fit together.
+
 ### What this Docker setup protects well
 
 - **Published ports**: the default stack merges **`docker-compose.ports.localhost.yml`**, which maps the gateway (and bridge) to **`127.0.0.1`** on the host. On **Linux**, some setups use **`docker-compose.linux-hostnet.yml`** (`network_mode: host`) instead—see [openclaw-secure/docs/INSTALL-docker.md](../openclaw-secure/docs/INSTALL-docker.md) §5.
