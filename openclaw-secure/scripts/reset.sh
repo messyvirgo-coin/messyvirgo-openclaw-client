@@ -81,7 +81,7 @@ ensure_docker_running
 load_env
 
 CONFIG_DIR="$(openclaw_host_config_dir)"
-WORKSPACE_DIR="${OPENCLAW_WORKSPACE_DIR:-$HOME/OpenClawWorkspaces/main}"
+WORKSPACE_DIR="${OPENCLAW_WORKSPACE_DIR:-$HOME/.openclaw/workspaces/main}"
 SRC_DIR="$(openclaw_host_src_dir)"
 IMAGE_TAG="${OPENCLAW_IMAGE:-openclaw-secure:local}"
 

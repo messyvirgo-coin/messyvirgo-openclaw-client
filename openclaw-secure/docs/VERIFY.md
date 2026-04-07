@@ -33,8 +33,8 @@ Your `.env` should define:
 
 Example:
 
-- `OPENCLAW_WORKSPACES_DIR=$HOME/OpenClawWorkspaces`
-- `OPENCLAW_WORKSPACE_DIR=$HOME/OpenClawWorkspaces/main`
+- `OPENCLAW_WORKSPACES_DIR=$HOME/.openclaw/workspaces`
+- `OPENCLAW_WORKSPACE_DIR=$HOME/.openclaw/workspaces/main`
 
 Check host-side directories:
 
@@ -55,7 +55,7 @@ Sanity check (CLI container shares config + workspaces with the gateway):
 Verify `openclaw-secure/docker-compose.yml` mounts at least:
 
 - `${OPENCLAW_CONFIG_DIR}:/home/node/.openclaw`
-- `${OPENCLAW_WORKSPACES_DIR}:/home/node/workspaces`
+- `${OPENCLAW_WORKSPACES_DIR}:/home/node/.openclaw/workspaces`
 - `${OPENCLAW_WORKSPACE_DIR}:/home/node/.openclaw/workspace` (default agent workspace)
 
 ## 3) Run OpenClaw’s security audit

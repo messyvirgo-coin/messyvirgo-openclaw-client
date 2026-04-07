@@ -24,7 +24,7 @@ Edit `.env` and set:
 
 - `OPENROUTER_API_KEY` (chat models **and** semantic memory embeddings — same key), `BRAVE_API_KEY` (if used)
 - `TAVILY_API_KEY` if you use the Tavily plugin in `config/openclaw.native.json`
-- `OPENCLAW_WORKSPACES_DIR` (default: `$HOME/OpenClawWorkspaces`)
+- `OPENCLAW_WORKSPACES_DIR` (default: `$HOME/.openclaw/workspaces`)
 - `OPENCLAW_SKILLS_DIR` (optional; use relative `skills` for portability, or leave empty to default to `<repo>/skills`)
 - `OPENCLAW_CONFIG_DIR` (default: `$HOME/.openclaw`)
 - `OPENCLAW_GATEWAY_TOKEN` (leave empty to auto-generate on first setup)
@@ -85,7 +85,7 @@ openclaw status
 | Docker | `config/openclaw.json`   | `$OPENCLAW_CONFIG_DIR/openclaw.json` |
 | Native | `config/openclaw.native.json` | `$OPENCLAW_CONFIG_DIR/openclaw.json` |
 
-The native template uses `${OPENCLAW_WORKSPACES_DIR}` and other vars. `OPENCLAW_SKILLS_DIR` is optional; when set, setup/upgrade inject it into the config so OpenClaw does not require it at runtime. Export `OPENCLAW_WORKSPACES_DIR` when running the gateway or CLI directly (our scripts do this automatically).
+The native template uses `~/.openclaw/workspaces/main` as the default workspace and still supports `OPENCLAW_WORKSPACES_DIR` for template deployment scripts. `OPENCLAW_SKILLS_DIR` is optional; when set, setup/upgrade inject it into the config so OpenClaw does not require it at runtime. Export `OPENCLAW_WORKSPACES_DIR` when running the gateway or CLI directly (our scripts do this automatically).
 
 ## Running as a service
 

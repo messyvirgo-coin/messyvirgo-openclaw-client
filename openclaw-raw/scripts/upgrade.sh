@@ -51,7 +51,7 @@ done
 require_cmd openclaw
 require_cmd npm
 
-OPENCLAW_WORKSPACES_DIR="${OPENCLAW_WORKSPACES_DIR:-$HOME/OpenClawWorkspaces}"
+OPENCLAW_WORKSPACES_DIR="${OPENCLAW_WORKSPACES_DIR:-$HOME/.openclaw/workspaces}"
 OPENCLAW_SKILLS_DIR="$(resolve_openclaw_skills_dir "${OPENCLAW_SKILLS_DIR:-}")"
 OPENCLAW_CONFIG_DIR="${OPENCLAW_CONFIG_DIR:-$HOME/.openclaw}"
 CONFIG_SRC="$REPO_ROOT/config/openclaw.native.json"

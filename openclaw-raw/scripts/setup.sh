@@ -27,7 +27,7 @@ load_env
 
 # Required for native config
 if [[ -z "${OPENCLAW_WORKSPACES_DIR:-}" ]]; then
-  OPENCLAW_WORKSPACES_DIR="${HOME:-}/OpenClawWorkspaces"
+  OPENCLAW_WORKSPACES_DIR="${HOME:-}/.openclaw/workspaces"
   info "Using default OPENCLAW_WORKSPACES_DIR=$OPENCLAW_WORKSPACES_DIR (add to .env to override)"
 fi
 OPENCLAW_SKILLS_DIR="$(resolve_openclaw_skills_dir "${OPENCLAW_SKILLS_DIR:-}")"

@@ -67,7 +67,7 @@ if [[ -z "${OPENCLAW_WORKSPACES_DIR:-}" ]]; then
       OPENCLAW_WORKSPACES_DIR="$LEGACY_PARENT_DIR"
     fi
   else
-    OPENCLAW_WORKSPACES_DIR="$HOME/OpenClawWorkspaces"
+    OPENCLAW_WORKSPACES_DIR="$OPENCLAW_CONFIG_DIR/workspaces"
   fi
 fi
 if [[ "$OPENCLAW_WORKSPACES_DIR" == "$HOME" || "$OPENCLAW_WORKSPACES_DIR" == "/" ]]; then

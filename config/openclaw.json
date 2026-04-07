@@ -167,7 +167,7 @@
       "subagents": {
         "maxConcurrent": 8
       },
-      "workspace": "/home/node/workspaces/main",
+      "workspace": "~/.openclaw/workspaces/main",
       "model": {
         "primary": "openrouter/x-ai/grok-4.1-fast"
       },
@@ -240,7 +240,7 @@
         "identity": {
           "name": "Messy Virgo"
         },
-        "workspace": "/home/node/workspaces/main",
+        "workspace": "~/.openclaw/workspaces/main",
         "model": "openrouter/x-ai/grok-4.1-fast"
       }
     ]

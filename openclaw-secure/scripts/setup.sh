@@ -109,7 +109,7 @@ elif [[ -n "${OPENCLAW_WORKSPACE_DIR:-}" ]]; then
     DEFAULT_WORKSPACES_DIR="$LEGACY_PARENT_DIR"
   fi
 else
-  DEFAULT_WORKSPACES_DIR="$HOME/OpenClawWorkspaces"
+  DEFAULT_WORKSPACES_DIR="$DEFAULT_CONFIG_DIR/workspaces"
 fi
 DEFAULT_SRC_DIR="$(openclaw_host_src_dir)"
 DEFAULT_GIT_REPO="${OPENCLAW_GIT_REPO:-https://github.com/openclaw/openclaw}"

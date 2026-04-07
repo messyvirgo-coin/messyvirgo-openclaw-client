@@ -176,7 +176,7 @@
         "maxConcurrent": 8
       },
 
-      "workspace": "${OPENCLAW_WORKSPACES_DIR}/main",
+      "workspace": "~/.openclaw/workspaces/main",
 
       "model": {
         "primary": "openrouter/x-ai/grok-4.1-fast"
@@ -237,7 +237,7 @@
         "identity": {
           "name": "Messy Virgo"
         },
-        "workspace": "${OPENCLAW_WORKSPACES_DIR}/main",
+        "workspace": "~/.openclaw/workspaces/main",
         "model": "openrouter/x-ai/grok-4.1-fast"
       }
     ]
