@@ -49,9 +49,6 @@ done
 
 ensure_docker_running
 
-if [[ -z "${OPENCLAW_SRC_DIR:-}" ]]; then
-  die "OPENCLAW_SRC_DIR is not set. Run ./openclaw-secure/scripts/setup.sh first."
-fi
 if [[ -z "${OPENCLAW_GIT_REPO:-}" ]]; then
   OPENCLAW_GIT_REPO="https://github.com/openclaw/openclaw"
 fi
@@ -59,23 +56,22 @@ if [[ -z "${OPENCLAW_NPM_VERSION:-}" ]]; then
   OPENCLAW_NPM_VERSION="11.11.1"
 fi
 
-DEFAULT_CONFIG_DIR="${OPENCLAW_CONFIG_DIR:-$HOME/.openclaw-secure}"
+OPENCLAW_CONFIG_DIR="$(openclaw_host_config_dir)"
+OPENCLAW_SRC_DIR="$(openclaw_host_src_dir)"
 if [[ -z "${OPENCLAW_WORKSPACES_DIR:-}" ]]; then
   if [[ -n "${OPENCLAW_WORKSPACE_DIR:-}" ]]; then
     LEGACY_PARENT_DIR="$(dirname "$OPENCLAW_WORKSPACE_DIR")"
     if [[ "$LEGACY_PARENT_DIR" == "$HOME" ]]; then
-      OPENCLAW_WORKSPACES_DIR="$DEFAULT_CONFIG_DIR/workspaces"
+      OPENCLAW_WORKSPACES_DIR="$OPENCLAW_CONFIG_DIR/workspaces"
     else
       OPENCLAW_WORKSPACES_DIR="$LEGACY_PARENT_DIR"
     fi
-  elif [[ -n "${OPENCLAW_CONFIG_DIR:-}" ]]; then
-    OPENCLAW_WORKSPACES_DIR="$HOME/OpenClawWorkspaces"
   else
     OPENCLAW_WORKSPACES_DIR="$HOME/OpenClawWorkspaces"
   fi
 fi
 if [[ "$OPENCLAW_WORKSPACES_DIR" == "$HOME" || "$OPENCLAW_WORKSPACES_DIR" == "/" ]]; then
-  die "Refusing unsafe workspaces root '$OPENCLAW_WORKSPACES_DIR'. Use a dedicated subdirectory (for example $DEFAULT_CONFIG_DIR/workspaces)."
+  die "Refusing unsafe workspaces root '$OPENCLAW_WORKSPACES_DIR'. Use a dedicated subdirectory (for example $OPENCLAW_CONFIG_DIR/workspaces)."
 fi
 
 if [[ ! -d "$OPENCLAW_SRC_DIR/.git" ]]; then

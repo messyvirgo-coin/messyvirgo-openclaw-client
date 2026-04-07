@@ -70,6 +70,19 @@ load_env() {
   fi
 }
 
+# Host directory for OpenClaw config/state (mounted to /home/node/.openclaw in Docker). Call after
+# load_env. Override with OPENCLAW_CONFIG_DIR in repo root `.env` (e.g. a second install:
+# $HOME/.openclaw-staging).
+openclaw_host_config_dir() {
+  echo "${OPENCLAW_CONFIG_DIR:-$HOME/.openclaw}"
+}
+
+# Upstream OpenClaw git clone used for Docker builds. Optional in `.env`; default is beside config:
+# $(openclaw_host_config_dir)/openclaw-src
+openclaw_host_src_dir() {
+  echo "${OPENCLAW_SRC_DIR:-$(openclaw_host_config_dir)/openclaw-src}"
+}
+
 os_name() {
   uname -s | tr '[:upper:]' '[:lower:]'
 }

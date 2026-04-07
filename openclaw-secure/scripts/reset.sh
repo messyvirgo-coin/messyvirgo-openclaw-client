@@ -80,9 +80,9 @@ confirm() {
 ensure_docker_running
 load_env
 
-CONFIG_DIR="${OPENCLAW_CONFIG_DIR:-$HOME/.openclaw-secure}"
+CONFIG_DIR="$(openclaw_host_config_dir)"
 WORKSPACE_DIR="${OPENCLAW_WORKSPACE_DIR:-$HOME/OpenClawWorkspaces/main}"
-SRC_DIR="${OPENCLAW_SRC_DIR:-$CONFIG_DIR/openclaw-src}"
+SRC_DIR="$(openclaw_host_src_dir)"
 IMAGE_TAG="${OPENCLAW_IMAGE:-openclaw-secure:local}"
 
 info "Reset scope: this project only (compose project: $(compose_project_name))"

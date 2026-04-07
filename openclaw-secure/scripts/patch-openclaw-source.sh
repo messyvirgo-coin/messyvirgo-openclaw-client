@@ -5,9 +5,14 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/_common.sh"
 
-TARGET_SRC_DIR="${1:-${OPENCLAW_SRC_DIR:-}}"
+if [[ $# -ge 1 ]]; then
+  TARGET_SRC_DIR="$1"
+else
+  load_env
+  TARGET_SRC_DIR="$(openclaw_host_src_dir)"
+fi
 if [[ -z "$TARGET_SRC_DIR" ]]; then
-  die "OPENCLAW_SRC_DIR is not set and no source dir argument was provided."
+  die "Could not resolve OpenClaw source dir (pass path as first arg or set OPENCLAW_SRC_DIR in .env)."
 fi
 
 TARGET_FILE="$TARGET_SRC_DIR/src/infra/install-package-dir.ts"

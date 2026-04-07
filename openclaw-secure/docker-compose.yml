@@ -14,7 +14,7 @@ services:
       # Prefer compiled outputs under dist/ (see upstream CHANGELOG: gateway loads dist/extensions).
       OPENCLAW_BUNDLED_PLUGINS_DIR: /app/dist/extensions
     volumes:
-      - ${OPENCLAW_CONFIG_DIR:-${HOME}/.openclaw-secure}:/home/node/.openclaw
+      - ${OPENCLAW_CONFIG_DIR:-${HOME}/.openclaw}:/home/node/.openclaw
       - ${OPENCLAW_WORKSPACES_DIR:-${HOME}/OpenClawWorkspaces}:/home/node/workspaces
       - ${OPENCLAW_WORKSPACE_DIR:-${HOME}/OpenClawWorkspaces/main}:/home/node/.openclaw/workspace
     init: true
@@ -45,7 +45,7 @@ services:
       BROWSER: echo
       OPENCLAW_BUNDLED_PLUGINS_DIR: /app/dist/extensions
     volumes:
-      - ${OPENCLAW_CONFIG_DIR:-${HOME}/.openclaw-secure}:/home/node/.openclaw
+      - ${OPENCLAW_CONFIG_DIR:-${HOME}/.openclaw}:/home/node/.openclaw
       - ${OPENCLAW_WORKSPACES_DIR:-${HOME}/OpenClawWorkspaces}:/home/node/workspaces
       - ${OPENCLAW_WORKSPACE_DIR:-${HOME}/OpenClawWorkspaces/main}:/home/node/.openclaw/workspace
     stdin_open: true

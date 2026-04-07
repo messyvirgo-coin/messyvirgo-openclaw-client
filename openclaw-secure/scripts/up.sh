@@ -8,7 +8,7 @@ source "$SCRIPT_DIR/_common.sh"
 ensure_docker_running
 load_env
 
-CONFIG_DIR="${OPENCLAW_CONFIG_DIR:-$HOME/.openclaw-secure}"
+CONFIG_DIR="$(openclaw_host_config_dir)"
 if [[ -d "$CONFIG_DIR" ]]; then
   chmod 700 "$CONFIG_DIR"
 fi

@@ -98,7 +98,7 @@ fi
 # Load current values (if any) so we can prompt with them
 load_env
 
-DEFAULT_CONFIG_DIR="${OPENCLAW_CONFIG_DIR:-$HOME/.openclaw-secure}"
+DEFAULT_CONFIG_DIR="$(openclaw_host_config_dir)"
 if [[ -n "${OPENCLAW_WORKSPACES_DIR:-}" ]]; then
   DEFAULT_WORKSPACES_DIR="$OPENCLAW_WORKSPACES_DIR"
 elif [[ -n "${OPENCLAW_WORKSPACE_DIR:-}" ]]; then
@@ -111,7 +111,7 @@ elif [[ -n "${OPENCLAW_WORKSPACE_DIR:-}" ]]; then
 else
   DEFAULT_WORKSPACES_DIR="$HOME/OpenClawWorkspaces"
 fi
-DEFAULT_SRC_DIR="${OPENCLAW_SRC_DIR:-$DEFAULT_CONFIG_DIR/openclaw-src}"
+DEFAULT_SRC_DIR="$(openclaw_host_src_dir)"
 DEFAULT_GIT_REPO="${OPENCLAW_GIT_REPO:-https://github.com/openclaw/openclaw}"
 DEFAULT_IMAGE="${OPENCLAW_IMAGE:-openclaw-secure:local}"
 DEFAULT_NPM_VERSION="${OPENCLAW_NPM_VERSION:-11.11.1}"
@@ -119,7 +119,7 @@ DEFAULT_NPM_VERSION="${OPENCLAW_NPM_VERSION:-11.11.1}"
 if [[ "$INTERACTIVE" == "1" ]]; then
   OPENCLAW_CONFIG_DIR="$(prompt_default "Host config/state directory" "$DEFAULT_CONFIG_DIR")"
   OPENCLAW_WORKSPACES_DIR="$(prompt_default "Host root directory for per-agent workspaces" "$DEFAULT_WORKSPACES_DIR")"
-  OPENCLAW_SRC_DIR="$(prompt_default "Where to clone OpenClaw source (for building)" "$DEFAULT_SRC_DIR")"
+  OPENCLAW_SRC_DIR="$(prompt_default "Where to clone OpenClaw source (for building)" "$(openclaw_host_src_dir)")"
   OPENCLAW_GIT_REPO="$(prompt_default "OpenClaw Git repo URL to clone/pull" "$DEFAULT_GIT_REPO")"
   OPENCLAW_IMAGE="$(prompt_default "Docker image tag to build" "$DEFAULT_IMAGE")"
 else
@@ -135,6 +135,18 @@ if [[ "$OPENCLAW_WORKSPACES_DIR" == "$HOME" || "$OPENCLAW_WORKSPACES_DIR" == "/"
 fi
 OPENCLAW_WORKSPACE_DIR="$OPENCLAW_WORKSPACES_DIR/main"
 
+OPENCLAW_DEFAULT_CONFIG_DIR="$HOME/.openclaw"
+WRITE_OPENCLAW_CONFIG_TO_ENV=0
+if [[ "$OPENCLAW_CONFIG_DIR" != "$OPENCLAW_DEFAULT_CONFIG_DIR" ]]; then
+  WRITE_OPENCLAW_CONFIG_TO_ENV=1
+fi
+
+OPENCLAW_DEFAULT_SRC_DIR="${OPENCLAW_CONFIG_DIR}/openclaw-src"
+WRITE_OPENCLAW_SRC_TO_ENV=0
+if [[ "$OPENCLAW_SRC_DIR" != "$OPENCLAW_DEFAULT_SRC_DIR" ]]; then
+  WRITE_OPENCLAW_SRC_TO_ENV=1
+fi
+
 mkdir -p "$OPENCLAW_CONFIG_DIR"
 chmod 700 "$OPENCLAW_CONFIG_DIR"
 mkdir -p "$OPENCLAW_WORKSPACES_DIR"
@@ -147,7 +159,6 @@ fi
 managed_env_keys=(
   OPENROUTER_API_KEY
   BRAVE_API_KEY
-  OPENCLAW_CONFIG_DIR
   OPENCLAW_WORKSPACES_DIR
   OPENCLAW_WORKSPACE_DIR
   OPENCLAW_GATEWAY_PORT
@@ -156,7 +167,6 @@ managed_env_keys=(
   OPENCLAW_IMAGE
   OPENCLAW_GATEWAY_TOKEN
   OPENCLAW_DOCKER_APT_PACKAGES
-  OPENCLAW_SRC_DIR
   OPENCLAW_GIT_REPO
   OPENCLAW_NPM_VERSION
 )
@@ -166,6 +176,9 @@ if [[ -f "$ENV_FILE" ]]; then
   while IFS= read -r line || [[ -n "$line" ]]; do
     if [[ "$line" =~ ^([A-Za-z_][A-Za-z0-9_]*)= ]]; then
       env_key="${BASH_REMATCH[1]}"
+      if [[ "$env_key" == "OPENCLAW_CONFIG_DIR" || "$env_key" == "OPENCLAW_SRC_DIR" ]]; then
+        continue
+      fi
       if ! is_managed_env_key "$env_key" "${managed_env_keys[@]}"; then
         preserved_env_lines+=("$line")
       fi
@@ -177,7 +190,6 @@ fi
 cat >"$ENV_FILE" <<EOF
 OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
 BRAVE_API_KEY=${BRAVE_API_KEY:-}
-OPENCLAW_CONFIG_DIR=$OPENCLAW_CONFIG_DIR
 OPENCLAW_WORKSPACES_DIR=$OPENCLAW_WORKSPACES_DIR
 OPENCLAW_WORKSPACE_DIR=$OPENCLAW_WORKSPACE_DIR
 OPENCLAW_GATEWAY_PORT=${OPENCLAW_GATEWAY_PORT:-18789}
@@ -186,10 +198,15 @@ OPENCLAW_GATEWAY_BIND=${OPENCLAW_GATEWAY_BIND:-lan}
 OPENCLAW_IMAGE=$OPENCLAW_IMAGE
 OPENCLAW_GATEWAY_TOKEN=$OPENCLAW_GATEWAY_TOKEN
 OPENCLAW_DOCKER_APT_PACKAGES=${OPENCLAW_DOCKER_APT_PACKAGES:-jq}
-OPENCLAW_SRC_DIR=$OPENCLAW_SRC_DIR
 OPENCLAW_GIT_REPO=$OPENCLAW_GIT_REPO
 OPENCLAW_NPM_VERSION=$OPENCLAW_NPM_VERSION
 EOF
+if [[ "$WRITE_OPENCLAW_CONFIG_TO_ENV" == "1" ]]; then
+  echo "OPENCLAW_CONFIG_DIR=$OPENCLAW_CONFIG_DIR" >>"$ENV_FILE"
+fi
+if [[ "$WRITE_OPENCLAW_SRC_TO_ENV" == "1" ]]; then
+  echo "OPENCLAW_SRC_DIR=$OPENCLAW_SRC_DIR" >>"$ENV_FILE"
+fi
 
 if [[ "${#preserved_env_lines[@]}" -gt 0 ]]; then
   {
@@ -200,6 +217,8 @@ fi
 
 # shellcheck disable=SC1090,SC1091
 set -a && source "$ENV_FILE" && set +a
+OPENCLAW_CONFIG_DIR="$(openclaw_host_config_dir)"
+OPENCLAW_SRC_DIR="$(openclaw_host_src_dir)"
 
 info "Cloning/updating OpenClaw source"
 if [[ ! -d "$OPENCLAW_SRC_DIR/.git" ]]; then
