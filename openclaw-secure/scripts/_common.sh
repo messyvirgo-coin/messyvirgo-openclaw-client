@@ -83,6 +83,50 @@ openclaw_host_src_dir() {
   echo "${OPENCLAW_SRC_DIR:-$(openclaw_host_config_dir)/openclaw-src}"
 }
 
+dir_owner_uid() {
+  local dir="$1"
+  if stat -c '%u' "$dir" >/dev/null 2>&1; then
+    stat -c '%u' "$dir"
+  else
+    stat -f '%u' "$dir"
+  fi
+}
+
+ensure_host_dir_writable() {
+  local dir="$1"
+  local label="${2:-directory}"
+  local auto_fix="${3:-0}"
+  [[ -n "$dir" ]] || die "ensure_host_dir_writable: missing directory path for $label"
+
+  if [[ ! -d "$dir" ]]; then
+    mkdir -p "$dir" 2>/dev/null || true
+  fi
+  if [[ ! -d "$dir" ]]; then
+    die "Could not create $label at '$dir' (permission denied). Fix: sudo mkdir -p \"$dir\" && sudo chown -R \"$USER:$USER\" \"$dir\""
+  fi
+
+  local my_uid owner_uid
+  my_uid="$(id -u)"
+  owner_uid="$(dir_owner_uid "$dir" 2>/dev/null || echo "")"
+  if [[ "$auto_fix" == "1" && "$owner_uid" != "$my_uid" ]]; then
+    local target_user target_group
+    target_user="${SUDO_USER:-$USER}"
+    target_group="$target_user"
+    if [[ "$EUID" -eq 0 ]]; then
+      chown -R "$target_user:$target_group" "$dir" 2>/dev/null || true
+    elif command -v sudo >/dev/null 2>&1; then
+      info "Fixing ownership for $label at '$dir' (sudo may prompt)"
+      sudo chown -R "$target_user:$target_group" "$dir" 2>/dev/null || true
+    fi
+  fi
+
+  if [[ ! -w "$dir" ]]; then
+    local perms
+    perms="$(ls -ld "$dir" 2>/dev/null || true)"
+    die "$label is not writable at '$dir'.${perms:+ Current permissions: $perms.} Fix: sudo chown -R \"$USER:$USER\" \"$dir\""
+  fi
+}
+
 os_name() {
   uname -s | tr '[:upper:]' '[:lower:]'
 }

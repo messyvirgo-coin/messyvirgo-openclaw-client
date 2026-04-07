@@ -147,10 +147,11 @@ if [[ "$OPENCLAW_SRC_DIR" != "$OPENCLAW_DEFAULT_SRC_DIR" ]]; then
   WRITE_OPENCLAW_SRC_TO_ENV=1
 fi
 
-mkdir -p "$OPENCLAW_CONFIG_DIR"
+ensure_host_dir_writable "$OPENCLAW_CONFIG_DIR" "config/state directory" 1
 chmod 700 "$OPENCLAW_CONFIG_DIR"
-mkdir -p "$OPENCLAW_WORKSPACES_DIR"
-mkdir -p "$(dirname "$OPENCLAW_SRC_DIR")"
+ensure_host_dir_writable "$OPENCLAW_WORKSPACES_DIR" "workspaces root directory" 1
+ensure_host_dir_writable "$OPENCLAW_WORKSPACE_DIR" "default workspace directory" 1
+ensure_host_dir_writable "$(dirname "$OPENCLAW_SRC_DIR")" "OpenClaw source parent directory" 1
 
 if [[ -z "${OPENCLAW_GATEWAY_TOKEN:-}" ]]; then
   OPENCLAW_GATEWAY_TOKEN="$(random_hex_64)"

@@ -85,7 +85,11 @@ WORKSPACE_DIR="${OPENCLAW_WORKSPACE_DIR:-$HOME/.openclaw/workspaces/main}"
 SRC_DIR="$(openclaw_host_src_dir)"
 IMAGE_TAG="${OPENCLAW_IMAGE:-openclaw-secure:local}"
 
-info "Reset scope: this project only (compose project: $(compose_project_name))"
+if [[ "$SYSTEM_PRUNE" -eq 1 ]]; then
+  info "Reset scope: this project + global Docker prune (compose project: $(compose_project_name))"
+else
+  info "Reset scope: this project only (compose project: $(compose_project_name))"
+fi
 info "Config dir:     $CONFIG_DIR"
 info "Workspace dir:  $WORKSPACE_DIR"
 info "Source dir:     $SRC_DIR"
@@ -146,7 +150,8 @@ if [[ "$SYSTEM_PRUNE" -eq 1 ]]; then
   echo "This affects your entire Docker system, not just this project."
   if confirm "Proceed with docker system prune -a --volumes ?"; then
     if confirm "Really proceed (this is destructive) ?"; then
-      docker system prune -a --volumes
+      # We already run explicit confirmations above; use --force to avoid a third Docker prompt.
+      docker system prune -a --volumes --force
     else
       info "Skipped docker system prune"
     fi

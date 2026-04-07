@@ -73,6 +73,17 @@ fi
 if [[ "$OPENCLAW_WORKSPACES_DIR" == "$HOME" || "$OPENCLAW_WORKSPACES_DIR" == "/" ]]; then
   die "Refusing unsafe workspaces root '$OPENCLAW_WORKSPACES_DIR'. Use a dedicated subdirectory (for example $OPENCLAW_CONFIG_DIR/workspaces)."
 fi
+OPENCLAW_WORKSPACE_DIR="${OPENCLAW_WORKSPACE_DIR:-$OPENCLAW_WORKSPACES_DIR/main}"
+
+ensure_host_dir_writable "$OPENCLAW_CONFIG_DIR" "config/state directory"
+chmod 700 "$OPENCLAW_CONFIG_DIR"
+ensure_host_dir_writable "$OPENCLAW_WORKSPACES_DIR" "workspaces root directory"
+ensure_host_dir_writable "$OPENCLAW_WORKSPACE_DIR" "default workspace directory"
+if [[ -d "$OPENCLAW_SRC_DIR" ]]; then
+  ensure_host_dir_writable "$OPENCLAW_SRC_DIR" "OpenClaw source clone directory"
+else
+  ensure_host_dir_writable "$(dirname "$OPENCLAW_SRC_DIR")" "OpenClaw source parent directory"
+fi
 
 if [[ ! -d "$OPENCLAW_SRC_DIR/.git" ]]; then
   die "No git repo at $OPENCLAW_SRC_DIR. Run ${OPENCLAW_SECURE_ROOT}/scripts/setup.sh first."
