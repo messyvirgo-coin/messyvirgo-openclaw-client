@@ -23,7 +23,6 @@ compose_base() {
     -f "$OPENCLAW_SECURE_ROOT/docker-compose.yml" \
     -f "$OPENCLAW_SECURE_ROOT/docker-compose.secure.yml" \
     -f "$OPENCLAW_SECURE_ROOT/docker-compose.ports.localhost.yml" \
-    -f "$OPENCLAW_SECURE_ROOT/docker-compose.skills.yml" \
     "$@"
 }
 
@@ -34,7 +33,6 @@ compose_linux_hostnet() {
     -f "$OPENCLAW_SECURE_ROOT/docker-compose.yml" \
     -f "$OPENCLAW_SECURE_ROOT/docker-compose.secure.yml" \
     -f "$OPENCLAW_SECURE_ROOT/docker-compose.linux-hostnet.yml" \
-    -f "$OPENCLAW_SECURE_ROOT/docker-compose.skills.yml" \
     "$@"
 }
 

@@ -294,14 +294,6 @@
       }
     }
   },
-  "skills": {
-    "load": {
-      "extraDirs": [
-        "/home/node/custom-skills"
-      ],
-      "watch": true
-    }
-  },
   "plugins": {
     "entries": {
       "memory-core": {

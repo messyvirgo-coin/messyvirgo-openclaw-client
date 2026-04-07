@@ -256,7 +256,7 @@ docker build \
 
 info "Deploying config templates"
 mkdir -p "$OPENCLAW_CONFIG_DIR"
-# Deploy Docker-oriented config only (openclaw.json has /home/node/ paths for containers).
+# Deploy Docker baseline config (compose mounts host ~/.openclaw into the container).
 f="$REPO_ROOT/config/openclaw.json"
 if [[ -f "$f" ]]; then
   dest="$OPENCLAW_CONFIG_DIR/$(basename "$f")"
