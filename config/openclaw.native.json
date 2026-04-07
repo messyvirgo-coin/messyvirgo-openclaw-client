@@ -296,15 +296,6 @@
     }
   },
 
-  "skills": {
-    "load": {
-      "extraDirs": [
-        "${OPENCLAW_SKILLS_DIR}"
-      ],
-      "watch": true
-    }
-  },
-
   "plugins": {
     "entries": {
       "memory-core": {

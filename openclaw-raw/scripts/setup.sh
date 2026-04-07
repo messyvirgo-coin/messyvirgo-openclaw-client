@@ -19,7 +19,7 @@ if [[ ! -f "$ENV_FILE" ]]; then
     cp "$REPO_ROOT/.env.raw.example" "$ENV_FILE"
     info "Created $ENV_FILE from .env.raw.example"
   else
-    die "Missing .env.raw.example. Create .env with OPENCLAW_WORKSPACES_DIR, OPENCLAW_SKILLS_DIR, API keys, and OPENCLAW_GATEWAY_TOKEN."
+    die "Missing .env.raw.example. Create .env with OPENCLAW_WORKSPACES_DIR, API keys, and OPENCLAW_GATEWAY_TOKEN."
   fi
 fi
 
@@ -30,7 +30,6 @@ if [[ -z "${OPENCLAW_WORKSPACES_DIR:-}" ]]; then
   OPENCLAW_WORKSPACES_DIR="${HOME:-}/.openclaw/workspaces"
   info "Using default OPENCLAW_WORKSPACES_DIR=$OPENCLAW_WORKSPACES_DIR (add to .env to override)"
 fi
-OPENCLAW_SKILLS_DIR="$(resolve_openclaw_skills_dir "${OPENCLAW_SKILLS_DIR:-}")"
 if [[ -z "${OPENCLAW_CONFIG_DIR:-}" ]]; then
   OPENCLAW_CONFIG_DIR="${HOME:-}/.openclaw"
   info "Using default OPENCLAW_CONFIG_DIR=$OPENCLAW_CONFIG_DIR (add to .env to override)"
@@ -44,19 +43,6 @@ dest="$OPENCLAW_CONFIG_DIR/openclaw.json"
 if [[ ! -f "$dest" ]]; then
   cp "$CONFIG_SRC" "$dest"
   info "Wrote $dest (from config/openclaw.native.json)"
-  # Inject optional OPENCLAW_SKILLS_DIR so OpenClaw doesn't warn about missing env var
-  if [[ -n "${OPENCLAW_SKILLS_DIR:-}" ]]; then
-    python3 - "$dest" "$OPENCLAW_SKILLS_DIR" <<'PY' || true
-import json, sys
-path, skills_dir = sys.argv[1], sys.argv[2]
-with open(path) as f:
-    cfg = json.load(f)
-cfg.setdefault("skills", {}).setdefault("load", {})["extraDirs"] = [skills_dir]
-with open(path, "w") as f:
-    json.dump(cfg, f, indent=2)
-PY
-    info "Injected OPENCLAW_SKILLS_DIR into config"
-  fi
 else
   info "$dest already exists (leaving untouched). To refresh: cp $CONFIG_SRC $dest"
 fi
@@ -84,7 +70,6 @@ fi
 info "Done."
 info "Config:      $OPENCLAW_CONFIG_DIR"
 info "Workspaces:  $OPENCLAW_WORKSPACES_DIR"
-info "Skills:      $OPENCLAW_SKILLS_DIR"
 echo ""
 info "Start the gateway: ./openclaw-raw/scripts/gateway.sh"
 info "Then get the dashboard URL: ./openclaw-raw/scripts/dashboard.sh"

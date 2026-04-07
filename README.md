@@ -1,13 +1,13 @@
 # OpenClaw (AI Assistant) — Messy Virgo wrapper
 
-This repo wraps [OpenClaw](https://github.com/openclaw/openclaw) with shared config, models, and skills for the default **Messy Virgo** agent. Choose your deployment mode:
+This repo wraps [OpenClaw](https://github.com/openclaw/openclaw) with shared config and models for the default **Messy Virgo** agent. Choose your deployment mode:
 
 | Mode | Path | Use when |
 |------|------|----------|
 | **OpenClaw-secure** (Docker) | `openclaw-secure/` | You want container isolation, hardened runtime |
 | **Openclaw-raw** (native) | `openclaw-raw/` | You prefer host install, no Docker |
 
-Both use the same `config/` and `skills/` from the repo root.
+Both use the same `config/` from the repo root.
 
 Environment file: **`.env`** at the repo root. Templates: **[`.env.secure.example`](./.env.secure.example)** (Docker), **[`.env.raw.example`](./.env.raw.example)** (native).
 

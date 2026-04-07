@@ -52,7 +52,6 @@ require_cmd openclaw
 require_cmd npm
 
 OPENCLAW_WORKSPACES_DIR="${OPENCLAW_WORKSPACES_DIR:-$HOME/.openclaw/workspaces}"
-OPENCLAW_SKILLS_DIR="$(resolve_openclaw_skills_dir "${OPENCLAW_SKILLS_DIR:-}")"
 OPENCLAW_CONFIG_DIR="${OPENCLAW_CONFIG_DIR:-$HOME/.openclaw}"
 CONFIG_SRC="$REPO_ROOT/config/openclaw.native.json"
 
@@ -72,18 +71,6 @@ if [[ -f "$CONFIG_SRC" ]]; then
   if [[ ! -f "$dest" ]]; then
     cp "$CONFIG_SRC" "$dest"
     info "Wrote $dest"
-    if [[ -n "${OPENCLAW_SKILLS_DIR:-}" ]]; then
-      python3 - "$dest" "$OPENCLAW_SKILLS_DIR" <<'PY' || true
-import json, sys
-path, skills_dir = sys.argv[1], sys.argv[2]
-with open(path) as f:
-    cfg = json.load(f)
-cfg.setdefault("skills", {}).setdefault("load", {})["extraDirs"] = [skills_dir]
-with open(path, "w") as f:
-    json.dump(cfg, f, indent=2)
-PY
-      info "Injected OPENCLAW_SKILLS_DIR into config"
-    fi
   elif cmp -s "$CONFIG_SRC" "$dest"; then
     info "openclaw.json already up to date at $dest"
   elif [[ "$SYNC_CONFIG" == "1" ]]; then
@@ -91,18 +78,6 @@ PY
     cp "$dest" "$backup_path"
     cp "$CONFIG_SRC" "$dest"
     info "Updated $dest (backup: $backup_path)"
-    if [[ -n "${OPENCLAW_SKILLS_DIR:-}" ]]; then
-      python3 - "$dest" "$OPENCLAW_SKILLS_DIR" <<'PY' || true
-import json, sys
-path, skills_dir = sys.argv[1], sys.argv[2]
-with open(path) as f:
-    cfg = json.load(f)
-cfg.setdefault("skills", {}).setdefault("load", {})["extraDirs"] = [skills_dir]
-with open(path, "w") as f:
-    json.dump(cfg, f, indent=2)
-PY
-      info "Injected OPENCLAW_SKILLS_DIR into config"
-    fi
   else
     info "openclaw.json already exists at $dest (leaving untouched). Use --sync-config to overwrite."
   fi
