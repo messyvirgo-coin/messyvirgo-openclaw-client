@@ -241,53 +241,7 @@
           "name": "Messy Virgo"
         },
         "workspace": "/home/node/workspaces/main",
-        "model": "openrouter/x-ai/grok-4.1-fast",
-        "subagents": {
-          "allowAgents": [
-            "mv-coder",
-            "mv-researcher",
-            "mv-planner"
-          ]
-        }
-      },
-      {
-        "id": "mv-coder",
-        "name": "Messy Michael (Coder)",
-        "identity": {
-          "name": "Messy Michael (Coder)"
-        },
-        "workspace": "/home/node/workspaces/mv-coder",
-        "model": "openrouter/minimax/minimax-m2.5",
-        "thinkingDefault": "medium",
-        "subagents": {
-          "thinking": "medium"
-        }
-      },
-      {
-        "id": "mv-researcher",
-        "name": "Messy Anna (Researcher)",
-        "identity": {
-          "name": "Messy Anna (Researcher)"
-        },
-        "workspace": "/home/node/workspaces/mv-researcher",
-        "model": "openrouter/x-ai/grok-4.1-fast",
-        "thinkingDefault": "high",
-        "subagents": {
-          "thinking": "high"
-        }
-      },
-      {
-        "id": "mv-planner",
-        "name": "Messy Franco (Planner)",
-        "identity": {
-          "name": "Messy Franco (Planner)"
-        },
-        "workspace": "/home/node/workspaces/mv-planner",
-        "model": "openrouter/moonshotai/kimi-k2.5",
-        "thinkingDefault": "high",
-        "subagents": {
-          "thinking": "high"
-        }
+        "model": "openrouter/x-ai/grok-4.1-fast"
       }
     ]
   },

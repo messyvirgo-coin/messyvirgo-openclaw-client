@@ -1,6 +1,6 @@
 # OpenClaw (AI Assistant) — Messy Virgo wrapper
 
-This repo wraps [OpenClaw](https://github.com/openclaw/openclaw) with shared config, models, agents, and skills. Choose your deployment mode:
+This repo wraps [OpenClaw](https://github.com/openclaw/openclaw) with shared config, models, and skills for the default **Messy Virgo** agent. Choose your deployment mode:
 
 | Mode | Path | Use when |
 |------|------|----------|
@@ -57,17 +57,6 @@ Set **`OPENCLAW_GIT_REF=main`** in `.env` to track the moving default branch ins
 ```
 
 OpenClaw overview (wrapper + links): [docs/OPENCLAW.md](docs/OPENCLAW.md). Verify: [openclaw-secure/docs/VERIFY.md](openclaw-secure/docs/VERIFY.md).
-
-## Agent packs
-
-Pack-specific agents live in a separate repo: `../messyvirgo-openclaw-agents`.
-
-```bash
-./openclaw-secure/scripts/setup.sh
-./openclaw-secure/scripts/up.sh
-cd ../messyvirgo-openclaw-agents
-./scripts/install.sh --target wrapper --profile mv-t1
-```
 
 Channels: `./openclaw-secure/scripts/cli.sh channels --help`
 
