@@ -45,9 +45,6 @@ ls -la "$OPENCLAW_WORKSPACES_DIR"
 You should see at least:
 
 - `main/`
-- `mv-coder/`
-- `mv-researcher/`
-- `mv-planner/`
 
 Sanity check (CLI container shares config + workspaces with the gateway):
 
@@ -83,13 +80,10 @@ The setup script copies `config/openclaw.json` (Docker) to the config dir on fir
 
 ## 5) Run simple per-agent identity checks
 
-Test each agent explicitly:
+Test the default agent explicitly:
 
 ```bash
 ./openclaw-secure/scripts/cli.sh agent --agent main --message "State your name in one sentence."
-./openclaw-secure/scripts/cli.sh agent --agent mv-coder --message "State your name in one sentence."
-./openclaw-secure/scripts/cli.sh agent --agent mv-researcher --message "State your name in one sentence."
-./openclaw-secure/scripts/cli.sh agent --agent mv-planner --message "State your name in one sentence."
 ```
 
 If an agent behaves like first-run onboarding ("Who am I?"), that workspace

@@ -1,76 +1,72 @@
-# Plugins (wrapper)
+# Plugins
 
-See [OPENCLAW.md](OPENCLAW.md) for how wrapper docs fit together.
+See [OPENCLAW.md](OPENCLAW.md) for the wrapper doc map.
 
-Templates enable first-party plugins (`memory-core`, `telegram`, `tavily`, …). Additional packages install with the OpenClaw CLI and persist under **`OPENCLAW_CONFIG_DIR`**.
+The templates enable core plugins such as `memory-core`, `telegram`, and `tavily`. Anything you install through the OpenClaw CLI is stored under `$OPENCLAW_CONFIG_DIR`.
 
-- [`openclaw plugins`](https://docs.openclaw.ai/cli/plugins)
+- [openclaw plugins](https://docs.openclaw.ai/cli/plugins)
 - [Plugin system](https://docs.openclaw.ai/tools/plugin)
 - [Gateway security](https://docs.openclaw.ai/gateway/security)
 
-## 1) CLI entry points
+## Use The CLI
 
-Docker (same volumes as the gateway):
+Docker:
 
 ```bash
 ./openclaw-secure/scripts/cli.sh plugins --help
-./openclaw-secure/scripts/cli-shell.sh
+./openclaw-secure/scripts/cli.sh plugins list
+./openclaw-secure/scripts/cli.sh plugins list --verbose
 ```
 
 Native:
 
 ```bash
 ./openclaw-raw/scripts/cli.sh plugins --help
+./openclaw-raw/scripts/cli.sh plugins list
 ```
 
-## 2) Install flow
+## Install A Plugin
 
-1. List installed:
+1. Check what is already installed.
+2. Install the plugin or bundle.
+3. Configure it with the plugin's own settings or env vars.
+4. Allowlist it in `$OPENCLAW_CONFIG_DIR/openclaw.json` if your policy requires that.
+5. Restart the gateway.
+6. Verify with `plugins list --enabled` and `plugins doctor`.
 
-   ```bash
-   ./openclaw-secure/scripts/cli.sh plugins list
-   ./openclaw-secure/scripts/cli.sh plugins list --verbose
-   ```
+```bash
+./openclaw-secure/scripts/cli.sh plugins install <package-or-spec>
+./openclaw-secure/scripts/down.sh
+./openclaw-secure/scripts/up.sh
+./openclaw-secure/scripts/cli.sh plugins list --enabled
+./openclaw-secure/scripts/cli.sh plugins doctor
+```
 
-2. Install (resolution order: upstream docs / ClawHub / npm):
+Notes:
 
-   ```bash
-   ./openclaw-secure/scripts/cli.sh plugins install <package-or-spec>
-   ```
+- Pin versions in production.
+- Treat plugin installs as code execution.
+- Use `plugins inspect <id>` to see capabilities and config.
 
-   Pin versions in production; plugins run arbitrary code.
+## Config Location
 
-3. Configure per plugin (env vars, dedicated CLI, etc.).
+- Templates: `config/openclaw.json`, `config/openclaw.native.json`
+- Runtime state: `$OPENCLAW_CONFIG_DIR/openclaw.json`
+- `setup.sh` seeds config on first install.
+- `upgrade.sh --sync-config` refreshes templates, so back up first.
 
-4. If policy requires it, allowlist via merged edits to **`$OPENCLAW_CONFIG_DIR/openclaw.json`** ([Gateway security](https://docs.openclaw.ai/gateway/security), `plugins inspect <id>`).
+## Example
 
-5. Restart: `./openclaw-secure/scripts/down.sh && ./openclaw-secure/scripts/up.sh`
-
-6. Verify: `./openclaw-secure/scripts/cli.sh plugins list --enabled` and `plugins doctor`.
-
----
-
-## 3) Example: Opik (LLM observability)
-
-[Opik’s OpenClaw integration](https://www.comet.com/docs/opik/integrations/openclaw) publishes traces for LLM, tool, and agent activity.
+For plugin-specific setup, follow the plugin's own docs after installation. For example, the Opik integration can be installed and configured with:
 
 ```bash
 ./openclaw-secure/scripts/cli.sh plugins install @opik/opik-openclaw
 ./openclaw-secure/scripts/cli.sh opik configure
+./openclaw-secure/scripts/cli.sh opik status
 ```
 
-Allowlist if required, restart gateway, then `./openclaw-secure/scripts/cli.sh opik status`.
+## Troubleshooting
 
-## 4) Template vs deployed config
-
-Git: `config/openclaw.json`, `config/openclaw.native.json`. Deployed state: **`$OPENCLAW_CONFIG_DIR/openclaw.json`** (including `plugins.installs`, allowlists). `setup.sh` seeds only when missing. Template refresh: `./openclaw-secure/scripts/upgrade.sh --sync-config` (back up first).
-
-## 5) Troubleshooting
-
-| Command / check | Use |
-|-----------------|-----|
-| `plugins doctor` | Load errors |
-| `plugins inspect <id>` | Capabilities, config |
-| `openclaw doctor --fix` | Upstream may require before install |
-
-Telegram: [TELEGRAM.md](TELEGRAM.md). Memory defaults: [MEMORY.md](MEMORY.md).
+- `plugins doctor` for load errors
+- `plugins inspect <id>` for capabilities and config
+- `openclaw doctor --fix` if the gateway asks for a repair step first

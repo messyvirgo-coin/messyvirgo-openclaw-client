@@ -5,7 +5,7 @@ This is the **canonical** install guide for **OpenClaw-secure** (this Messy Virg
 - installing the hardened Docker stack
 - dashboard + device pairing (**Linux** vs **macOS** differ)
 - smoke checks and optional semantic memory verification
-- optional Messy Virgo agents + Telegram
+- the default Messy Virgo agent + Telegram
 
 The upstream OpenClaw **source** used to build the image is cloned by `setup.sh` into `OPENCLAW_SRC_DIR` (default under your config dir)—you do **not** clone that manually for a normal install.
 
@@ -62,7 +62,7 @@ Set at least:
 - `BRAVE_API_KEY` — if you use Brave-backed tools
 - `TAVILY_API_KEY` — if you use the Tavily plugin (`config/openclaw.json` → `plugins.entries.tavily`)
 
-Messy Virgo agent pack (optional):
+Messy Virgo MCP tools (optional):
 
 - `MESSY_VIRGO_MCP_URL`, `MESSY_VIRGO_API_KEY`
 
@@ -89,7 +89,7 @@ Use `./openclaw-secure/scripts/setup.sh --interactive` for prompts.
 
 If your workspace, config, or OpenClaw source paths live outside Docker Desktop’s allowed paths, add them under **Settings → Resources → File Sharing**, apply, and restart Docker Desktop if prompted.
 
-*(Linux: skip this section.)*
+Linux users can skip this section.
 
 ---
 
@@ -111,7 +111,7 @@ Open the full URL including `#token=...`. Without the token you may see `unautho
 
 ## 6) Approve the first device pairing
 
-### Linux
+### Linux device pairing
 
 ```bash
 ./openclaw-secure/scripts/cli.sh devices list
@@ -120,7 +120,7 @@ Open the full URL including `#token=...`. Without the token you may see `unautho
 
 Copy `<requestId>` from the pending entry in `devices list`.
 
-### macOS
+### macOS device pairing
 
 On Docker Desktop, `cli.sh devices …` may hit websocket errors (`1006`, timeouts). Run the same commands **inside** the gateway container:
 
@@ -159,13 +159,10 @@ openclaw status
 ./openclaw-secure/scripts/security-audit.sh
 ```
 
-Optional per-agent identity:
+Optional agent identity checks:
 
 ```bash
 ./openclaw-secure/scripts/cli.sh agent --agent main --message "State your name in one sentence."
-./openclaw-secure/scripts/cli.sh agent --agent mv-coder --message "State your name in one sentence."
-./openclaw-secure/scripts/cli.sh agent --agent mv-researcher --message "State your name in one sentence."
-./openclaw-secure/scripts/cli.sh agent --agent mv-planner --message "State your name in one sentence."
 ```
 
 If an agent acts like first-run onboarding, remove `BOOTSTRAP.md` from that workspace (or use setup/upgrade `--cleanup-bootstrap`), then restart.
@@ -182,9 +179,9 @@ See [MEMORY.md](../../docs/MEMORY.md) and [VERIFY.md](VERIFY.md) §6.
 
 ---
 
-## 9) Optional: Messy Virgo agents + Telegram
+## 9) Optional: Messy Virgo MCP tools + Telegram
 
-Skip if you only want the default wrapper agents.
+Skip if you only want the default Messy Virgo setup.
 
 ### 9.1 Messy Virgo credentials
 
@@ -198,27 +195,7 @@ MESSY_VIRGO_API_KEY=<your_key>
 - Default bridge networking: often `http://172.17.0.1:8000/mcp`
 - `./openclaw-secure/scripts/up-linux-hostnet.sh` (host network): `http://localhost:8000/mcp`
 
-### 9.2 Install agent pack
-
-Repo: `https://github.com/messyvirgo-coin/messyvirgo-openclaw-agents`
-
-```bash
-git clone https://github.com/messyvirgo-coin/messyvirgo-openclaw-agents.git
-cd messyvirgo-openclaw-agents
-set -a && source /path/to/this-wrapper-repo/.env && set +a
-./scripts/install.sh --target wrapper --profile <profile>
-```
-
-Restart:
-
-```bash
-cd /path/to/this-wrapper-repo
-./openclaw-secure/scripts/down.sh && ./openclaw-secure/scripts/up.sh
-```
-
-Global MCP config: `OPENCLAW_CONFIG_DIR/mcporter.json` (not per-workspace).
-
-### 9.3 Telegram
+### 9.2 Telegram
 
 See [docs/TELEGRAM.md](../../docs/TELEGRAM.md). Register channels:
 

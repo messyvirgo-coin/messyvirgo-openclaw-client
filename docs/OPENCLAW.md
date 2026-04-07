@@ -1,33 +1,34 @@
-# OpenClaw in this wrapper
+# OpenClaw In This Wrapper
 
-This repository is a **deployment wrapper** around upstream [OpenClaw](https://github.com/openclaw/openclaw). Day-to-day behavior, CLI, and gateway semantics are defined upstream; this repo supplies shared **templates**, **compose/scripts**, and **Messy Virgo–specific defaults**.
+This repository is a deployment wrapper around upstream [OpenClaw](https://github.com/openclaw/openclaw). It provides the local templates, compose files, scripts, and defaults used for Messy Virgo deployments.
 
-## Where things live
+## Start Here
 
-| Topic | In this repo | Upstream |
-|--------|----------------|----------|
-| Install (Docker) | [openclaw-secure/docs/INSTALL-docker.md](../openclaw-secure/docs/INSTALL-docker.md) | [docs.openclaw.ai](https://docs.openclaw.ai) |
-| Install (native) | [openclaw-raw/docs/INSTALL-native.md](../openclaw-raw/docs/INSTALL-native.md) | same |
-| Verify / health | [openclaw-secure/docs/VERIFY.md](../openclaw-secure/docs/VERIFY.md) | — |
-| Baseline gateway config (templates) | `config/openclaw.json` (Docker), `config/openclaw.native.json` (native) | [Configuration reference](https://docs.openclaw.ai/gateway/configuration-reference) |
-| Env templates | `.env.secure.example`, `.env.raw.example` | — |
-| Messy Virgo agents & pack skills | `../messyvirgo-openclaw-agents` (separate repo) | — |
+- [openclaw-secure/docs/INSTALL-docker.md](../openclaw-secure/docs/INSTALL-docker.md) for Docker install
+- [openclaw-raw/docs/INSTALL-native.md](../openclaw-raw/docs/INSTALL-native.md) for native install
+- [openclaw-secure/docs/VERIFY.md](../openclaw-secure/docs/VERIFY.md) for health checks
+- [TELEGRAM.md](TELEGRAM.md) for Telegram setup
+- [MEMORY.md](MEMORY.md) for memory defaults and behavior
+- [PLUGINS.md](PLUGINS.md) for plugin install and inspection
+- [SECURITY.md](SECURITY.md) for the wrapper security model
 
-## Wrapper docs (topic guides)
+## What This Repo Owns
 
-- **[TELEGRAM.md](TELEGRAM.md)** — Bot registration, pairing, group policy, **Telegram streaming** and troubleshooting.
-- **[MEMORY.md](MEMORY.md)** — Semantic memory, embeddings, `memory-core`, dreaming, template keys.
-- **[PLUGINS.md](PLUGINS.md)** — Installing and inspecting plugins via the wrapper CLI.
-- **[SECURITY.md](SECURITY.md)** — Threat model, ports, sandboxing defaults in Docker.
+- `config/openclaw.json` and `config/openclaw.native.json` for baseline wrapper config
+- `config/workspaces/main/` for the default workspace content
+- `openclaw-secure/` and `openclaw-raw/` for deployment scripts and compose files
 
-## Configuration workflow
+## Configuration Workflow
 
-1. **Templates** in `config/` are copied or merged when you run `setup.sh` / `upgrade.sh` (see each script’s flags; back up `$OPENCLAW_CONFIG_DIR` before forcing overwrites).
-2. **Runtime truth** is `$OPENCLAW_CONFIG_DIR/openclaw.json` on the host (mounted into the gateway container for Docker).
-3. **Agent list and models** in the template are starting points; pack installs (e.g. `mv-t1`) can add agents and bindings—see [README.md](../README.md) § Agent packs.
+1. Treat `config/` as templates, not runtime state.
+2. `setup.sh` seeds config on first install.
+3. `upgrade.sh` preserves deployed config unless you explicitly sync templates.
+4. The runtime source of truth is `$OPENCLAW_CONFIG_DIR/openclaw.json` on the host.
 
-## Useful upstream entry points
+## Upstream Reference
 
-- [Gateway](https://docs.openclaw.ai/gateway) · [CLI](https://docs.openclaw.ai/cli) · [Channels](https://docs.openclaw.ai/channels)
-- [Telegram channel](https://docs.openclaw.ai/channels/telegram) (full feature list vs this repo’s short setup guide)
-- [Agent loop / tools](https://docs.openclaw.ai/concepts/agent-loop)
+- [Gateway](https://docs.openclaw.ai/gateway)
+- [CLI](https://docs.openclaw.ai/cli)
+- [Channels](https://docs.openclaw.ai/channels)
+- [Configuration reference](https://docs.openclaw.ai/gateway/configuration-reference)
+- [Telegram channel](https://docs.openclaw.ai/channels/telegram)

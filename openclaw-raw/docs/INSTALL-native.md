@@ -1,6 +1,6 @@
 # Native OpenClaw install (no Docker)
 
-This guide sets up OpenClaw to run directly on the host (no containers), using this repo's configuration, models, agents, and skills.
+This guide sets up OpenClaw to run directly on the host (no containers), using this repo's configuration, models, and skills for the default Messy Virgo agent.
 
 For **Docker**, use [../openclaw-secure/docs/INSTALL-docker.md](../openclaw-secure/docs/INSTALL-docker.md). Use **openclaw-raw** when you want lower latency, easier debugging, or Docker is unavailable.
 
@@ -105,17 +105,6 @@ openclaw gateway install
 ```
 
 See OpenClaw docs for service configuration details.
-
-## Agent packs
-
-To install Messy Virgo agents from `messyvirgo-openclaw-agents`:
-
-```bash
-cd ../messyvirgo-openclaw-agents
-./scripts/install.sh --target native --profile <profile>
-```
-
-(Confirm the pack supports `--target native`; otherwise adapt the install steps for native config paths.)
 
 ## Optional: Telegram
 
