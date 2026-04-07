@@ -30,8 +30,8 @@ while [[ $# -gt 0 ]]; do
       INTERACTIVE=1
       ;;
     -h|--help)
-      cat <<'EOF'
-Usage: ./openclaw-secure/scripts/setup.sh [options]
+      cat <<EOF
+Usage: $0 [options]
 
 Options:
   --sync-workspaces    Overwrite changed workspace templates (creates .bak timestamped backups)

@@ -16,7 +16,7 @@ if [[ -f "$ENV_FILE" ]]; then
   TOKEN="$(grep -E '^OPENCLAW_GATEWAY_TOKEN=' "$ENV_FILE" | cut -d= -f2- | tr -d '\r\n \t\"' || true)"
 fi
 if [[ -z "${TOKEN}" ]]; then
-  die "OPENCLAW_GATEWAY_TOKEN is not set in .env. Run ./openclaw-secure/scripts/setup.sh or add the token to .env."
+  die "OPENCLAW_GATEWAY_TOKEN is not set in .env. Run ${OPENCLAW_SECURE_ROOT}/scripts/setup.sh or add the token to .env."
 fi
 
 PORT="${OPENCLAW_GATEWAY_PORT:-18789}"

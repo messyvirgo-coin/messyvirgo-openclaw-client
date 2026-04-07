@@ -25,8 +25,8 @@ while [[ $# -gt 0 ]]; do
       CLEANUP_BOOTSTRAP=1
       ;;
     -h|--help)
-      cat <<'EOF'
-Usage: ./openclaw-secure/scripts/upgrade.sh [options]
+      cat <<EOF
+Usage: $0 [options]
 
 Environment (from .env):
   OPENCLAW_GIT_REF   Git ref to check out after fetch (default: latest v* release tag).
@@ -75,7 +75,7 @@ if [[ "$OPENCLAW_WORKSPACES_DIR" == "$HOME" || "$OPENCLAW_WORKSPACES_DIR" == "/"
 fi
 
 if [[ ! -d "$OPENCLAW_SRC_DIR/.git" ]]; then
-  die "No git repo at $OPENCLAW_SRC_DIR. Run ./openclaw-secure/scripts/setup.sh first."
+  die "No git repo at $OPENCLAW_SRC_DIR. Run ${OPENCLAW_SECURE_ROOT}/scripts/setup.sh first."
 fi
 
 openclaw_sync_and_checkout_openclaw_source "$OPENCLAW_SRC_DIR" "$OPENCLAW_GIT_REPO"

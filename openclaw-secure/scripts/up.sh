@@ -25,4 +25,4 @@ if [[ $CODE -ne 0 ]]; then
 fi
 
 info "Dashboard: http://127.0.0.1:${OPENCLAW_GATEWAY_PORT:-18789}/"
-info "Authenticated URL: ./openclaw-secure/scripts/dashboard.sh"
+info "Tokenized Control UI (prints URL): ${OPENCLAW_SECURE_ROOT}/scripts/dashboard.sh"
