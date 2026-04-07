@@ -15,8 +15,10 @@ set -euo pipefail
 #
 # Flags:
 #   --delete-config     Delete OPENCLAW_CONFIG_DIR (OpenClaw config/state) after stopping containers
+#                       (default layout: this already removes workspaces under that tree; see --delete-workspace)
 #   --delete-src        Delete OPENCLAW_SRC_DIR (OpenClaw source clone) after stopping containers
-#   --delete-workspace  Delete OPENCLAW_WORKSPACE_DIR (your RW workspace) (extra confirmation)
+#   --delete-workspace  Delete OPENCLAW_WORKSPACE_DIR when it is outside the config dir (extra confirmation).
+#                       Skipped automatically if --delete-config already removed the config tree containing it.
 #   --remove-image      Remove OPENCLAW_IMAGE (local image tag) if present
 #   --system-prune      Run: docker system prune -a --volumes (VERY destructive)
 #   -y, --yes           Non-interactive: assume "yes" for confirmations
@@ -77,6 +79,48 @@ confirm() {
   [[ "${yn:-}" == "y" || "${yn:-}" == "Y" ]]
 }
 
+# Best-effort absolute path for prefix checks (symlink-resolved when parent exists).
+resolve_for_prefix_compare() {
+  local p="${1:-}"
+  [[ -n "$p" ]] || {
+    echo ""
+    return
+  }
+  if [[ -e "$p" ]]; then
+    if [[ -d "$p" ]]; then
+      (cd "$p" && pwd -P)
+    else
+      local parent dir_abs
+      parent="$(dirname "$p")"
+      dir_abs="$(cd "$parent" && pwd -P)"
+      echo "${dir_abs}/$(basename "$p")"
+    fi
+  else
+    local parent="${p%/*}"
+    local base="${p##*/}"
+    if [[ "$parent" == "$p" ]]; then
+      echo "$p"
+    elif [[ -d "$parent" ]]; then
+      local resolved
+      resolved="$(cd "$parent" && pwd -P)"
+      echo "${resolved}/$base"
+    else
+      echo "${p%/}"
+    fi
+  fi
+}
+
+# True if workspace path is the config dir or inside it (so rm -rf config already removed it).
+workspace_is_under_config_dir() {
+  local root needle
+  root="$(resolve_for_prefix_compare "$1")"
+  needle="$(resolve_for_prefix_compare "$2")"
+  [[ -n "$root" && -n "$needle" ]] || return 1
+  root="${root%/}"
+  needle="${needle%/}"
+  [[ "$needle" == "$root" || "$needle" == "$root"/* ]]
+}
+
 ensure_docker_running
 load_env
 
@@ -84,6 +128,12 @@ CONFIG_DIR="$(openclaw_host_config_dir)"
 WORKSPACE_DIR="${OPENCLAW_WORKSPACE_DIR:-$HOME/.openclaw/workspaces/main}"
 SRC_DIR="$(openclaw_host_src_dir)"
 IMAGE_TAG="${OPENCLAW_IMAGE:-openclaw-secure:local}"
+
+CONFIG_DELETED=0
+WORKSPACE_CONTAINED_IN_CONFIG=0
+if workspace_is_under_config_dir "$CONFIG_DIR" "$WORKSPACE_DIR"; then
+  WORKSPACE_CONTAINED_IN_CONFIG=1
+fi
 
 if [[ "$SYSTEM_PRUNE" -eq 1 ]]; then
   info "Reset scope: this project + global Docker prune (compose project: $(compose_project_name))"
@@ -112,6 +162,7 @@ if [[ "$DELETE_CONFIG" -eq 1 ]]; then
   echo ""
   if confirm "Delete config/state dir: $CONFIG_DIR ?"; then
     rm -rf "$CONFIG_DIR"
+    CONFIG_DELETED=1
     info "Deleted: $CONFIG_DIR"
   else
     info "Skipped deleting config dir"
@@ -129,18 +180,23 @@ if [[ "$DELETE_SRC" -eq 1 ]]; then
 fi
 
 if [[ "$DELETE_WORKSPACE" -eq 1 ]]; then
-  echo ""
-  echo "WARNING: This deletes your workspace (the only RW host folder OpenClaw uses)."
-  echo "If you pointed the workspace at a real project directory, this will delete it."
-  if confirm "Type 'y' to confirm deleting workspace: $WORKSPACE_DIR ?"; then
-    if confirm "Last chance: really delete $WORKSPACE_DIR ?"; then
-      rm -rf "$WORKSPACE_DIR"
-      info "Deleted: $WORKSPACE_DIR"
+  if [[ "$CONFIG_DELETED" -eq 1 && "$WORKSPACE_CONTAINED_IN_CONFIG" -eq 1 ]]; then
+    echo ""
+    info "Skipping workspace delete: $WORKSPACE_DIR (already removed with config dir $CONFIG_DIR)"
+  else
+    echo ""
+    echo "WARNING: This deletes your workspace (the only RW host folder OpenClaw uses)."
+    echo "If you pointed the workspace at a real project directory, this will delete it."
+    if confirm "Type 'y' to confirm deleting workspace: $WORKSPACE_DIR ?"; then
+      if confirm "Last chance: really delete $WORKSPACE_DIR ?"; then
+        rm -rf "$WORKSPACE_DIR"
+        info "Deleted: $WORKSPACE_DIR"
+      else
+        info "Skipped deleting workspace dir"
+      fi
     else
       info "Skipped deleting workspace dir"
     fi
-  else
-    info "Skipped deleting workspace dir"
   fi
 fi
 
