@@ -15,7 +15,7 @@ Do not commit real bot tokens. Put them in `.env` or paste them only when the CL
 
 - The gateway is running.
 - You know which agent to bind the channel to.
-- If you use Messy Virgo MCP tools, set `MESSY_VIRGO_API_KEY` and `MESSY_VIRGO_MCP_URL` in `.env`.
+- If the agent should use **Messy Virgo** via **`@messyvirgo/cli`** (shell), set `MV_API_URL` and `MV_API_KEY` in `.env` (Docker: compose passes them into the gateway; native: `gateway.sh` exports `.env` via `set -a`).
 
 The wrapper defaults Telegram to the `main` account, so the usual path is to register the bot under `main` and bind it to the `main` agent.
 

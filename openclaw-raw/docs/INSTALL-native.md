@@ -28,6 +28,7 @@ Edit `.env` and set:
 - `OPENCLAW_CONFIG_DIR` (default: `$HOME/.openclaw`)
 - `OPENCLAW_GATEWAY_TOKEN` (leave empty to auto-generate on first setup)
 - `OPENCLAW_GATEWAY_PORT` (default: 18789)
+- Optional: `MV_API_URL` and `MV_API_KEY` for **[`@messyvirgo/cli`](https://www.npmjs.com/package/@messyvirgo/cli)** (Messy Virgo HTTP API — bearer auth; same semantics as the platform CLI runbook)
 
 ## 2) Bootstrap
 
@@ -35,7 +36,7 @@ Edit `.env` and set:
 ./openclaw-raw/scripts/setup.sh
 ```
 
-This creates the config directory, copies `config/openclaw.native.json` to `$OPENCLAW_CONFIG_DIR/openclaw.json`, deploys workspace templates, and generates a gateway token if missing. That template already includes the **builtin** memory stack (no separate memory bootstrap step).
+This creates the config directory, copies `config/openclaw.native.json` to `$OPENCLAW_CONFIG_DIR/openclaw.json`, deploys workspace templates, runs **`npm install -g @messyvirgo/cli@latest`** (so `mv` is on your `PATH`), and generates a gateway token if missing. That template already includes the **builtin** memory stack (no separate memory bootstrap step).
 
 ## 3) Start the gateway
 
@@ -120,11 +121,13 @@ After channel changes, restart the gateway (Ctrl+C, then `./openclaw-raw/scripts
 
 ## Upgrading
 
-To upgrade OpenClaw and optionally sync config or workspace templates:
+To upgrade OpenClaw, refresh **`@messyvirgo/cli`** to the latest npm release, and optionally sync config or workspace templates:
 
 ```bash
 ./openclaw-raw/scripts/upgrade.sh
 ```
+
+The script runs **`npm install -g openclaw`** and **`npm install -g @messyvirgo/cli@latest`** each time.
 
 Options:
 

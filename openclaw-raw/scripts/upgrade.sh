@@ -62,6 +62,9 @@ fi
 info "Upgrading OpenClaw (npm install -g openclaw)"
 npm install -g openclaw
 
+info "Upgrading Messy Virgo CLI (npm install -g @messyvirgo/cli@latest)"
+npm install -g @messyvirgo/cli@latest
+
 info "Ensuring config templates exist"
 mkdir -p "$OPENCLAW_CONFIG_DIR"
 ts="$(date +%Y%m%d-%H%M%S)"

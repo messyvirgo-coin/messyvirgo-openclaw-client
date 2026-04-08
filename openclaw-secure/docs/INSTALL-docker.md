@@ -62,9 +62,16 @@ Set at least:
 - `BRAVE_API_KEY` — if you use Brave-backed tools
 - `TAVILY_API_KEY` — if you use the Tavily plugin (`config/openclaw.json` → `plugins.entries.tavily`)
 
-Messy Virgo MCP tools (optional):
+Optional Messy Virgo HTTP API (for **`@messyvirgo/cli`** inside the gateway — bearer auth; passed through to containers as `MV_API_URL` / `MV_API_KEY`):
 
-- `MESSY_VIRGO_MCP_URL`, `MESSY_VIRGO_API_KEY`
+- `MV_API_URL` (for example `https://api.messyvirgo.com`)
+- `MV_API_KEY`
+
+Docker image build only (optional pin for `@messyvirgo/cli`; default is `latest`):
+
+- `MESSYVIRGO_CLI_VERSION`
+
+If you previously used `MESSY_VIRGO_MCP_URL` / `MESSY_VIRGO_API_KEY`, migrate to `MV_API_URL` (API base URL, not `/mcp`) and `MV_API_KEY`.
 
 Paths and clones (optional overrides):
 
@@ -179,21 +186,27 @@ See [MEMORY.md](../../docs/MEMORY.md) and [VERIFY.md](VERIFY.md) §6.
 
 ---
 
-## 9) Optional: Messy Virgo MCP tools + Telegram
+## 9) Optional: Messy Virgo CLI + Telegram
 
 Skip if you only want the default Messy Virgo setup.
 
-### 9.1 Messy Virgo credentials
+### 9.1 Messy Virgo CLI
+
+`setup.sh` / `upgrade.sh` bake **`@messyvirgo/cli`** into the runtime image (global `mv` on `PATH`). Set `MV_API_URL` and `MV_API_KEY` in `.env` if the agent should call the Messy Virgo HTTP API from shell commands; restart the gateway after changing them.
+
+Quick check (override the service entrypoint — the default `openclaw-cli` entrypoint is the OpenClaw CLI):
 
 ```bash
-MESSY_VIRGO_MCP_URL=https://api.messyvirgo.com/mcp
-MESSY_VIRGO_API_KEY=<your_key>
+bash -lc 'source ./openclaw-secure/scripts/_common.sh && compose run --rm --entrypoint mv openclaw-cli --help'
 ```
 
-**Linux — local MCP on the same machine:**
+With credentials in `.env`, validate connectivity (example from the platform CLI runbook):
 
-- Default bridge networking: often `http://172.17.0.1:8000/mcp`
-- `./openclaw-secure/scripts/up-linux-hostnet.sh` (host network): `http://localhost:8000/mcp`
+```bash
+bash -lc 'source ./openclaw-secure/scripts/_common.sh && compose run --rm --entrypoint mv openclaw-cli funds list --json'
+```
+
+You can also use `npx @messyvirgo/cli` on the host; the image install avoids a download on every run inside the container.
 
 ### 9.2 Telegram
 
@@ -238,7 +251,7 @@ Restart after channel changes. Approve bot pairing:
 ./openclaw-secure/scripts/upgrade.sh
 ```
 
-Upstream also documents global `npm` installs and `openclaw update`; this Docker layout rebuilds the image via **`upgrade.sh`** instead. Config and workspaces are kept unless you pass flags such as **`--sync-config`**.
+Upstream also documents global `npm` installs and `openclaw update`; this Docker layout rebuilds the image via **`upgrade.sh`** instead (including the **`npm-overlay`** layer that pins `npm` and reinstalls **`@messyvirgo/cli`** per **`MESSYVIRGO_CLI_VERSION`** / `latest`). Config and workspaces are kept unless you pass flags such as **`--sync-config`**.
 
 ---
 

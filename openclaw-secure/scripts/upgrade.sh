@@ -109,10 +109,11 @@ docker build \
   -f "$OPENCLAW_SRC_DIR/Dockerfile" \
   "$OPENCLAW_SRC_DIR"
 
-info "Pinning npm in runtime image ($OPENCLAW_NPM_VERSION)"
+info "Pinning npm and refreshing @messyvirgo/cli in runtime image (${MESSYVIRGO_CLI_VERSION:-latest})"
 docker build \
   --build-arg "BASE_IMAGE=$OPENCLAW_IMAGE" \
   --build-arg "OPENCLAW_NPM_VERSION=$OPENCLAW_NPM_VERSION" \
+  --build-arg "MESSYVIRGO_CLI_VERSION=${MESSYVIRGO_CLI_VERSION:-latest}" \
   -t "$OPENCLAW_IMAGE" \
   -f "$OPENCLAW_SECURE_ROOT/docker/npm-overlay.Dockerfile" \
   "$REPO_ROOT"

@@ -9,6 +9,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/_common.sh"
 
 require_cmd openclaw
+require_cmd npm
 
 ENV_FILE="$REPO_ROOT/.env"
 CONFIG_SRC="$REPO_ROOT/config/openclaw.native.json"
@@ -24,6 +25,9 @@ if [[ ! -f "$ENV_FILE" ]]; then
 fi
 
 load_env
+
+info "Installing @messyvirgo/cli globally (mv on PATH)"
+npm install -g @messyvirgo/cli@latest
 
 # Required for native config
 if [[ -z "${OPENCLAW_WORKSPACES_DIR:-}" ]]; then
