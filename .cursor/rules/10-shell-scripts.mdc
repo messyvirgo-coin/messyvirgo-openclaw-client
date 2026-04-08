@@ -4,10 +4,8 @@ globs: openclaw-secure/scripts/**/*.sh, openclaw-raw/scripts/**/*.sh
 alwaysApply: false
 ---
 
-# Shell Script Rules
+# Shell scripts (`openclaw-secure/scripts/`, `openclaw-raw/scripts/`)
 
-- Preserve Linux + macOS bash compatibility.
-- Prefer extending shared helpers in `openclaw-secure/scripts/_common.sh` or `openclaw-raw/scripts/_common.sh` over duplicating logic.
-- Keep `setup.sh` and `upgrade.sh` non-destructive by default; never overwrite user config or workspaces unless an explicit sync/cleanup flag is present.
-- Do not print secrets, tokens, or full credential-bearing URLs.
-- Keep path checks and "refuse unsafe directory" guards intact when touching `OPENCLAW_*` paths.
+- Keep **bash** portable for **Linux and macOS** (POSIX-ish patterns; avoid GNU-only assumptions without guards).
+- Add behavior in the matching tree’s **`_common.sh`** instead of copying logic across scripts.
+- When changing paths, keep existing **`OPENCLAW_*`** validation and **refuse-unsafe-directory** checks.

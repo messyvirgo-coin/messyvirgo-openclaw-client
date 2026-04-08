@@ -3,27 +3,9 @@ description: Core Cursor guidance for the Messy Virgo OpenClaw wrapper repo
 alwaysApply: true
 ---
 
-# Wrapper Repo Rules
+# Wrapper repo (not upstream OpenClaw)
 
-- Treat this repository as the deployment wrapper around OpenClaw, not the main OpenClaw source tree.
-- The OpenClaw source is cloned from `OPENCLAW_GIT_REPO` (default upstream) into `OPENCLAW_SRC_DIR`; in local dev the checkout often lives as a sibling directory (e.g. `../messyvirgo-openclaw` or `../openclaw`).
-- Track upstream OpenClaw for source changes; keep wrapper concerns in this repo and keep any optional external agent-pack work clearly separated unless a source-level change is truly required.
-- Keep changes small and reviewable; avoid broad refactors without clear need.
-- Do not hardcode secrets, tokens, private URLs, or machine-specific paths.
-- If behavior changes, update docs or comments in the same PR when needed.
-
-## Primary Customization Areas
-
-- Prefer editing `config/openclaw.json` for wrapper baseline gateway/model/tool defaults (shared template; native setup/upgrade patches `gateway.bind` + `agents.defaults.sandbox.mode` after deploy).
-- Prefer editing `openclaw-secure/docker-compose*.yml` and `openclaw-secure/scripts/*.sh` for Docker deployment; `openclaw-raw/scripts/*.sh` for native.
-- Prefer editing external agent-pack repos for managed agent profiles, pack skills, config fragments, and pack lifecycle scripts.
-
-## Security And Upgrade Expectations
-
-- Preserve the secure-wrapper model: explicit mounts only, hardened containers, token-authenticated gateway, and no unnecessary host exposure.
-- `setup.sh` and `upgrade.sh` should preserve deployed user config/workspaces by default; only overwrite templates when sync flags explicitly request it.
-
-## Validation Defaults
-
-- Run only the smallest relevant checks first (lint/tests for touched areas).
-- Report what was verified and what still needs manual validation.
+- This tree is the **deployment wrapper**. Upstream OpenClaw is cloned per `OPENCLAW_GIT_REPO` → `OPENCLAW_SRC_DIR` (often a sibling dir in dev). Do not treat this repo as the OpenClaw monorepo.
+- **Edit here:** `config/openclaw.json` (shared template; native scripts patch `gateway.bind` + `agents.defaults.sandbox.mode` after copy), `openclaw-secure/docker-compose*.yml` + `openclaw-secure/scripts/`, `openclaw-raw/scripts/`. Agent packs/skills live in **external** pack repos when using that model.
+- **Secure stack:** explicit mounts, token gateway, avoid widening host exposure; tool sandbox stays off in the gateway container by design.
+- **`setup.sh` / `upgrade.sh`:** do not overwrite deployed config or workspaces unless the script’s **sync** flags say so.
