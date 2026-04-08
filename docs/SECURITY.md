@@ -1,35 +1,20 @@
-# Security
+# Security (Docker wrapper)
 
-See [OPENCLAW.md](OPENCLAW.md) for the wrapper doc map.
+## What this stack does
 
-## What The Docker Wrapper Protects
+- Binds the gateway to **127.0.0.1** on the host by default (Linux host-network mode: see compose + [INSTALL-docker.md](../openclaw-secure/docs/INSTALL-docker.md)).
+- Mounts only configured config + workspace paths (not your whole home unless you set it that way).
+- Secure overlay: read-only root where applicable, dropped caps, `no-new-privileges`, limits, tmpfs for temp (see compose files).
+- **Tool sandbox off** in the gateway container so it does not need the host Docker socket.
 
-- The default stack publishes the gateway on `127.0.0.1` on the host.
-- The gateway container uses explicit config and workspace mounts, not your whole home directory unless you point it there.
-- The secure compose overlay hardens the container with a read-only root filesystem, dropped capabilities, `no-new-privileges`, tmpfs for temp files, and resource limits.
-- Docker sandboxing is disabled in this wrapper, so the gateway does not need host Docker socket access.
+## What it does not do
 
-## What It Does Not Solve
+- Container escape and workspace trust are still your responsibility.
+- External channels (e.g. Telegram) carry usual prompt-injection risk.
 
-- Docker is not a perfect security boundary.
-- A workspace path still gives OpenClaw access to everything inside that workspace.
-- External channels still carry prompt-injection risk.
+## Baseline
 
-## Recommended Baseline
+- Dedicated workspace directory; tight DM/group allowlists; mentions in groups unless you trust everyone.
+- No secrets in git. Run `./openclaw-secure/scripts/security-audit.sh` after changes.
 
-- Use a dedicated workspace folder, not a broad home directory.
-- Prefer DM pairing and allowlists over open access.
-- Require mentions in groups unless you have a specific reason not to.
-- Keep bot tokens and config secrets out of git.
-
-## Audit
-
-Run the security audit after deployment or when you change the stack:
-
-```bash
-./openclaw-secure/scripts/security-audit.sh
-```
-
-## Stronger Isolation
-
-If you need a harder boundary than containers, run OpenClaw in a separate VM or machine and access it remotely.
+Stronger isolation: separate VM or machine + remote gateway.

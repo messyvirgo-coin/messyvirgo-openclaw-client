@@ -1,30 +1,12 @@
-## Context & Purpose
+## Summary
 
-- What is the purpose of this change?
-- What problem does it solve or improve?
+What changed and why?
 
-## What changed
+## Test plan
 
-- Summarize the key changes (scripts, docs, compose files, etc.).
-- Note any behavior changes for users.
-
-## How to test
-
-- Provide exact commands you ran.
-- If applicable: include OS and Docker version.
-
-Example:
-
-```bash
-./openclaw-secure/scripts/setup.sh
-./openclaw-secure/scripts/up.sh
-./openclaw-secure/scripts/cli.sh status
-./openclaw-secure/scripts/dashboard.sh
-```
+Commands run (OS / Docker version if relevant):
 
 ## Checklist
 
-- [ ] No secrets/tokens/private paths were committed (especially `.env`)
-- [ ] Docs updated if user workflow changed
-- [ ] Changes are scoped and easy to review
-
+- [ ] No secrets, tokens, or private paths (including `.env`)
+- [ ] Docs updated if behavior changed

@@ -53,7 +53,7 @@ require_cmd npm
 
 OPENCLAW_WORKSPACES_DIR="${OPENCLAW_WORKSPACES_DIR:-$HOME/.openclaw/workspaces}"
 OPENCLAW_CONFIG_DIR="${OPENCLAW_CONFIG_DIR:-$HOME/.openclaw}"
-CONFIG_SRC="$REPO_ROOT/config/openclaw.native.json"
+CONFIG_SRC="$REPO_ROOT/config/openclaw.json"
 
 if [[ "$OPENCLAW_WORKSPACES_DIR" == "$HOME" || "$OPENCLAW_WORKSPACES_DIR" == "/" ]]; then
   die "Refusing unsafe workspaces root '$OPENCLAW_WORKSPACES_DIR'. Use a dedicated subdirectory."
@@ -73,16 +73,24 @@ if [[ -f "$CONFIG_SRC" ]]; then
   dest="$OPENCLAW_CONFIG_DIR/openclaw.json"
   if [[ ! -f "$dest" ]]; then
     cp "$CONFIG_SRC" "$dest"
-    info "Wrote $dest"
-  elif cmp -s "$CONFIG_SRC" "$dest"; then
-    info "openclaw.json already up to date at $dest"
+    patch_openclaw_config_for_native "$dest"
+    info "Wrote $dest (from config/openclaw.json + native patch)"
   elif [[ "$SYNC_CONFIG" == "1" ]]; then
     backup_path="$dest.bak.$ts"
     cp "$dest" "$backup_path"
     cp "$CONFIG_SRC" "$dest"
+    patch_openclaw_config_for_native "$dest"
     info "Updated $dest (backup: $backup_path)"
   else
-    info "openclaw.json already exists at $dest (leaving untouched). Use --sync-config to overwrite."
+    tmp="$(mktemp)"
+    cp "$CONFIG_SRC" "$tmp"
+    PATCH_OC_QUIET=1 patch_openclaw_config_for_native "$tmp"
+    if cmp -s "$tmp" "$dest"; then
+      info "openclaw.json already up to date at $dest"
+    else
+      info "openclaw.json already exists at $dest (leaving untouched). Use --sync-config to overwrite."
+    fi
+    rm -f "$tmp"
   fi
 fi
 

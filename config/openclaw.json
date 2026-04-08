@@ -169,7 +169,8 @@
       },
       "workspace": "~/.openclaw/workspaces/main",
       "model": {
-        "primary": "openrouter/x-ai/grok-4.1-fast"
+        "primary": "openrouter/x-ai/grok-4.1-fast",
+        "fallbacks": ["openrouter/anthropic/claude-haiku-4-5"]
       },
       "models": {
         "openrouter/x-ai/grok-4.1-fast": {
@@ -274,6 +275,11 @@
     "nativeSkills": "auto",
     "restart": true,
     "ownerDisplay": "raw"
+  },
+  "skills": {
+    "load": {
+      "watch": true
+    }
   },
   "channels": {
     "telegram": {

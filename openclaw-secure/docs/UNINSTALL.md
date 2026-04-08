@@ -1,61 +1,18 @@
-# Uninstall (Linux + macOS)
+# Uninstall (Docker)
 
-This guide applies to both Linux and macOS. It removes **this wrapper’s** Docker stack and optional host data paths from `.env`—not upstream OpenClaw’s public repo.
-
-## 1) Go to the wrapper repo
-
-```bash
-cd /path/to/this-wrapper-repo
-```
-
-## 2) Stop running containers
+From the wrapper repo:
 
 ```bash
 ./openclaw-secure/scripts/down.sh
 ```
 
-## 3) Choose uninstall level
+**Levels** (see `reset.sh --help`):
 
-### A) Full uninstall for this wrapper (recommended when removing everything)
+| Goal | Command |
+|------|---------|
+| Containers + volumes only | `./openclaw-secure/scripts/reset.sh` |
+| + delete config, source clone, image (keep workspace) | `./openclaw-secure/scripts/reset.sh --delete-config --delete-src --remove-image --yes` |
+| + delete workspace dir from `.env` | add `--delete-workspace` (dangerous if path is a real project) |
+| Docker system prune (host-wide) | `./openclaw-secure/scripts/reset.sh --system-prune --yes` |
 
-Removes:
-
-- wrapper containers + volumes
-- OpenClaw config/state directory
-- source clone used for image builds
-- configured workspace directory
-- local wrapper image tag
-
-```bash
-./openclaw-secure/scripts/reset.sh --delete-config --delete-src --delete-workspace --remove-image --yes
-```
-
-### B) Keep your workspace data, remove runtime only
-
-Removes containers/config/source/image, but keeps the workspace folder:
-
-```bash
-./openclaw-secure/scripts/reset.sh --delete-config --delete-src --remove-image --yes
-```
-
-### C) Stop/remove containers + wrapper volumes only (least destructive)
-
-```bash
-./openclaw-secure/scripts/reset.sh
-```
-
-## 4) Optional: remove all unused Docker resources system-wide
-
-Only run this if you explicitly want cleanup beyond this project:
-
-```bash
-./openclaw-secure/scripts/reset.sh --system-prune --yes
-```
-
-This affects your whole Docker host, not just OpenClaw.
-
-## Notes
-
-- `--delete-workspace` deletes `OPENCLAW_WORKSPACE_DIR` from your `.env`.
-- If your workspace path points to a real project directory, that directory will be deleted.
-- `--yes` skips confirmations. Remove `--yes` if you want interactive prompts.
+Drop `--yes` for prompts.

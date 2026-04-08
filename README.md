@@ -1,75 +1,63 @@
-# OpenClaw (AI Assistant) — Messy Virgo wrapper
+# Messy Virgo — OpenClaw wrapper
 
-This repo wraps [OpenClaw](https://github.com/openclaw/openclaw) with shared config and models for the default **Messy Virgo** agent. Choose your deployment mode:
+Wraps [OpenClaw](https://github.com/openclaw/openclaw) with shared `config/` and scripts for the default **Messy Virgo** agent.
 
-| Mode | Path | Use when |
-|------|------|----------|
-| **OpenClaw-secure** (Docker) | `openclaw-secure/` | You want container isolation, hardened runtime |
-| **Openclaw-raw** (native) | `openclaw-raw/` | You prefer host install, no Docker |
+| Mode | Directory | When |
+|------|-----------|------|
+| **Docker** | `openclaw-secure/` | Containers, hardened compose |
+| **Native** | `openclaw-raw/` | Host install, no Docker |
 
-Both use the same `config/` from the repo root.
+**`.env`** at repo root. Templates: [`.env.secure.example`](./.env.secure.example) (Docker), [`.env.raw.example`](./.env.raw.example) (native).
 
-Environment file: **`.env`** at the repo root. Templates: **[`.env.secure.example`](./.env.secure.example)** (Docker), **[`.env.raw.example`](./.env.raw.example)** (native).
-
-Provided as-is, best-effort maintenance. See [SUPPORT.md](./SUPPORT.md).
+As-is / best-effort. See [SUPPORT.md](./SUPPORT.md).
 
 ## Quickstart
 
-### OpenClaw-secure (Docker, Linux + macOS)
-
-- **Install**: [openclaw-secure/docs/INSTALL-docker.md](openclaw-secure/docs/INSTALL-docker.md)
+**Docker:** [openclaw-secure/docs/INSTALL-docker.md](openclaw-secure/docs/INSTALL-docker.md)
 
 ```bash
 ./openclaw-secure/scripts/setup.sh
 ./openclaw-secure/scripts/dashboard.sh
 ```
 
-### Openclaw-raw (native, no Docker)
-
-- **Native**: [openclaw-raw/docs/INSTALL-native.md](openclaw-raw/docs/INSTALL-native.md)
+**Native:** [openclaw-raw/docs/INSTALL-native.md](openclaw-raw/docs/INSTALL-native.md)
 
 ```bash
 ./openclaw-raw/scripts/setup.sh
 ./openclaw-raw/scripts/gateway.sh
 ```
 
-## OpenClaw-secure operations
+## Docker operations
 
 ```bash
 ./openclaw-secure/scripts/up.sh
 ./openclaw-secure/scripts/down.sh
 ./openclaw-secure/scripts/logs.sh
 ./openclaw-secure/scripts/cli.sh status
-./openclaw-secure/scripts/cli-shell.sh
 ```
 
 Uninstall: [openclaw-secure/docs/UNINSTALL.md](openclaw-secure/docs/UNINSTALL.md).
 
-## Upgrade (openclaw-secure)
-
-Upstream [stable](https://github.com/openclaw/openclaw) is published as **`v*`** tags. **`setup.sh`** and **`upgrade.sh`** fetch **`OPENCLAW_GIT_REPO`**, check out the latest **`v*`** tag when **`OPENCLAW_GIT_REF`** is unset, and rebuild the image. In-container Control UI self-update is usually unavailable (`not-git-install`); use **`upgrade.sh`** instead.
-
-Set **`OPENCLAW_GIT_REF=main`** in `.env` to track the moving default branch instead of the latest tag.
+## Upgrade (Docker)
 
 ```bash
 ./openclaw-secure/scripts/upgrade.sh
-./openclaw-secure/scripts/upgrade.sh --sync-config
+./openclaw-secure/scripts/upgrade.sh --sync-config   # refresh repo config template
 ```
 
-OpenClaw overview (wrapper + links): [docs/OPENCLAW.md](docs/OPENCLAW.md). Verify: [openclaw-secure/docs/VERIFY.md](openclaw-secure/docs/VERIFY.md).
+Upstream uses `v*` tags; set `OPENCLAW_GIT_REF=main` in `.env` to track `main`. In-container Control UI self-update often fails; use `upgrade.sh`.
 
-Channels: `./openclaw-secure/scripts/cli.sh channels --help`
+More: [docs/OPENCLAW.md](docs/OPENCLAW.md), [openclaw-secure/docs/VERIFY.md](openclaw-secure/docs/VERIFY.md).
 
-## Security (openclaw-secure)
+## Security (Docker)
 
-- Default compose publishes the dashboard on **`127.0.0.1`**; Linux may use **host networking** instead (see [docs/SECURITY.md](docs/SECURITY.md))
-- Gateway is **token-authenticated**; explicit config + workspace mounts only
-- Tool sandboxing **off** in Docker by default (no Docker socket in the gateway); see [docs/SECURITY.md](docs/SECURITY.md)
+- Dashboard bound to **127.0.0.1** by default (see [docs/SECURITY.md](docs/SECURITY.md); Linux may use host networking).
+- Gateway is **token**-authenticated; tool **sandbox is off** in the container (no Docker socket). Details: [docs/SECURITY.md](docs/SECURITY.md).
 
 ## License
 
-Apache-2.0. See [LICENSE](./LICENSE).
+Apache-2.0 — [LICENSE](./LICENSE).
 
 ## Contributing
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md).
+[CONTRIBUTING.md](./CONTRIBUTING.md).

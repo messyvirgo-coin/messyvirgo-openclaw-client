@@ -1,149 +1,63 @@
-# Native OpenClaw install (no Docker)
+# Native install (no Docker)
 
-This guide sets up OpenClaw to run directly on the host (no containers), using this repo's configuration and models for the default Messy Virgo agent.
+Host OpenClaw with this repo’s `config/`. For Docker: [../openclaw-secure/docs/INSTALL-docker.md](../openclaw-secure/docs/INSTALL-docker.md).
 
-For **Docker**, use [../openclaw-secure/docs/INSTALL-docker.md](../openclaw-secure/docs/INSTALL-docker.md). Use **openclaw-raw** when you want lower latency, easier debugging, or Docker is unavailable.
+## Requirements
 
-## Prerequisites
+- Node/npm matching your `openclaw` CLI
+- `npm install -g openclaw`
+- This repo cloned
 
-- **Node.js** and npm compatible with your installed `openclaw` CLI (check `openclaw --help` / [upstream OpenClaw](https://github.com/openclaw/openclaw) release notes if unsure)
-- OpenClaw installed globally: `npm install -g openclaw`
-- This **wrapper** repo cloned locally
-
-## 1) Prepare `.env`
-
-All wrapper scripts read **one file** at the repo root — **`.env`**.
+## 1. `.env`
 
 ```bash
 cp .env.raw.example .env
 ```
 
-(`openclaw-secure` / Docker uses [`.env.secure.example`](../../.env.secure.example) instead — same `.env` name, different template.)
+Set at least `OPENROUTER_API_KEY`. Optional: `BRAVE_API_KEY`, `TAVILY_API_KEY`, `OPENCLAW_CONFIG_DIR`, `OPENCLAW_WORKSPACES_DIR`, `OPENCLAW_GATEWAY_TOKEN` (empty = generated on setup), `OPENCLAW_GATEWAY_PORT`, `MV_API_URL` / `MV_API_KEY`.
 
-Edit `.env` and set:
-
-- `OPENROUTER_API_KEY` (chat models **and** semantic memory embeddings — same key), `BRAVE_API_KEY` (if used)
-- `TAVILY_API_KEY` if you use the Tavily plugin in `config/openclaw.native.json`
-- `OPENCLAW_WORKSPACES_DIR` (default: `$HOME/.openclaw/workspaces`)
-- `OPENCLAW_CONFIG_DIR` (default: `$HOME/.openclaw`)
-- `OPENCLAW_GATEWAY_TOKEN` (leave empty to auto-generate on first setup)
-- `OPENCLAW_GATEWAY_PORT` (default: 18789)
-- Optional: `MV_API_URL` and `MV_API_KEY` for **[`@messyvirgo/cli`](https://www.npmjs.com/package/@messyvirgo/cli)** (Messy Virgo HTTP API — bearer auth; same semantics as the platform CLI runbook)
-
-## 2) Bootstrap
+## 2. Bootstrap
 
 ```bash
 ./openclaw-raw/scripts/setup.sh
 ```
 
-This creates the config directory, copies `config/openclaw.native.json` to `$OPENCLAW_CONFIG_DIR/openclaw.json`, deploys workspace templates, runs **`npm install -g @messyvirgo/cli@latest`** (so `mv` is on your `PATH`), and generates a gateway token if missing. That template already includes the **builtin** memory stack (no separate memory bootstrap step).
+Copies `config/openclaw.json` → `$OPENCLAW_CONFIG_DIR/openclaw.json`, then sets **native** defaults (`gateway.bind`: loopback, `sandbox.mode`: all). Installs `@messyvirgo/cli` globally.
 
-## 3) Start the gateway
+## 3. Gateway
 
 ```bash
 ./openclaw-raw/scripts/gateway.sh
+# optional: ./openclaw-raw/scripts/gateway.sh --port 18789 --bind lan
 ```
 
-Or with explicit port and bind:
-
-```bash
-./openclaw-raw/scripts/gateway.sh --port 18789 --bind lan
-```
-
-## 4) Open the dashboard
-
-The dashboard requires the gateway token in the URL. Run:
+## 4. Dashboard / CLI
 
 ```bash
 ./openclaw-raw/scripts/dashboard.sh
-```
-
-This prints the tokenized URL (e.g. `http://127.0.0.1:18789/#token=...`). Open that URL in your browser. Without the token, you will see an unauthorized or empty start page.
-
-## 5) Run CLI commands
-
-```bash
 ./openclaw-raw/scripts/cli.sh status
-./openclaw-raw/scripts/cli.sh channels list
-./openclaw-raw/scripts/cli.sh agent --agent main --message "Hello"
 ```
 
-Or source `.env` and use `openclaw` directly:
+## Config
 
-```bash
-set -a && source .env && set +a
-export OPENCLAW_CONFIG_PATH=$OPENCLAW_CONFIG_DIR/openclaw.json
-export OPENCLAW_STATE_DIR=$OPENCLAW_CONFIG_DIR
-export OPENCLAW_WORKSPACES_DIR
-openclaw status
-```
+Single template: `config/openclaw.json` → deployed `openclaw.json`. Docker and native post-process bind/sandbox differently after copy.
 
-## Config files
+## Service (optional)
 
-| Mode   | Template                 | Deployed as                         |
-|--------|--------------------------|-------------------------------------|
-| Docker | `config/openclaw.json`   | `$OPENCLAW_CONFIG_DIR/openclaw.json` |
-| Native | `config/openclaw.native.json` | `$OPENCLAW_CONFIG_DIR/openclaw.json` |
+`openclaw gateway install` then systemd user or launchd — expose `OPENCLAW_CONFIG_PATH`, `OPENCLAW_WORKSPACES_DIR`, keys (e.g. `EnvironmentFile=`). See upstream docs.
 
-The native template uses `~/.openclaw/workspaces/main` as the default workspace and supports `OPENCLAW_WORKSPACES_DIR` for template deployment scripts. Export `OPENCLAW_WORKSPACES_DIR` when running the gateway or CLI directly (our scripts do this automatically). For custom skills, configure OpenClaw yourself (for example via packs under `~/.openclaw/` or `skills.load.extraDirs` in your deployed `openclaw.json`); this wrapper does not ship or mount a repo `skills/` tree.
+## Telegram
 
-## Running as a service
+[../../docs/TELEGRAM.md](../../docs/TELEGRAM.md) — use `./openclaw-raw/scripts/cli.sh` instead of `openclaw-secure`.
 
-**Linux (systemd user):**
-
-```bash
-openclaw gateway install
-systemctl --user enable --now openclaw-gateway
-```
-
-Ensure the service unit inherits `OPENCLAW_CONFIG_PATH`, `OPENCLAW_WORKSPACES_DIR`, and your API keys (e.g. via `EnvironmentFile=`).
-
-**macOS (launchd):**
-
-```bash
-openclaw gateway install
-```
-
-See OpenClaw docs for service configuration details.
-
-## Optional: Telegram
-
-To connect an agent to Telegram, create a bot via @BotFather, then register the channel with OpenClaw. See [docs/TELEGRAM.md](../../docs/TELEGRAM.md) for the full flow.
-
-**Native commands** (replace placeholders with your values):
-
-```bash
-./openclaw-raw/scripts/cli.sh channels add --channel telegram --account <account> --name "<agent-name>" --token "<telegram_bot_token>"
-./openclaw-raw/scripts/cli.sh agents bind --agent <agent-name> --bind telegram:<account>
-```
-
-After channel changes, restart the gateway (Ctrl+C, then `./openclaw-raw/scripts/gateway.sh`).
-
-## Upgrading
-
-To upgrade OpenClaw, refresh **`@messyvirgo/cli`** to the latest npm release, and optionally sync config or workspace templates:
+## Upgrade
 
 ```bash
 ./openclaw-raw/scripts/upgrade.sh
 ```
 
-The script runs **`npm install -g openclaw`** and **`npm install -g @messyvirgo/cli@latest`** each time.
+Options: `--sync-config`, `--sync-workspaces`, `--cleanup-bootstrap`, `--dry-run`.
 
-Options:
+## Memory
 
-- `--sync-workspaces` – Overwrite changed workspace templates (creates timestamped backups)
-- `--sync-config` – Overwrite `openclaw.json` from `config/openclaw.native.json` (creates backup)
-- `--cleanup-bootstrap` – Remove `BOOTSTRAP.md` from deployed workspaces
-- `--dry-run` – Show what would change without applying
-
-## Semantic memory (native)
-
-There is **no additional install step** for memory beyond bootstrap (`setup.sh`) and a valid **`OPENROUTER_API_KEY`**. Native and Docker both use the **builtin** engine + **OpenRouter** embeddings defined in the repo templates.
-
-**Optional verification** (gateway running, from repo root):
-
-```bash
-./openclaw-raw/scripts/cli.sh memory status --deep
-```
-
-You do **not** need `memory index --force` on a fresh install unless you are debugging or you **changed** embedding provider/model and want a full rebuild (see **[../../docs/MEMORY.md](../../docs/MEMORY.md)** §6 and §8).
+No extra install; `memory status --deep` when gateway is up. Reindex with `memory index --force` if you change embeddings. [../../docs/MEMORY.md](../../docs/MEMORY.md).

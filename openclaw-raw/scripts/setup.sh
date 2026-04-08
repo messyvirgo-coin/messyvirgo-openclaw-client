@@ -12,7 +12,7 @@ require_cmd openclaw
 require_cmd npm
 
 ENV_FILE="$REPO_ROOT/.env"
-CONFIG_SRC="$REPO_ROOT/config/openclaw.native.json"
+CONFIG_SRC="$REPO_ROOT/config/openclaw.json"
 
 # Ensure .env exists
 if [[ ! -f "$ENV_FILE" ]]; then
@@ -42,13 +42,14 @@ fi
 mkdir -p "$OPENCLAW_CONFIG_DIR"
 mkdir -p "$OPENCLAW_WORKSPACES_DIR"
 
-# Deploy native config (openclaw.native.json uses ${OPENCLAW_*} env vars)
+# Deploy shared template, then apply native-host overrides (bind/sandbox).
 dest="$OPENCLAW_CONFIG_DIR/openclaw.json"
 if [[ ! -f "$dest" ]]; then
   cp "$CONFIG_SRC" "$dest"
-  info "Wrote $dest (from config/openclaw.native.json)"
+  patch_openclaw_config_for_native "$dest"
+  info "Wrote $dest (from config/openclaw.json + native patch)"
 else
-  info "$dest already exists (leaving untouched). To refresh: cp $CONFIG_SRC $dest"
+  info "$dest already exists (leaving untouched). To refresh: ./openclaw-raw/scripts/upgrade.sh --sync-config"
 fi
 
 # Deploy workspace templates

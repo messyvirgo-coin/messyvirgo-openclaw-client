@@ -1,81 +1,30 @@
-# Telegram Setup
+# Telegram
 
-This guide covers the steps to create a Telegram bot, register it with OpenClaw, and pair it with an agent. Use the `openclaw-secure` commands for Docker and the `openclaw-raw` commands for native.
+Prereqs: gateway running; bot token from [@BotFather](https://t.me/BotFather) (`/newbot`). Never commit tokens.
 
-## Create A Bot
+Optional Messy Virgo shell API: `MV_API_URL` + `MV_API_KEY` in `.env` (see `.env` examples).
 
-1. Open Telegram and start a chat with `@BotFather`.
-2. Send `/newbot`.
-3. Choose a bot name and a username ending in `bot`.
-4. Copy the token BotFather returns and store it securely.
+Use **`./openclaw-secure/scripts/cli.sh`** below, or the same commands with **`./openclaw-raw/scripts/cli.sh`** for native.
 
-Do not commit real bot tokens. Put them in `.env` or paste them only when the CLI prompts for them.
-
-## Prerequisites
-
-- The gateway is running.
-- You know which agent to bind the channel to.
-- If the agent should use **Messy Virgo** via **`@messyvirgo/cli`** (shell), set `MV_API_URL` and `MV_API_KEY` in `.env` (Docker: compose passes them into the gateway; native: `gateway.sh` exports `.env` via `set -a`).
-
-The wrapper defaults Telegram to the `main` account, so the usual path is to register the bot under `main` and bind it to the `main` agent.
-
-## Register The Channel
+## Register + bind (default `main` agent)
 
 ```bash
-# Docker
-./openclaw-secure/scripts/cli.sh channels add --channel telegram --account main --name "Messy Virgo" --token "<telegram_bot_token>"
+./openclaw-secure/scripts/cli.sh channels add --channel telegram --account main --name "Messy Virgo" --token "<token>"
 ./openclaw-secure/scripts/cli.sh agents bind --agent main --bind telegram:main
-
-# Native
-./openclaw-raw/scripts/cli.sh channels add --channel telegram --account main --name "Messy Virgo" --token "<telegram_bot_token>"
-./openclaw-raw/scripts/cli.sh agents bind --agent main --bind telegram:main
 ```
 
-If you are setting up a second bot, change `--account` and bind that account to the target agent.
-
-## Set Group Policy
-
-Use `allowlist` for group chats unless you explicitly want an open trusted group. Telegram group allowlists use numeric Telegram user IDs.
+## Groups (allowlist example)
 
 ```bash
-# Docker
 ./openclaw-secure/scripts/cli.sh config set channels.telegram.groupPolicy '"allowlist"'
 ./openclaw-secure/scripts/cli.sh config set channels.telegram.accounts.main.groupPolicy '"allowlist"'
-./openclaw-secure/scripts/cli.sh config set channels.telegram.accounts.main.groupAllowFrom '["tg:<telegram_user_id>"]'
-
-# Native
-./openclaw-raw/scripts/cli.sh config set channels.telegram.groupPolicy '"allowlist"'
-./openclaw-raw/scripts/cli.sh config set channels.telegram.accounts.main.groupPolicy '"allowlist"'
-./openclaw-raw/scripts/cli.sh config set channels.telegram.accounts.main.groupAllowFrom '["tg:<telegram_user_id>"]'
+./openclaw-secure/scripts/cli.sh config set channels.telegram.accounts.main.groupAllowFrom '["tg:<numeric_user_id>"]'
 ```
 
-Replace `<telegram_user_id>` with the numeric Telegram user ID you want to allow.
-
-## Restart And Verify
+Restart gateway, then DM the bot; approve pairing:
 
 ```bash
-# Docker
-./openclaw-secure/scripts/down.sh
-./openclaw-secure/scripts/up.sh
-./openclaw-secure/scripts/cli.sh channels list
-./openclaw-secure/scripts/cli.sh agents list --bindings
-
-# Native
-./openclaw-raw/scripts/gateway.sh
-./openclaw-raw/scripts/cli.sh channels list
-./openclaw-raw/scripts/cli.sh agents list --bindings
+./openclaw-secure/scripts/cli.sh pairing approve telegram <code>
 ```
 
-## Pair The Bot
-
-The first message usually triggers a pairing code. Approve it with:
-
-```bash
-# Docker
-./openclaw-secure/scripts/cli.sh pairing approve telegram <pairing_code>
-
-# Native
-./openclaw-raw/scripts/cli.sh pairing approve telegram <pairing_code>
-```
-
-If the bot does not prompt immediately, send a simple message like `Hi` and try again.
+Upstream: [Telegram channel](https://docs.openclaw.ai/channels/telegram).

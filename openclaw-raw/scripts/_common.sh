@@ -33,6 +33,42 @@ load_env() {
   fi
 }
 
+# Shared repo template (config/openclaw.json) uses Docker-friendly defaults
+# (gateway.bind=lan, agents.defaults.sandbox.mode=off). Native hosts need
+# loopback bind + full tool sandbox; apply after copying the template.
+patch_openclaw_config_for_native() {
+  local path="$1"
+  [[ -f "$path" ]] || die "patch_openclaw_config_for_native: missing $path"
+  require_cmd python3
+  python3 - "$path" <<'PY'
+import json, os, sys
+
+path = sys.argv[1]
+with open(path) as f:
+    cfg = json.load(f)
+
+gw = cfg.setdefault("gateway", {})
+agents = cfg.setdefault("agents", {})
+defaults = agents.setdefault("defaults", {})
+sb = defaults.setdefault("sandbox", {})
+changed = False
+
+if gw.get("bind") != "loopback":
+    gw["bind"] = "loopback"
+    changed = True
+if sb.get("mode") != "all":
+    sb["mode"] = "all"
+    changed = True
+
+if changed:
+    with open(path, "w") as f:
+        json.dump(cfg, f, indent=2)
+        f.write("\n")
+    if os.environ.get("PATCH_OC_QUIET") != "1":
+        print("==> Patched gateway.bind + sandbox.mode for native host in " + path)
+PY
+}
+
 workspace_dir_for_agent() {
   local workspace_root="$1"
   local agent_id="$2"

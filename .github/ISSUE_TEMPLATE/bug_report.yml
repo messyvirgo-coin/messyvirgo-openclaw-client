@@ -1,5 +1,5 @@
 name: Bug report
-description: Report a problem with the Docker wrapper/scripts
+description: Report a problem with wrapper scripts or docs
 labels: ["bug"]
 body:
   - type: markdown

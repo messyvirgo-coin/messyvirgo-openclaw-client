@@ -14,7 +14,7 @@ alwaysApply: true
 
 ## Primary Customization Areas
 
-- Prefer editing `config/openclaw.json` (Docker) and `config/openclaw.native.json` (native) for wrapper baseline gateway/model/tool defaults.
+- Prefer editing `config/openclaw.json` for wrapper baseline gateway/model/tool defaults (shared template; native setup/upgrade patches `gateway.bind` + `agents.defaults.sandbox.mode` after deploy).
 - Prefer editing `openclaw-secure/docker-compose*.yml` and `openclaw-secure/scripts/*.sh` for Docker deployment; `openclaw-raw/scripts/*.sh` for native.
 - Prefer editing external agent-pack repos for managed agent profiles, pack skills, config fragments, and pack lifecycle scripts.
 
