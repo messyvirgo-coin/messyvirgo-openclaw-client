@@ -180,7 +180,7 @@ refresh_openclaw_pnpm_lockfile() {
   ) || die "pnpm install failed in $src (could not refresh lockfile)"
 }
 
-# Fetch origin; check out OPENCLAW_GIT_REF if set, else newest v* tag (aligned with upgrade.sh).
+# Fetch origin; check out OPENCLAW_GIT_REF if set, else highest stable v* tag by semver (aligned with upgrade.sh).
 openclaw_sync_and_checkout_openclaw_source() {
   local src="${1:?}"
   local repo="${2:?}"
@@ -194,12 +194,17 @@ openclaw_sync_and_checkout_openclaw_source() {
       git -C "$src" reset --hard "origin/${OPENCLAW_GIT_REF}"
     fi
   else
+    # Semver order (--sort=-v:refname) ranks prereleases (e.g. v2026.4.9-beta.1) above the matching
+    # stable (v2026.4.9). Prefer the highest tag without "-beta" in the name, then fall back.
     local tag
-    tag="$(git -C "$src" tag -l 'v*' --sort=-v:refname | head -n 1)"
+    tag="$(git -C "$src" tag -l 'v*' --sort=-v:refname | grep -v -- '-beta' | head -n 1)"
+    if [[ -z "$tag" ]]; then
+      tag="$(git -C "$src" tag -l 'v*' --sort=-v:refname | head -n 1)"
+    fi
     if [[ -z "$tag" ]]; then
       die "No v* release tags in $src. Set OPENCLAW_GIT_REF in .env (e.g. main)."
     fi
-    info "Checking out $tag"
+    info "Checking out $tag (highest stable v* by semver)"
     git -C "$src" -c advice.detachedHead=false checkout --force "$tag"
   fi
   info "OpenClaw $(git -C "$src" log -1 --oneline)"

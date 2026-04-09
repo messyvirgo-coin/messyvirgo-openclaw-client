@@ -104,7 +104,7 @@ bash -lc 'source ./openclaw-secure/scripts/_common.sh && compose run --rm --entr
 ./openclaw-secure/scripts/upgrade.sh
 ```
 
-Tracks latest upstream `v*` tag unless `OPENCLAW_GIT_REF` is set (e.g. `main`). Rebuilds image (including `npm` + `@messyvirgo/cli` overlay). `--sync-config` / `--sync-workspaces` overwrite deployed templates (back up first).
+Tracks the highest stable upstream `v*` tag by semver (prereleases with `-beta` in the tag name are skipped unless no other `v*` tags exist) unless `OPENCLAW_GIT_REF` is set (e.g. `main`). Rebuilds image (including `npm` + `@messyvirgo/cli` overlay). `--sync-config` / `--sync-workspaces` overwrite deployed templates (back up first).
 
 ## 12. Uninstall
 

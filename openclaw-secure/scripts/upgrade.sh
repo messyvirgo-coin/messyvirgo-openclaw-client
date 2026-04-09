@@ -29,7 +29,7 @@ while [[ $# -gt 0 ]]; do
 Usage: $0 [options]
 
 Environment (from .env):
-  OPENCLAW_GIT_REF   Git ref to check out after fetch (default: latest v* release tag).
+  OPENCLAW_GIT_REF   Git ref to check out after fetch (default: highest stable v* tag by semver, excluding -beta).
 
 Options:
   --sync-workspaces    Overwrite changed workspace templates (creates .bak timestamped backups)
