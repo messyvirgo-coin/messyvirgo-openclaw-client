@@ -239,12 +239,20 @@ if [[ -n "${OPENCLAW_NODE_BOOKWORM_IMAGE:-}" ]]; then
   OPENCLAW_DOCKER_BUILD_EXTRA_ARGS+=(--build-arg "OPENCLAW_NODE_BOOKWORM_IMAGE=$OPENCLAW_NODE_BOOKWORM_IMAGE")
   info "OpenClaw Dockerfile base: OPENCLAW_NODE_BOOKWORM_IMAGE=$OPENCLAW_NODE_BOOKWORM_IMAGE"
 fi
-docker build \
-  --build-arg "OPENCLAW_DOCKER_APT_PACKAGES=${OPENCLAW_DOCKER_APT_PACKAGES:-jq}" \
-  "${OPENCLAW_DOCKER_BUILD_EXTRA_ARGS[@]}" \
-  -t "$OPENCLAW_IMAGE" \
-  -f "$OPENCLAW_SRC_DIR/Dockerfile" \
-  "$OPENCLAW_SRC_DIR"
+if [[ ${#OPENCLAW_DOCKER_BUILD_EXTRA_ARGS[@]} -gt 0 ]]; then
+  docker build \
+    --build-arg "OPENCLAW_DOCKER_APT_PACKAGES=${OPENCLAW_DOCKER_APT_PACKAGES:-jq}" \
+    "${OPENCLAW_DOCKER_BUILD_EXTRA_ARGS[@]}" \
+    -t "$OPENCLAW_IMAGE" \
+    -f "$OPENCLAW_SRC_DIR/Dockerfile" \
+    "$OPENCLAW_SRC_DIR"
+else
+  docker build \
+    --build-arg "OPENCLAW_DOCKER_APT_PACKAGES=${OPENCLAW_DOCKER_APT_PACKAGES:-jq}" \
+    -t "$OPENCLAW_IMAGE" \
+    -f "$OPENCLAW_SRC_DIR/Dockerfile" \
+    "$OPENCLAW_SRC_DIR"
+fi
 
 info "Pinning npm and installing @messyvirgo/cli in runtime image (${MESSYVIRGO_CLI_VERSION:-latest})"
 docker build \
