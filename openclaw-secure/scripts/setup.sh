@@ -266,9 +266,9 @@ if [[ -f "$f" ]]; then
     info "Wrote $dest"
   else
     info "$(basename "$f") already exists at $dest (leaving untouched)"
+    info "Existing config in $OPENCLAW_CONFIG_DIR left unchanged; merge template updates manually if needed."
   fi
 fi
-info "Existing config in $OPENCLAW_CONFIG_DIR left unchanged; merge template updates manually if needed."
 
 deploy_workspace_templates \
   "$REPO_ROOT" \
