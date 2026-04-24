@@ -114,7 +114,7 @@ fi
 DEFAULT_SRC_DIR="$(openclaw_host_src_dir)"
 DEFAULT_GIT_REPO="${OPENCLAW_GIT_REPO:-https://github.com/openclaw/openclaw}"
 DEFAULT_IMAGE="${OPENCLAW_IMAGE:-openclaw-secure:local}"
-DEFAULT_NPM_VERSION="${OPENCLAW_NPM_VERSION:-11.11.1}"
+DEFAULT_NPM_VERSION="${OPENCLAW_NPM_VERSION:-11.13.0}"
 
 if [[ "$INTERACTIVE" == "1" ]]; then
   OPENCLAW_CONFIG_DIR="$(prompt_default "Host config/state directory" "$DEFAULT_CONFIG_DIR")"

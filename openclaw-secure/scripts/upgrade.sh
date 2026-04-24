@@ -53,7 +53,7 @@ if [[ -z "${OPENCLAW_GIT_REPO:-}" ]]; then
   OPENCLAW_GIT_REPO="https://github.com/openclaw/openclaw"
 fi
 if [[ -z "${OPENCLAW_NPM_VERSION:-}" ]]; then
-  OPENCLAW_NPM_VERSION="11.11.1"
+  OPENCLAW_NPM_VERSION="11.13.0"
 fi
 
 OPENCLAW_CONFIG_DIR="$(openclaw_host_config_dir)"
