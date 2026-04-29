@@ -22,7 +22,10 @@ services:
       nofile:
         soft: 4096
         hard: 8192
-      nproc: 4096
+      # Do not set nproc: RLIMIT_NPROC is per real UID on the host. A matching
+      # container UID + a busy desktop can exceed a low nproc before the first
+      # exec, causing "resource temporarily unavailable" / EAGAIN fork errors.
+      # pids_limit (above) caps this cgroup without that cross-host interaction.
 
   openclaw-cli:
     read_only: true
